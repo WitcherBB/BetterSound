@@ -1,0 +1,35 @@
+{
+  "creativetab.bettersound.title": "更好的声音",
+
+  "item.bettersound.school_song_music_disc": "音乐唱片",
+  "item.bettersound.school_song_music_disc.desc": "山东理工大学校歌",
+  "item.bettersound.happy_to_fly_forward_music_disc": "音乐唱片",
+  "item.bettersound.happy_to_fly_forward_music_disc.desc": "VIVI - 开心往前飞",
+  "item.bettersound.excited1_music_disc": "音乐唱片",
+  "item.bettersound.excited1_music_disc.desc": "中国人民解放军军团 - 运动员进行曲",
+  "item.bettersound.excited2_music_disc": "音乐唱片",
+  "item.bettersound.excited2_music_disc.desc": "横田真人 - Super Mario Galaxy",
+  "item.bettersound.awarding_music_disc": "音乐唱片",
+  "item.bettersound.awarding_music_disc.desc": "经典颁奖音乐",
+  "item.bettersound.ending_music_disc": "音乐唱片",
+  "item.bettersound.ending_music_disc.desc": "李谷一 - 难忘今宵",
+  "item.bettersound.small_town_music_disc": "音乐唱片",
+  "item.bettersound.small_town_music_disc.desc": "陶喆 - 小镇姑娘(Live)",
+  "item.bettersound.see_you_again_music_disc": "音乐唱片",
+  "item.bettersound.see_you_again_music_disc.desc": "Wiz Khalifa & Charlie Puth - See You Again",
+  "item.bettersound.ldcxq_music_disc": "音乐唱片",
+  "item.bettersound.ldcxq_music_disc.desc": "牢大处刑曲",
+  "item.bettersound.tuner": "调音器",
+
+  "block.bettersound.jukebox_controller": "唱片机控制器",
+  "block.bettersound.example_block": "例子",
+  "block.bettersound.jukebox.name_input": "名称:",
+  "block.bettersound.jukebox.tip.fail": "保存失败! 未找到指定控制器",
+  "block.bettersound.jukebox.tip.null": "输入不能为空!",
+  "block.bettersound.jukebox.tip.success": "保存成功!",
+  "block.bettersound.note_block.title": "键盘",
+  "block.bettersound.piano_block": "钢琴方块",
+  "block.bettersound.piano_block.title": "键盘",
+  "block.bettersound.confine_pedal": "制音踏板"
+
+}

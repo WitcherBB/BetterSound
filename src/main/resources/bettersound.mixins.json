@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "verbose": true,
+  "minVersion": "0.8",
+  "package": "com.witcherbb.bettersound.mixins.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mixin.refmap.json",
+  "plugin": "com.witcherbb.bettersound.mixins.mixins.MixinPlugin",
+  "mixins": [
+    "JukeboxBlockEntityMixin",
+    "JukeboxMixin",
+    "MinecraftServerMixin",
+    "NoteBlockMixin",
+    "RecordItemMixin"
+  ],
+  "client": [
+    "MinecraftMixin",
+    "SoundEngineMixin",
+    "SoundInstanceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,steped=false": {
+      "model": "bettersound:block/confine_pedal"
+    },
+    "facing=north,steped=true": {
+      "model": "bettersound:block/confine_pedal_down"
+    },
+    "facing=east,steped=false": {
+      "model": "bettersound:block/confine_pedal",
+      "y": 90
+    },
+    "facing=east,steped=true": {
+      "model": "bettersound:block/confine_pedal_down",
+      "y": 90
+    },
+    "facing=south,steped=false": {
+      "model": "bettersound:block/confine_pedal",
+      "y": 180
+    },
+    "facing=south,steped=true": {
+      "model": "bettersound:block/confine_pedal_down",
+      "y": 180
+    },
+    "facing=west,steped=false": {
+      "model": "bettersound:block/confine_pedal",
+      "y": 270
+    },
+    "facing=west,steped=true": {
+      "model": "bettersound:block/confine_pedal_down",
+      "y": 270
+    }
+  }
+}

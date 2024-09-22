@@ -1,0 +1,35 @@
+{
+  "creativetab.bettersound.title": "Better Sound",
+
+  "item.bettersound.school_song_music_disc": "Music Disc",
+  "item.bettersound.school_song_music_disc.desc": "SDUT School Song",
+  "item.bettersound.happy_to_fly_forward_music_disc": "Music Disc",
+  "item.bettersound.happy_to_fly_forward_music_disc.desc": "VIVI - Happy to fly forward",
+  "item.bettersound.excited1_music_disc": "Music Disc",
+  "item.bettersound.excited1_music_disc.desc": "The Army of the People's Liberation Army - The Athletes' March",
+  "item.bettersound.excited2_music_disc": "Music Disc",
+  "item.bettersound.excited2_music_disc.desc": "Yokota Mahito - Super Mario Galaxy",
+  "item.bettersound.awarding_music_disc": "Music Disc",
+  "item.bettersound.awarding_music_disc.desc": "Classic Award Music",
+  "item.bettersound.ending_music_disc": "Music Disc",
+  "item.bettersound.ending_music_disc.desc": "Li Guyi - Unforgettable Tonight",
+  "item.bettersound.small_town_music_disc": "Music Disc",
+  "item.bettersound.small_town_music_disc.desc": "David Tao - Small Town Girl (Live)",
+  "item.bettersound.see_you_again_music_disc": "Music Disc",
+  "item.bettersound.see_you_again_music_disc.desc": "Wiz Khalifa & Charlie Puth - See You Again",
+  "item.bettersound.ldcxq_music_disc": "Music Disc",
+  "item.bettersound.ldcxq_music_disc.desc": "See You Again (x2)",
+  "item.bettersound.tuner": "Tuner",
+
+  "block.bettersound.jukebox_controller": "Jukebox Controller",
+  "block.bettersound.example_block": "Example Block",
+  "block.bettersound.jukebox.name_input": "Connection String:",
+  "block.bettersound.jukebox.tip.fail": "Save failed, specified controller not found",
+  "block.bettersound.jukebox.tip.null": "The input cannot be empty!",
+  "block.bettersound.jukebox.tip.success": "Save successfully!",
+  "block.bettersound.note_block.title": "Keyboard",
+  "block.bettersound.piano_block": "Piano Block",
+  "block.bettersound.piano_block.title": "Keyboard",
+  "block.bettersound.confine_pedal": "Confine Pedal"
+
+}

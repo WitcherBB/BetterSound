@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "_": {
+      "item": "minecraft:emerald"
+    },
+    "#": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "pattern": [
+    "WRW",
+    "#_#",
+    "###"
+  ],
+  "result": {
+    "item": "bettersound:jukebox_controller"
+  },
+  "show_notification": true
+}
