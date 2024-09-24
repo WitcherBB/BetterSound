@@ -18,6 +18,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -27,6 +28,7 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -117,6 +119,16 @@ public class ModEventHandler {
 			}
 		}
 
+		@SubscribeEvent
+		public static void onBlockBreak(BlockEvent.BreakEvent event) {
+			Player player = event.getPlayer();
+			BlockPos pos = event.getPos();
+			BlockState state = event.getState();
+
+			if (state.getBlock() instanceof BedBlock) {
+				System.out.println("bed");
+			}
+		}
 
 	}
 
