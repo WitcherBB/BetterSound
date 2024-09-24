@@ -7,6 +7,7 @@ import com.witcherbb.bettersound.blocks.state.properties.BlockPart;
 import com.witcherbb.bettersound.blocks.state.properties.ExamplePart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -82,7 +83,12 @@ public class ExampleBlock extends BaseEntityBlock implements CombinedBlock<Examp
 
 	@Override
 	public @Nullable BlockState getStateForPlacement(BlockPlaceContext pContext) {
-		return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite());
+		Direction facing = pContext.getHorizontalDirection().getOpposite();
+		BlockPos thisPos = pContext.getClickedPos();
+		BlockPos combinedPos = thisPos.relative(facing.getCounterClockWise());
+		Level level = pContext.getLevel();
+
+		return level.getBlockState(combinedPos).canBeReplaced() && level.getWorldBorder().isWithinBounds(combinedPos) ? this.defaultBlockState().setValue(FACING, facing) : null;
 	}
 
 	@Override
