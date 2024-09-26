@@ -40,7 +40,7 @@ public class ExampleBlockEntity extends BlockEntity implements MenuProvider, Tic
 
 	@Override
 	public @NotNull Component getDisplayName() {
-		return Component.translatable("block.sdutmod.example_block");
+		return Component.translatable("block.bettersound.example_block");
 	}
 
 	@Nullable

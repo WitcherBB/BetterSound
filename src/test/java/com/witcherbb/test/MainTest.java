@@ -10,11 +10,7 @@ import java.util.*;
 public class MainTest {
     @Test
     public void test() {
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(0);
-        list.remove(0);
-        list.remove(0);
-        System.out.println(list);
+        System.out.println(check(Comparable.class));
     }
 
     public int getZero(float num, int start, float offset) {
@@ -23,6 +19,11 @@ public class MainTest {
         } else {
             return start;
         }
+    }
+
+    public <T extends Comparable<?>> boolean check(Class<T> clazz) {
+        Pojo pojo = new Pojo(1);
+        return clazz.isInstance(pojo);
     }
 
     public static class Pojo implements Comparable<Pojo> {

@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.blocks;
 
+import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -28,41 +29,22 @@ public class ConfinePedalBlock extends HorizontalDirectionalBlock {
     protected static final VoxelShape N_L_PEDAL_SHAPE = Block.box(3.0D, 3.0D, 8.0D, 5.0D, 4.0D, 14.0D);
     protected static final VoxelShape N_M_PEDAL_SHAPE = Block.box(7.0D, 3.0D, 8.0D, 9.0D, 4.0D, 14.0D);
     protected static final VoxelShape N_R_PEDAL_SHAPE = Block.box(11.0D, 3.0D, 8.0D, 13.0D, 4.0D, 14.0D);
-    protected static final VoxelShape E_FRAME_SHAPE = rotateShapeY(N_FRAME_SHAPE, 90.0D);
-    protected static final VoxelShape E_L_PEDAL_SHAPE = rotateShapeY(N_L_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape E_M_PEDAL_SHAPE = rotateShapeY(N_M_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape E_R_PEDAL_SHAPE = rotateShapeY(N_R_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape S_FRAME_SHAPE = rotateShapeY(N_FRAME_SHAPE, 180.0D);
-    protected static final VoxelShape S_L_PEDAL_SHAPE = rotateShapeY(N_L_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape S_M_PEDAL_SHAPE = rotateShapeY(N_M_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape S_R_PEDAL_SHAPE = rotateShapeY(N_R_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape W_FRAME_SHAPE = rotateShapeY(N_FRAME_SHAPE, 270.0D);
-    protected static final VoxelShape W_L_PEDAL_SHAPE = rotateShapeY(N_L_PEDAL_SHAPE, 270.0D);
-    protected static final VoxelShape W_M_PEDAL_SHAPE = rotateShapeY(N_M_PEDAL_SHAPE, 270.0D);
-    protected static final VoxelShape W_R_PEDAL_SHAPE = rotateShapeY(N_R_PEDAL_SHAPE, 270.0D);
+    protected static final VoxelShape E_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 90.0D);
+    protected static final VoxelShape E_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 90.0D);
+    protected static final VoxelShape E_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 90.0D);
+    protected static final VoxelShape E_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 90.0D);
+    protected static final VoxelShape S_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 180.0D);
+    protected static final VoxelShape S_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 180.0D);
+    protected static final VoxelShape S_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 180.0D);
+    protected static final VoxelShape S_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 180.0D);
+    protected static final VoxelShape W_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 270.0D);
+    protected static final VoxelShape W_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 270.0D);
+    protected static final VoxelShape W_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 270.0D);
+    protected static final VoxelShape W_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 270.0D);
 
     public ConfinePedalBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(getStateDefinition().any().setValue(POWERED, false).setValue(FACING, Direction.NORTH).setValue(STEPED, false));
-    }
-
-    protected static VoxelShape rotateShapeY(VoxelShape shape, double angle) {
-        int times = (int) Math.floor(angle / 90) % 4;
-        double minX = shape.min(Direction.Axis.X);
-        double maxX = shape.max(Direction.Axis.X);
-        double minY = shape.min(Direction.Axis.Y);
-        double maxY = shape.max(Direction.Axis.Y);
-        double minZ = shape.min(Direction.Axis.Z);
-        double maxZ = shape.max(Direction.Axis.Z);
-        double size = 1.0D;
-
-        return switch (times) {
-            case 0 -> Shapes.box(minX, minY, minZ, maxX, maxY, maxZ);
-            case 1 -> Shapes.box(size - maxZ, minY, minX, size - minZ, maxY, maxX);
-            case 2 -> Shapes.box(size - maxX, minY, size - maxZ, size - minX, maxY, size - minZ);
-            case 3 -> Shapes.box(minZ, minY, size - maxX, maxZ, maxY, size - minX);
-            default -> throw new IllegalStateException("Shape Wrong!");
-        };
     }
 
     @Override
