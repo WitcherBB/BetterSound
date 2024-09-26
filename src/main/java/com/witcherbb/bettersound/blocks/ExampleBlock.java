@@ -75,7 +75,7 @@ public class ExampleBlock extends BaseEntityBlock implements CombinedBlock<Examp
 	public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
 		if (!pLevel.isClientSide) {
 			BlockPos pos = pPos.relative(this.getCombinedDirection(pState.getValue(PART), pState.getValue(FACING)));
-			pLevel.setBlock(pos, pState.setValue(PART, ExamplePart.SECOND), ExampleBlock.UPDATE_ALL);
+			pLevel.setBlock(pos, this.getCombinedState(ExamplePart.FIRST, pState), ExampleBlock.UPDATE_ALL);
 			pLevel.blockUpdated(pPos, Blocks.AIR);
 			pState.updateNeighbourShapes(pLevel, pPos, ExampleBlock.UPDATE_ALL);
 		}
@@ -122,6 +122,14 @@ public class ExampleBlock extends BaseEntityBlock implements CombinedBlock<Examp
 		return switch (part) {
 			case FIRST -> facing.getCounterClockWise();
             case SECOND -> facing.getClockWise();
+        };
+	}
+
+	@Override
+	public BlockState getCombinedState(ExamplePart part, BlockState state) {
+		return switch (part) {
+            case FIRST -> state.setValue(PART, ExamplePart.SECOND);
+			default -> null;
         };
 	}
 }

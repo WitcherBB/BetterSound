@@ -2,6 +2,9 @@ package com.witcherbb.bettersound.blocks;
 
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
+import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
+import com.witcherbb.bettersound.blocks.state.properties.ExamplePart;
+import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.items.TunerItem;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
@@ -16,38 +19,90 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PianoBlock extends BaseEntityBlock {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PianoBlock extends BaseEntityBlock implements CombinedBlock<PianoPart> {
     public static IntegerProperty TONE = IntegerProperty.create("tone", 0, 87);
     public static BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static EnumProperty<PianoPart> PART = EnumProperty.create("part", PianoPart.class);
+    public static DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    private static PianoPart LAST_PART = PianoPart.PEDAL_L;
 
     protected PianoBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(TONE, 0).setValue(POWERED, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(TONE, 0).setValue(POWERED, false).setValue(PART, PianoPart.PEDAL));
+    }
+
+    @Override
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
+        PianoPart part = pState.getValue(PART);
+        if (!pLevel.isClientSide && part != LAST_PART) {
+            BlockState state = pState;
+            while ((state = this.getCombinedState(state.getValue(PART), state)) != null) {
+                BlockPos pos = pPos.relative(this.getCombinedDirection(pState.getValue(PART), pState.getValue(FACING)));
+                pLevel.setBlock(pos, state, ExampleBlock.UPDATE_ALL);
+                pLevel.blockUpdated(pPos, Blocks.AIR);
+                state.updateNeighbourShapes(pLevel, pPos, ExampleBlock.UPDATE_ALL);
+                pPos = pos;
+                pState = state;
+            }
+        }
     }
 
     @Override
     public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext pContext) {
-        return super.getStateForPlacement(pContext);
+        Direction facing = pContext.getHorizontalDirection().getOpposite();
+        BlockPos thisPos = pContext.getClickedPos();
+        Level level = pContext.getLevel();
+
+        List<BlockPos> posList = new ArrayList<>();
+        posList.add(thisPos.relative(facing.getCounterClockWise()));
+        posList.add(thisPos.relative(facing.getClockWise()));
+        posList.add(thisPos.relative(Direction.UP));
+        posList.add(thisPos.relative(facing.getCounterClockWise()).relative(Direction.UP));
+        posList.add(thisPos.relative(facing.getClockWise()).relative(Direction.UP));
+
+        boolean flag = true;
+        int size = posList.size();
+        for (int i = 0; i < size; i++) {
+            BlockPos pos = posList.get(i);
+            if (!level.getBlockState(pos).canBeReplaced() || !level.getWorldBorder().isWithinBounds(pos)) {
+                flag = false;
+                break;
+            }
+        }
+        return flag ? this.defaultBlockState().setValue(FACING, facing) : null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pPos, BlockPos pNeighborPos) {
+        if (pDirection == this.getCombinedDirection(pState.getValue(PART), pState.getValue(FACING))) {
+            return pNeighborState.is(this) && pNeighborState.getValue(PART) != pState.getValue(PART) ? pState.setValue(TONE, pNeighborState.getValue(TONE)) : Blocks.AIR.defaultBlockState();
+        }
+        return super.updateShape(pState, pDirection, pNeighborState, pLevel, pPos, pNeighborPos);
     }
 
     @Override
@@ -175,17 +230,34 @@ public class PianoBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        super.tick(pState, pLevel, pPos, pRandom);
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(TONE, POWERED);
+        pBuilder.add(TONE, POWERED, PART, FACING);
     }
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
         return TickableBlockEntity.createTicker();
+    }
+
+    @Override
+    public Direction getCombinedDirection(PianoPart part, Direction facing) {
+        return switch (part) {
+            case PEDAL, PEDAL_L -> facing.getCounterClockWise();
+            case PEDAL_R -> Direction.UP;
+            case KEYBOARD_R, KEYBOARD_M -> facing.getClockWise();
+            case KEYBOARD_L -> Direction.DOWN;
+        };
+    }
+
+    @Override
+    public BlockState getCombinedState(PianoPart part, BlockState state) {
+        return switch (part) {
+            case PEDAL -> state.setValue(PART, PianoPart.PEDAL_R);
+            case PEDAL_R -> state.setValue(PART, PianoPart.KEYBOARD_R);
+            case KEYBOARD_R -> state.setValue(PART, PianoPart.KEYBOARD_M);
+            case KEYBOARD_M -> state.setValue(PART, PianoPart.KEYBOARD_L);
+            case KEYBOARD_L -> state.setValue(PART, PianoPart.PEDAL_L);
+            case PEDAL_L -> null;
+        };
     }
 }

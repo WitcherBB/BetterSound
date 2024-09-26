@@ -11,4 +11,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public interface CombinedBlock<P extends BlockPart> {
     Direction getCombinedDirection(P part, Direction baseDirection);
+
+    BlockState getCombinedState(P part, BlockState state);
 }
