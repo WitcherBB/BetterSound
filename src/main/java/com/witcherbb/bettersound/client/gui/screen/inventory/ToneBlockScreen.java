@@ -2,15 +2,11 @@ package com.witcherbb.bettersound.client.gui.screen.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
-import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.menu.inventory.ToneBlockMenu;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.menu.inventory.PianoBlockMenu;
-import com.witcherbb.bettersound.network.protocol.SPianoKeyPressedPacket;
-import com.witcherbb.bettersound.network.protocol.SPianoKeyReleasedPacket;
 import com.witcherbb.bettersound.network.protocol.SToneKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.SToneKeyReleasedPacket;
 import net.minecraft.client.Minecraft;
@@ -303,7 +299,7 @@ public class ToneBlockScreen extends AbstractContainerScreen<ToneBlockMenu> {
             if (minecraft != null) {
                 BlockPos pos = ToneBlockScreen.this.blockEntity.getBlockPos();
                 ModNetwork.sendToServer(new SToneKeyPressedPacket(pos, this.id));
-                minecraftExtender.getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
+                minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
             }
         }
 
@@ -375,7 +371,7 @@ public class ToneBlockScreen extends AbstractContainerScreen<ToneBlockMenu> {
             BlockPos pos = ToneBlockScreen.this.blockEntity.getBlockPos();
             if (!fatherInstance.blockEntity.isSoundDelay())
                 if (minecraft != null) {
-                    minecraftExtender.getmodSoundManager().tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
+                    minecraftExtender.betterSound$getmodSoundManager().tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
                 }
             ModNetwork.sendToServer(new SToneKeyReleasedPacket(pos, this.id, !fatherInstance.blockEntity.isSoundDelay()));
         }

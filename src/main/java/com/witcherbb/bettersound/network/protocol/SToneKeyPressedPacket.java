@@ -33,7 +33,7 @@ public record SToneKeyPressedPacket(BlockPos pos, int tone) {
             level.setBlock(pos, state, ToneBlock.UPDATE_ALL);
             if (state.getBlock() instanceof ToneBlock toneBlock) {
                 toneBlock.playSound(sender, state, level, pos);
-                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).getModDataManager().putLastTone(packet.pos, sender.getUUID(), packet.tone());
+                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().putLastTone(packet.pos, sender.getUUID(), packet.tone());
             }
         });
         ctx.get().setPacketHandled(true);

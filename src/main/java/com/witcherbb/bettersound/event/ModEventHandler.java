@@ -1,7 +1,6 @@
 package com.witcherbb.bettersound.event;
 
 import com.witcherbb.bettersound.BetterSound;
-import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
 import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
@@ -16,11 +15,9 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -28,10 +25,8 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -64,7 +59,13 @@ public class ModEventHandler {
 		@SubscribeEvent
 		public static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
 			if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
-				event.accept(ModItems.ITEM_CONFINE_PEDAL);
+				event.accept(ModItems.ITEM_SUSTAIN_PEDAL);
+				event.accept(ModItems.ITEM_TONE_BLOCK);
+			} else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+				event.accept(ModItems.ITEM_PIANO_VOICE_CORE.get());
+				event.accept(ModItems.ITEM_KEYBOARD.get());
+				event.accept(ModItems.ITEM_WHITE_KEY.get());
+				event.accept(ModItems.ITEM_BLACK_KEY.get());
 			}
 		}
 

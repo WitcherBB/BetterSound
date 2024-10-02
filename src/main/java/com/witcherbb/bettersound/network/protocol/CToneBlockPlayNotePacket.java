@@ -33,7 +33,7 @@ public record CToneBlockPlayNotePacket(UUID playerUUID, BlockPos pos, int tone, 
 
     public static void handle(CToneBlockPlayNotePacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).getmodSoundManager();
+            ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).betterSound$getmodSoundManager();
             if (Minecraft.getInstance().level != null) {
                 BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.pos);
                 if (packet.stop) {

@@ -21,28 +21,29 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ConfinePedalBlock extends HorizontalDirectionalBlock {
+public class SustainPedalBlock extends HorizontalDirectionalBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty STEPED = BooleanProperty.create("steped");
 
-    protected static final VoxelShape N_FRAME_SHAPE = Block.box(0.0D, 0.0D, 14.0D, 16.0D, 6.0D, 16.0D);
-    protected static final VoxelShape N_L_PEDAL_SHAPE = Block.box(3.0D, 3.0D, 8.0D, 5.0D, 4.0D, 14.0D);
-    protected static final VoxelShape N_M_PEDAL_SHAPE = Block.box(7.0D, 3.0D, 8.0D, 9.0D, 4.0D, 14.0D);
-    protected static final VoxelShape N_R_PEDAL_SHAPE = Block.box(11.0D, 3.0D, 8.0D, 13.0D, 4.0D, 14.0D);
-    protected static final VoxelShape E_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 90.0D);
-    protected static final VoxelShape E_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape E_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape E_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 90.0D);
-    protected static final VoxelShape S_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 180.0D);
-    protected static final VoxelShape S_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape S_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape S_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 180.0D);
-    protected static final VoxelShape W_FRAME_SHAPE = ShapeUtil.rotateShapeY(N_FRAME_SHAPE, 270.0D);
-    protected static final VoxelShape W_L_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_L_PEDAL_SHAPE, 270.0D);
-    protected static final VoxelShape W_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 270.0D);
-    protected static final VoxelShape W_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 270.0D);
+    protected static final VoxelShape N_PEDAL_SHAPE;
+    protected static final VoxelShape E_PEDAL_SHAPE;
+    protected static final VoxelShape S_PEDAL_SHAPE;
+    protected static final VoxelShape W_PEDAL_SHAPE;
 
-    protected ConfinePedalBlock(Properties pProperties) {
+    static {
+        N_PEDAL_SHAPE = Shapes.or(
+                Block.box(0.0, 0.0, 15.0, 16.0, 6.0, 16.0),
+                Block.box(3.0, 3.0, 9.0, 5.0, 4.0, 15.0),
+                Block.box(7.0, 3.0, 9.0, 9.0, 4.0, 15.0),
+                Block.box(11.0, 3.0, 9.0, 13.0, 4.0, 15.0)
+        );
+        VoxelShape[] shapes = ShapeUtil.getESWShapes(N_PEDAL_SHAPE);
+        E_PEDAL_SHAPE = shapes[0];
+        S_PEDAL_SHAPE = shapes[1];
+        W_PEDAL_SHAPE = shapes[2];
+    }
+
+    protected SustainPedalBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(getStateDefinition().any().setValue(POWERED, false).setValue(FACING, Direction.NORTH).setValue(STEPED, false));
     }
@@ -50,10 +51,10 @@ public class ConfinePedalBlock extends HorizontalDirectionalBlock {
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         return switch (pState.getValue(FACING)) {
-            case NORTH -> Shapes.or(N_FRAME_SHAPE, N_L_PEDAL_SHAPE, N_M_PEDAL_SHAPE, N_R_PEDAL_SHAPE);
-            case WEST -> Shapes.or(W_FRAME_SHAPE, W_L_PEDAL_SHAPE, W_M_PEDAL_SHAPE, W_R_PEDAL_SHAPE);
-            case EAST -> Shapes.or(E_FRAME_SHAPE, E_L_PEDAL_SHAPE, E_M_PEDAL_SHAPE, E_R_PEDAL_SHAPE);
-            case SOUTH -> Shapes.or(S_FRAME_SHAPE, S_L_PEDAL_SHAPE, S_M_PEDAL_SHAPE, S_R_PEDAL_SHAPE);
+            case NORTH -> N_PEDAL_SHAPE;
+            case WEST -> W_PEDAL_SHAPE;
+            case EAST -> E_PEDAL_SHAPE;
+            case SOUTH -> S_PEDAL_SHAPE;
             default -> Shapes.empty();
         };
     }

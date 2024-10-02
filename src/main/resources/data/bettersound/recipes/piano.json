@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "w": {
+      "tag": "minecraft:planks"
+    },
+    "k": {
+      "item": "bettersound:keyboard"
+    },
+    "C": {
+      "item": "bettersound:piano_voice_core"
+    },
+    "#": {
+      "item": "bettersound:sustain_pedal"
+    }
+  },
+  "pattern": [
+    "kkk",
+    "wCw",
+    "w#w"
+  ],
+  "result": {
+    "item": "bettersound:piano_block"
+  }
+}

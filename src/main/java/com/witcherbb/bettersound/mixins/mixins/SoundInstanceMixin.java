@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(SoundInstance.class)
 public interface SoundInstanceMixin extends SoundInstanceExtender {
     @Override
-    default void onStop() {
+    default void betterSound$onStop() {
     }
 }

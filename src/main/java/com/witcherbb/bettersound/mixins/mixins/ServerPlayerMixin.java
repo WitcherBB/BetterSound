@@ -20,19 +20,19 @@ public abstract class ServerPlayerMixin extends PlayerSittingMixin implements Se
     }
 
     @Override
-    public boolean startSitting(Sittable<?> pSeat) {
-        if (!super.startSitting(pSeat)) {
+    public boolean betterSound$startSitting(Sittable<?> pSeat) {
+        if (!super.betterSound$startSitting(pSeat)) {
             return false;
         } else {
-            pSeat.positionPassenger(self);
+            pSeat.positionPassenger(betterSound$self);
             this.connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             return true;
         }
     }
 
     @Override
-    public void stopSitting() {
-        super.stopSitting();
+    public void betterSound$stopSitting() {
+        super.betterSound$stopSitting();
         this.connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
     }
 }

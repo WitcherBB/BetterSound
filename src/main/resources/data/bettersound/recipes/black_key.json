@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "w": {
+      "tag": "minecraft:planks"
+    },
+    "b": {
+      "item": "minecraft:blackstone"
+    }
+  },
+  "pattern": [
+    " b ",
+    "bwb"
+  ],
+  "result": {
+    "item": "bettersound:black_key",
+    "count": 3
+  }
+}

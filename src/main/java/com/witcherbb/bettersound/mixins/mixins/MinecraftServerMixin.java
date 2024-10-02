@@ -29,7 +29,7 @@ public abstract class MinecraftServerMixin implements MinecraftServerExtender {
     }
 
     @Override
-    public ModDataManager getModDataManager() {
+    public ModDataManager betterSound$getModDataManager() {
         return this.betterSound$modDataManager;
     }
 }

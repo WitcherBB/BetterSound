@@ -6,12 +6,10 @@ import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.items.TunerItem;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.CPianoBlockStopPacket;
-import com.witcherbb.bettersound.network.protocol.CToneBlockStopPacket;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,10 +18,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -50,9 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PianoBlock extends BaseEntityBlock implements CombinedBlock<PianoPart> {
     public static final IntegerProperty TONE = IntegerProperty.create("tone", 0, 87);
@@ -312,7 +305,7 @@ public class PianoBlock extends BaseEntityBlock implements CombinedBlock<PianoPa
                 BlockState state1 = level.getBlockState(blockPos);
                 if (!delay && (state1.getValue(PART) == PianoPart.KEYBOARD_L || state1.getValue(PART) == PianoPart.KEYBOARD_M || state1.getValue(PART) == PianoPart.KEYBOARD_R)) {
                     tones.addAll(
-                            Util.toIntegerList(((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).getModDataManager().getLastTones(blockPos))
+                            Util.toIntegerList(((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().getLastTones(blockPos))
                     );
                     ModNetwork.broadcast(new CPianoBlockStopPacket(blockPos, Util.toIntArray(tones)));
                 }

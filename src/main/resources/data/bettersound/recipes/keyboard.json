@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "w": {
+      "item": "bettersound:white_key"
+    },
+    "b": {
+      "item": "bettersound:black_key"
+    }
+  },
+  "pattern": [
+    "bbb",
+    "www"
+  ],
+  "result": {
+    "item": "bettersound:keyboard"
+  }
+}

@@ -7,6 +7,7 @@
   "refmap": "mixin.refmap.json",
   "plugin": "com.witcherbb.bettersound.mixins.mixins.MixinPlugin",
   "mixins": [
+    "EntityMixin",
     "JukeboxBlockEntityMixin",
     "JukeboxMixin",
     "MinecraftServerMixin",

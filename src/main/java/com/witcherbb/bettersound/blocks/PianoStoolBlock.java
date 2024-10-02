@@ -1,8 +1,9 @@
 package com.witcherbb.bettersound.blocks;
 
 import com.witcherbb.bettersound.blocks.entity.PianoStoolBlockEntity;
+import com.witcherbb.bettersound.blocks.entity.utils.Sittable;
 import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
-import com.witcherbb.bettersound.mixins.extenders.PlayerSittingExtender;
+import com.witcherbb.bettersound.mixins.extenders.CouldSittingExtender;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -31,11 +32,11 @@ public class PianoStoolBlock extends BaseEntityBlock {
 
     static {
         N_MODEL = Shapes.or(
-                PianoStoolBlock.box(2.0, 0.0, 3.0, 4.0, 8.0, 5.0),
-                PianoStoolBlock.box(12.0, 0.0, 3.0, 14.0, 8.0, 5.0),
-                PianoStoolBlock.box(2.0, 0.0, 11.0, 4.0, 8.0, 13.0),
-                PianoStoolBlock.box(12.0, 0.0, 11.0, 14.0, 8.0, 13.0),
-                PianoStoolBlock.box(2.0, 8.0, 3.0, 14.0, 12.0, 13.0)
+                PianoStoolBlock.box(1.0, 0.0, 3.0, 3.0, 8.0, 5.0),
+                PianoStoolBlock.box(13.0, 0.0, 3.0, 15.0, 8.0, 5.0),
+                PianoStoolBlock.box(1.0, 0.0, 11.0, 3.0, 8.0, 13.0),
+                PianoStoolBlock.box(13.0, 0.0, 11.0, 15.0, 8.0, 13.0),
+                PianoStoolBlock.box(1.0, 8.0, 3.0, 15.0, 12.0, 13.0)
         );
 
         VoxelShape[] shapes =ShapeUtil.getESWShapes(N_MODEL);
@@ -50,14 +51,11 @@ public class PianoStoolBlock extends BaseEntityBlock {
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        PianoStoolBlockEntity blockEntity = (PianoStoolBlockEntity) pLevel.getBlockEntity(pPos);
-        if (blockEntity != null && blockEntity.canAddPassenger(pPlayer)) {
-            Direction facing = pState.getValue(FACING);
-            float yRot = facing.toYRot();
-            pPlayer.setYRot(yRot);
+        Sittable<PianoStoolBlockEntity> seat = (PianoStoolBlockEntity) pLevel.getBlockEntity(pPos);
+        if (seat != null && !pPlayer.isSecondaryUseActive()) {
+            pPlayer.setYRot(seat.yRot());
             pPlayer.setXRot(0.0F);
-            ((PlayerSittingExtender) pPlayer).startSitting(blockEntity);
-            return InteractionResult.sidedSuccess(pLevel.isClientSide);
+            return ((CouldSittingExtender) pPlayer).betterSound$startSitting(seat) ? InteractionResult.sidedSuccess(pLevel.isClientSide) : InteractionResult.PASS;
         }
         return InteractionResult.PASS;
     }

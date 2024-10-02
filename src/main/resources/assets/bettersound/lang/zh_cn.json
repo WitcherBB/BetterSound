@@ -20,6 +20,10 @@
   "item.bettersound.ldcxq_music_disc": "音乐唱片",
   "item.bettersound.ldcxq_music_disc.desc": "牢大处刑曲",
   "item.bettersound.tuner": "调音器",
+  "item.bettersound.white_key": "白键",
+  "item.bettersound.black_key": "黑键",
+  "item.bettersound.keyboard": "键盘",
+  "item.bettersound.piano_voice_core": "钢琴音核",
 
   "block.bettersound.jukebox_controller": "唱片机控制器",
   "block.bettersound.example_block": "例子",
@@ -28,9 +32,9 @@
   "block.bettersound.jukebox.tip.null": "输入不能为空!",
   "block.bettersound.jukebox.tip.success": "保存成功!",
   "block.bettersound.note_block.title": "键盘",
-  "block.bettersound.piano_block": "钢琴方块",
+  "block.bettersound.piano_block": "钢琴",
   "block.bettersound.piano_block.title": "键盘",
-  "block.bettersound.confine_pedal": "制音踏板",
+  "block.bettersound.sustain_pedal": "延音踏板",
   "block.bettersound.tone_block": "音阶方块",
   "block.bettersound.piano_stool_block": "琴凳"
 

@@ -32,7 +32,7 @@ public record SToneKeyReleasedPacket(BlockPos pos, int tone, boolean whetherToSt
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof ToneBlock toneBlock) {
                 if (packet.whetherToStop) toneBlock.stopSound(sender, state, level, pos);
-                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).getModDataManager().removeLastTone(packet.pos, sender.getUUID(), packet.tone());
+                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().removeLastTone(packet.pos, sender.getUUID(), packet.tone());
             }
         });
         ctx.get().setPacketHandled(true);

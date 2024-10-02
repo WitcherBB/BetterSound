@@ -21,6 +21,6 @@ public abstract class SoundEngineMixin {
                     ordinal = 1),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void tickNonePaused0(CallbackInfo ci, Iterator iterator, Map.Entry entry, ChannelAccess.ChannelHandle channelaccess$channelhandle1, SoundInstance soundinstance) {
-        ((SoundInstanceExtender) soundinstance).onStop();
+        ((SoundInstanceExtender) soundinstance).betterSound$onStop();
     }
 }

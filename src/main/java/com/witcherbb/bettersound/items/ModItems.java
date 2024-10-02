@@ -49,9 +49,14 @@ public class ModItems {
 	public static final RegistryObject<Item> ITEM_PIANO_BLOCK = registerBlockItem(ModBlocks.PIANO_BLOCK, new Item.Properties());
 	public static final RegistryObject<Item> ITEM_TONE_BLOCK = registerBlockItem(ModBlocks.TONE_BLOCK, new Item.Properties());
 	public static final RegistryObject<Item> ITEM_PIANO_STOOL_BLOCK = registerBlockItem(ModBlocks.PIANO_STOOL_BLOCK, new Item.Properties());
-	public static final RegistryObject<Item> ITEM_CONFINE_PEDAL = registerBlockItem(ModBlocks.CONFINE_PEDAL, new Item.Properties());
+	public static final RegistryObject<Item> ITEM_SUSTAIN_PEDAL = registerBlockItem(ModBlocks.SUSTAIN_PEDAL, new Item.Properties());
 
 	public static final RegistryObject<Item> ITEM_TUNER = ITEMS.register("tuner", TunerItem::new);
+
+	public static final RegistryObject<Item> ITEM_WHITE_KEY = registerNormalItem("white_key", new Item.Properties());
+	public static final RegistryObject<Item> ITEM_BLACK_KEY = registerNormalItem("black_key", new Item.Properties());
+	public static final RegistryObject<Item> ITEM_KEYBOARD = registerNormalItem("keyboard", new Item.Properties());
+	public static final RegistryObject<Item> ITEM_PIANO_VOICE_CORE = registerNormalItem("piano_voice_core", new Item.Properties());
 
 	private static RegistryObject<Item> registerMusicDisc(String music_name, Supplier<SoundEvent> soundSupplier, int delay_second) {
 		RegistryObject<Item> registryObject = ITEMS.register(music_name + "_music_disc",
@@ -64,5 +69,9 @@ public class ModItems {
 	private static RegistryObject<Item> registerBlockItem(RegistryObject<Block> block, Item.Properties properties) {
 		return ITEMS.register(block.getId().getPath(),
 				() -> new BlockItem(block.get(), properties));
+	}
+
+	private static RegistryObject<Item> registerNormalItem(String name, Item.Properties properties) {
+		return ITEMS.register(name, () -> new Item(properties));
 	}
 }

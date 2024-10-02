@@ -32,7 +32,7 @@ public abstract class MinecraftMixin implements MinecraftExtender {
     }
 
     @Override
-    public ModSoundManager getmodSoundManager() {
+    public ModSoundManager betterSound$getmodSoundManager() {
         return this.betterSound$modSoundManager;
     }
 }

@@ -98,10 +98,10 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     }
 
     @Override
-    public void onStop() {
+    public void betterSound$onStop() {
         //判断是否是手动停止很有必要！！！这样就不会在声音彻底停止以后再清除一次，否则可能会把清除之前播放的另一个音清除掉！！！
         if (!this.wasSet) {
-            ((MinecraftExtender) Minecraft.getInstance()).getmodSoundManager().getPlayingPianoNotes().removeFirst(this.pos, this.playerUUID, this.tone);
+            ((MinecraftExtender) Minecraft.getInstance()).betterSound$getmodSoundManager().getPlayingPianoNotes().removeFirst(this.pos, this.playerUUID, this.tone);
         }
         ModNetwork.sendToServer(new SPianoKeyReleasedPacket(pos, this.tone, true));
     }

@@ -32,7 +32,7 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos pos, int tone,
 
     public static void handle(CPianoBlockPlayNotePacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).getmodSoundManager();
+            ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).betterSound$getmodSoundManager();
             if (Minecraft.getInstance().level != null) {
                 net.minecraft.world.level.block.entity.BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.pos);
                 if (packet.stop) {

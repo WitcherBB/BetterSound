@@ -28,7 +28,7 @@ public class ToneBlockEntity extends BlockEntity implements MenuProvider, Tickab
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
     };
     public static final Map<Integer, String> toneNameMap = new TreeMap<>();
-    private boolean isSoundDelay = true;
+    private boolean isSoundDelay = false;
     private String toneName = "";
 
     static {

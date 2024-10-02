@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
 import com.witcherbb.bettersound.blocks.entity.utils.Sittable;
-import com.witcherbb.bettersound.mixins.extenders.PlayerSittingExtender;
+import com.witcherbb.bettersound.mixins.extenders.CouldSittingExtender;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -13,11 +13,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Player.class)
-public abstract class PlayerSittingMixin extends LivingEntity implements PlayerSittingExtender {
+public abstract class PlayerSittingMixin extends LivingEntity implements CouldSittingExtender {
     @Shadow protected abstract boolean wantsToStopRiding();
 
     @Shadow public abstract void rideTick();
@@ -27,9 +26,9 @@ public abstract class PlayerSittingMixin extends LivingEntity implements PlayerS
     @Shadow public float oBob;
     @Shadow public float bob;
     @Unique
-    protected Player self = (Player) (Object) this;
+    protected Player betterSound$self = (Player) (Object) this;
     @Unique
-    protected Sittable<?> seat;
+    protected Sittable<?> betterSound$seat;
 
     protected PlayerSittingMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -37,21 +36,21 @@ public abstract class PlayerSittingMixin extends LivingEntity implements PlayerS
 
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
     public void travel0(Vec3 pTravelVector, CallbackInfo ci) {
-        if (this.isSitting()) {
+        if (this.betterSound$isSitting()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
     private void tick0(CallbackInfo ci) {
-        if (this.isSitting() && (this.wantsToStopRiding() || this.seat.isRemoved())) {
-            this.stopSitting();
+        if (this.betterSound$isSitting() && (this.wantsToStopRiding() || this.betterSound$seat.isRemoved())) {
+            this.betterSound$stopSitting();
             this.setShiftKeyDown(false);
         }
-        if (this.isSitting()) {
+        if (this.betterSound$isSitting()) {
             this.setOldPosAndRot();
             this.tickCount++;
-            this.getSeat().positionPassenger(this.self);
+            this.betterSound$getSeat().positionPassenger(this.betterSound$self);
             this.oRun = this.run;
             this.run = 0.0F;
             this.resetFallDistance();
@@ -61,13 +60,13 @@ public abstract class PlayerSittingMixin extends LivingEntity implements PlayerS
     }
 
     @Override
-    public Sittable<?> getSeat() {
-        return this.seat;
+    public Sittable<?> betterSound$getSeat() {
+        return this.betterSound$seat;
     }
 
     @Override
-    public boolean isSitting() {
-        return this.seat != null;
+    public boolean betterSound$isSitting() {
+        return this.betterSound$seat != null;
     }
 
     @Override
@@ -76,29 +75,30 @@ public abstract class PlayerSittingMixin extends LivingEntity implements PlayerS
     }
 
     @Override
-    public void stopSitting() {
+    public void betterSound$stopSitting() {
         if (!this.level().isClientSide) {
-            this.dismountVehicle(this.seat);
+            this.betterSound$dismountSeat(this.betterSound$seat);
         }
-        this.seat.removePassenger(self);
-        this.seat = null;
-//        this.setNoGravity(false);
+        this.betterSound$seat.removePassenger(betterSound$self);
+        this.betterSound$seat = null;
     }
 
     @Override
-    public boolean startSitting(Sittable<?> pSeat) {
-        if (this.seat == pSeat) {
+    public boolean betterSound$startSitting(Sittable<?> pSeat) {
+        if (this.betterSound$seat == pSeat) {
             return false;
         } else {
-            if (this.canSit(pSeat) && pSeat.canAddPassenger(self)) {
-                if (this.isSitting()) {
-                    this.stopSitting();
+            if (this.betterSound$canSit(pSeat) && pSeat.canAddPassenger(betterSound$self)) {
+                if (this.betterSound$isSitting()) {
+                    this.betterSound$stopSitting();
+                }
+                if (this.isPassenger()) {
+                    this.stopRiding();
                 }
 
                 this.setPose(Pose.STANDING);
-//                this.setNoGravity(true);
-                this.seat = pSeat;
-                this.seat.addPassenger(self);
+                this.betterSound$seat = pSeat;
+                this.betterSound$seat.addPassenger(betterSound$self);
                 return true;
             }
         }
@@ -106,21 +106,21 @@ public abstract class PlayerSittingMixin extends LivingEntity implements PlayerS
     }
 
     @Unique
-    protected boolean canSit(Sittable<?> seat) {
+    protected boolean betterSound$canSit(Sittable<?> seat) {
         return !this.isShiftKeyDown();
     }
 
     @Override
-    public void dismountVehicle(Sittable<?> seat) {
+    public void betterSound$dismountSeat(Sittable<?> seat) {
         Vec3 vec3;
         if (this.isRemoved()) {
             vec3 = this.position();
         } else if (!seat.isRemoved()) {
-            vec3 = seat.getDismountLocationForPassenger(self);
+            vec3 = seat.getDismountLocationForPassenger(betterSound$self);
         } else {
             vec3 = new Vec3(this.getX(), this.getY(), this.getZ());
         }
 
-        this.dismountTo(vec3.x, vec3.y, vec3.z);
+        this.setPos(vec3.x, vec3.y, vec3.z);
     }
 }

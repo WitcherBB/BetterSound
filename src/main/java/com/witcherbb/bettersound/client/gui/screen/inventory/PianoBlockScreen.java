@@ -299,7 +299,7 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
             if (minecraft != null) {
                 BlockPos pos = PianoBlockScreen.this.blockEntity.getBlockPos();
                 ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id));
-                minecraftExtender.getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
+                minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
             }
         }
 
@@ -371,7 +371,7 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
             BlockPos pos = PianoBlockScreen.this.blockEntity.getBlockPos();
             if (!fatherInstance.blockEntity.isSoundDelay())
                 if (minecraft != null) {
-                    minecraftExtender.getmodSoundManager().tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
+                    minecraftExtender.betterSound$getmodSoundManager().tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
                 }
             ModNetwork.sendToServer(new SPianoKeyReleasedPacket(pos, this.id, !fatherInstance.blockEntity.isSoundDelay()));
         }

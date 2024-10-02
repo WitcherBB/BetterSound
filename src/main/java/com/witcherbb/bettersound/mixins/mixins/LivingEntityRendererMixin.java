@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.witcherbb.bettersound.mixins.extenders.PlayerSittingExtender;
+import com.witcherbb.bettersound.mixins.extenders.CouldSittingExtender;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -29,8 +29,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
             at = @At("STORE"),
             ordinal = 0)
     private boolean render1(boolean shouldSit) {
-        if (this.betterSound$renderArg0 instanceof PlayerSittingExtender extender) {
-            return shouldSit || extender.isSitting();
+        if (this.betterSound$renderArg0 instanceof CouldSittingExtender extender) {
+            return shouldSit || extender.betterSound$isSitting();
         }
         return shouldSit;
     }

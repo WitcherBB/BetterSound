@@ -33,7 +33,7 @@ public record SPianoKeyPressedPacket(BlockPos pos, int tone) {
             level.setBlock(pos, state, PianoBlock.UPDATE_ALL);
             if (state.getBlock() instanceof PianoBlock pianoBlock) {
                 pianoBlock.playSound(sender, state, level, pos);
-                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).getModDataManager().putLastTone(packet.pos, sender.getUUID(), packet.tone());
+                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().putLastTone(packet.pos, sender.getUUID(), packet.tone());
             }
         });
         ctx.get().setPacketHandled(true);

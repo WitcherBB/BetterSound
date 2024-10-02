@@ -42,7 +42,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(JukeboxBlockEntity.class)
 public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Clearable, ContainerSingleItem, MenuProvider {
 
-	@Shadow public abstract void startPlaying();
 	@Unique
 	private final JukeboxBlockEntity betterSound$INSTANCE = (JukeboxBlockEntity) (Object) this;
 
@@ -77,7 +76,8 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 	@Unique
 	protected ContainerData betterSound$data;
 
-	private String name = "";
+	@Unique
+	private String betterSound$name = "";
 
 	public JukeboxBlockEntityMixin(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
 		super(pType, pPos, pBlockState);
@@ -125,14 +125,14 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 
 	@Inject(method = "load", at = @At("HEAD"))
 	public void load1(CompoundTag pTag, CallbackInfo ci) {
-		this.name = pTag.getString("Name");
+		this.betterSound$name = pTag.getString("Name");
 	}
 
 	@Inject(method = "saveAdditional", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;putBoolean(Ljava/lang/String;Z)V"))
 	public void saveAdditional(CompoundTag pTag, CallbackInfo ci) {
 		if (!betterSound$itemHandler.getStackInSlot(0).isEmpty())
 			pTag.put("RecordItem", betterSound$itemHandler.getStackInSlot(0).save(new CompoundTag()));
-		pTag.putString("Name", this.name);
+		pTag.putString("Name", this.betterSound$name);
 	}
 
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/JukeboxBlockEntity;stopPlaying()V"))

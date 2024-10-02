@@ -62,11 +62,11 @@ public class ToneBlock extends BaseEntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof ToneBlockEntity blockEntity) {
                 boolean flag1 = hasNeighborPedalSteped(pLevel, pPos);
-                boolean flag2 = !blockEntity.isSoundDelay();
+                boolean flag2 = blockEntity.isSoundDelay();
                 if (flag1 != flag2) {
-                    if (flag1) {
+                    if (!flag1) {
                         blockEntity.setSoundDelay(false);
-                        int[] tones = ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).getModDataManager().getLastTones(pPos);
+                        int[] tones = ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().getLastTones(pPos);
                         ModNetwork.broadcast(new CToneBlockStopPacket(pPos, tones));
                     } else {
                         blockEntity.setSoundDelay(true);
@@ -93,17 +93,17 @@ public class ToneBlock extends BaseEntityBlock {
 
     public static boolean hasNeighborPedalSteped(Level level, BlockPos pos) {
         BlockState state;
-        if ((state = level.getBlockState(pos.north())).getBlock() instanceof ConfinePedalBlock
-                && state.getValue(ConfinePedalBlock.FACING) == Direction.NORTH && state.getValue(ConfinePedalBlock.STEPED))
+        if ((state = level.getBlockState(pos.north())).getBlock() instanceof SustainPedalBlock
+                && state.getValue(SustainPedalBlock.FACING) == Direction.NORTH && state.getValue(SustainPedalBlock.STEPED))
             return true;
-        else if ((state = level.getBlockState(pos.east())).getBlock() instanceof ConfinePedalBlock
-                && state.getValue(ConfinePedalBlock.FACING) == Direction.EAST && state.getValue(ConfinePedalBlock.STEPED))
+        else if ((state = level.getBlockState(pos.east())).getBlock() instanceof SustainPedalBlock
+                && state.getValue(SustainPedalBlock.FACING) == Direction.EAST && state.getValue(SustainPedalBlock.STEPED))
             return true;
-        else if ((state = level.getBlockState(pos.south())).getBlock() instanceof ConfinePedalBlock
-                && state.getValue(ConfinePedalBlock.FACING) == Direction.SOUTH && state.getValue(ConfinePedalBlock.STEPED))
+        else if ((state = level.getBlockState(pos.south())).getBlock() instanceof SustainPedalBlock
+                && state.getValue(SustainPedalBlock.FACING) == Direction.SOUTH && state.getValue(SustainPedalBlock.STEPED))
             return true;
-        else return (state = level.getBlockState(pos.west())).getBlock() instanceof ConfinePedalBlock
-                    && state.getValue(ConfinePedalBlock.FACING) == Direction.WEST && state.getValue(ConfinePedalBlock.STEPED);
+        else return (state = level.getBlockState(pos.west())).getBlock() instanceof SustainPedalBlock
+                    && state.getValue(SustainPedalBlock.FACING) == Direction.WEST && state.getValue(SustainPedalBlock.STEPED);
     }
 
     /**

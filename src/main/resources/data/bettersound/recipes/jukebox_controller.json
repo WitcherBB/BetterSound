@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
+  "category": "redstone",
   "key": {
     "W": {
       "tag": "minecraft:wool"
@@ -22,6 +22,5 @@
   ],
   "result": {
     "item": "bettersound:jukebox_controller"
-  },
-  "show_notification": true
+  }
 }

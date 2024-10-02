@@ -24,7 +24,7 @@ public record CToneBlockStopPacket(BlockPos pos, int[] tones) {
             Minecraft minecraft = Minecraft.getInstance();
             ClientLevel level = minecraft.level;
             if (level != null) {
-                ((MinecraftExtender) minecraft).getmodSoundManager().tryToStopAllPianoSounds(packet.pos, packet.tones);
+                ((MinecraftExtender) minecraft).betterSound$getmodSoundManager().tryToStopAllPianoSounds(packet.pos, packet.tones);
             }
         });
         ctx.get().setPacketHandled(true);
