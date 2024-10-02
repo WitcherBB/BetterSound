@@ -73,6 +73,18 @@ public class ModNetwork {
                 .decoder(SPianoKeyReleasedPacket::decode)
                 .consumerMainThread(SPianoKeyReleasedPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(SToneKeyReleasedPacket.class, id())
+                .encoder(SToneKeyReleasedPacket::encode)
+                .decoder(SToneKeyReleasedPacket::decode)
+                .consumerMainThread(SToneKeyReleasedPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(SToneKeyPressedPacket.class, id())
+                .encoder(SToneKeyPressedPacket::encode)
+                .decoder(SToneKeyPressedPacket::decode)
+                .consumerMainThread(SToneKeyPressedPacket::handle)
+                .add();
     }
 
     private static void addClientPacket() {
@@ -93,6 +105,18 @@ public class ModNetwork {
                 .encoder(CPianoBlockStopPacket::encode)
                 .decoder(CPianoBlockStopPacket::decode)
                 .consumerMainThread(CPianoBlockStopPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CToneBlockPlayNotePacket.class, id())
+                .encoder(CToneBlockPlayNotePacket::encode)
+                .decoder(CToneBlockPlayNotePacket::decode)
+                .consumerMainThread(CToneBlockPlayNotePacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CToneBlockStopPacket.class, id())
+                .encoder(CToneBlockStopPacket::encode)
+                .decoder(CToneBlockStopPacket::decode)
+                .consumerMainThread(CToneBlockStopPacket::handle)
                 .add();
     }
 

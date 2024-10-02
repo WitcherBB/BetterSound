@@ -11,9 +11,13 @@
     "JukeboxMixin",
     "MinecraftServerMixin",
     "NoteBlockMixin",
-    "RecordItemMixin"
+    "PlayerSittingMixin",
+    "RecordItemMixin",
+    "ServerPlayerMixin"
   ],
   "client": [
+    "LivingEntityRendererMixin",
+    "LocalPlayerMixin",
     "MinecraftMixin",
     "SoundEngineMixin",
     "SoundInstanceMixin"

@@ -3,6 +3,7 @@ package com.witcherbb.bettersound.data;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.ModBlocks;
 import com.witcherbb.bettersound.blocks.PianoBlock;
+import com.witcherbb.bettersound.blocks.PianoStoolBlock;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModBlockStateProvider extends BlockStateProvider {
     private final ModelFile PIANO_PEDAL;
+    private final ModelFile PIANO_PEDAL_DOWN;
     private final ModelFile PIANO_PEDAL_L;
     private final ModelFile PIANO_PEDAL_R;
     private final ModelFile PIANO_KEYBOARD_L;
@@ -21,10 +23,12 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private final ModelFile PIANO_KEYBOARD_R;
 
     private final ExistingFileHelper existingHelper;
+
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
         super(output, BetterSound.MODID, exFileHelper);
         this.existingHelper = exFileHelper;
         this.PIANO_PEDAL = new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_pedal"), exFileHelper);
+        this.PIANO_PEDAL_DOWN = new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_pedal_down"), exFileHelper);
         this.PIANO_PEDAL_L = new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_pedal_left"), exFileHelper);
         this.PIANO_PEDAL_R = new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_pedal_right"), exFileHelper);
         this.PIANO_KEYBOARD_L = new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_keyboard_left"), exFileHelper);
@@ -34,13 +38,14 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        getVariantBuilder(ModBlocks.PIANO_BLOCK.get()).forAllStatesExcept(state -> {
+        this.getVariantBuilder(ModBlocks.PIANO_BLOCK.get()).forAllStatesExcept(state -> {
             PianoPart part = state.getValue(PianoBlock.PART);
             Direction facing = state.getValue(PianoBlock.FACING);
+            boolean delay = state.getValue(PianoBlock.DELAY);
 
             return ConfiguredModel.builder().modelFile(
                 switch (part) {
-                    case PEDAL -> PIANO_PEDAL;
+                    case PEDAL -> delay ? PIANO_PEDAL_DOWN : PIANO_PEDAL;
                     case PEDAL_R -> PIANO_PEDAL_R;
                     case KEYBOARD_R -> PIANO_KEYBOARD_R;
                     case KEYBOARD_M -> PIANO_KEYBOARD_M;
@@ -54,6 +59,20 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 default -> 0;
             }).build();
 
-        }, PianoBlock.TONE, PianoBlock.POWERED);
+        }, PianoBlock.TONE);
+
+        this.getVariantBuilder(ModBlocks.PIANO_STOOL_BLOCK.get()).forAllStatesExcept(state -> {
+            Direction facing = state.getValue(PianoStoolBlock.FACING);
+
+            return ConfiguredModel.builder().modelFile(
+                new ModelFile.ExistingModelFile(new ResourceLocation(BetterSound.MODID, "block/piano_stool_block"), this.existingHelper)
+            ).rotationY(switch (facing) {
+                case SOUTH -> 180;
+                case WEST -> 270;
+                case EAST -> 90;
+                default -> 0;
+            }).build();
+
+        });
     }
 }

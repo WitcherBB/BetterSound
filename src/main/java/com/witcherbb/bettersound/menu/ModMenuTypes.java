@@ -23,6 +23,8 @@ public class ModMenuTypes {
 			registerMenuType("note_block_menu", NoteBlockMenu::new);
 	public static final RegistryObject<MenuType<PianoBlockMenu>> PIANO_BLOCK_MENU =
 			registerMenuType("piano_block_menu", PianoBlockMenu::new);
+	public static final RegistryObject<MenuType<ToneBlockMenu>> TONE_BLOCK_MENU =
+			registerMenuType("tone_block_menu", ToneBlockMenu::new);
 
 	private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
 		return MENUS.register(name, () -> IForgeMenuType.create(factory));

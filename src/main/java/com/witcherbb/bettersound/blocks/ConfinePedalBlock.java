@@ -42,7 +42,7 @@ public class ConfinePedalBlock extends HorizontalDirectionalBlock {
     protected static final VoxelShape W_M_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_M_PEDAL_SHAPE, 270.0D);
     protected static final VoxelShape W_R_PEDAL_SHAPE = ShapeUtil.rotateShapeY(N_R_PEDAL_SHAPE, 270.0D);
 
-    public ConfinePedalBlock(Properties pProperties) {
+    protected ConfinePedalBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(getStateDefinition().any().setValue(POWERED, false).setValue(FACING, Direction.NORTH).setValue(STEPED, false));
     }

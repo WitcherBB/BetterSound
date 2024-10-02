@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bettersound:block/tone_block"
+    }
+  }
+}

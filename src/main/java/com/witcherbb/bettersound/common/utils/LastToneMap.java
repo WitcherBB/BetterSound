@@ -40,7 +40,7 @@ public class LastToneMap extends HashMap<BlockPos, HashMap<UUID, List<Integer>>>
         for (List<Integer> tones : map.values()) {
             newTones.addAll(tones);
         }
-        return newTones.stream().mapToInt(Integer::valueOf).toArray();
+        return Util.toIntArray(newTones);
     }
 
     public static LastToneMap create() {

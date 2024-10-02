@@ -3,7 +3,6 @@ package com.witcherbb.bettersound.blocks.entity;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.ModBlocks;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,7 +31,17 @@ public class ModBlockEntityTypes {
 					BlockEntityType.Builder.of(PianoBlockEntity::new, ModBlocks.PIANO_BLOCK.get())
 							.build(null));
 
-	public static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, Supplier<BlockEntityType<T>> sup) {
+	public static final RegistryObject<BlockEntityType<ToneBlockEntity>> TONE_BLOCK_ENTITY_TYPE =
+			register("tone_block_entity", () ->
+					BlockEntityType.Builder.of(ToneBlockEntity::new, ModBlocks.TONE_BLOCK.get())
+							.build(null));
+
+	public static final RegistryObject<BlockEntityType<PianoStoolBlockEntity>> PIANO_STOOL_BLOCK_ENTITY_TYPE =
+			register("piano_stool_block_entity", () ->
+					BlockEntityType.Builder.of(PianoStoolBlockEntity::new, ModBlocks.PIANO_STOOL_BLOCK.get())
+							.build(null));
+
+	public static <T extends net.minecraft.world.level.block.entity.BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, Supplier<BlockEntityType<T>> sup) {
 		return BLOCK_ENTITIES.register(name, sup);
 	}
 }

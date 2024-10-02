@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.client.util;
 
 import com.witcherbb.bettersound.client.resources.sounds.PianoSoundInstance;
+import com.witcherbb.bettersound.common.utils.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -70,7 +71,7 @@ public class PianoSoundMap extends HashMap<BlockPos, HashMap<UUID, TreeMap<Integ
     public List<PianoSoundInstance> removeAllButLast(BlockPos pos, int[] tones) {
         if (tones.length == 0) return this.removeAll(pos);
 
-        List<Integer> toneList = Arrays.stream(tones).boxed().toList();
+        List<Integer> toneList = Util.toIntegerList(tones);
         HashMap<UUID, TreeMap<Integer, List<PianoSoundInstance>>> removedUuidMap = this.remove(pos);
         if (removedUuidMap == null || removedUuidMap.isEmpty()) return new ArrayList<>();
 

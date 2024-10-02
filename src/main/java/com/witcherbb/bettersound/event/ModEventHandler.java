@@ -1,9 +1,10 @@
 package com.witcherbb.bettersound.event;
 
 import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
-import com.witcherbb.bettersound.client.renderer.blockentity.PianoRenderer;
+import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.Level;
@@ -26,6 +28,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -48,8 +51,9 @@ public class ModEventHandler {
 			MenuScreens.register(ModMenuTypes.JUKEBOX_CONTROLLER_MENU.get(), JukeboxControllerScreen::new);
 			MenuScreens.register(ModMenuTypes.NOTE_BLOCK_MENU.get(), NoteBlockScreen::new);
 			MenuScreens.register(ModMenuTypes.PIANO_BLOCK_MENU.get(), PianoBlockScreen::new);
+			MenuScreens.register(ModMenuTypes.TONE_BLOCK_MENU.get(), ToneBlockScreen::new);
 
-			BlockEntityRenderers.register(ModBlockEntityTypes.PIANO_BLOCK_ENTITY_TYPE.get(), ctx -> new PianoRenderer());
+			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
         }
 
 		@SubscribeEvent
@@ -63,7 +67,6 @@ public class ModEventHandler {
 				event.accept(ModItems.ITEM_CONFINE_PEDAL);
 			}
 		}
-
 
 	}
 
@@ -79,6 +82,11 @@ public class ModEventHandler {
 		public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
 
 		}
+	}
+
+	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+	static class ForgeClientEvents {
+
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -116,17 +124,6 @@ public class ModEventHandler {
 					}
 					player.awardStat(Stats.PLAY_NOTEBLOCK);
 				}
-			}
-		}
-
-		@SubscribeEvent
-		public static void onBlockBreak(BlockEvent.BreakEvent event) {
-			Player player = event.getPlayer();
-			BlockPos pos = event.getPos();
-			BlockState state = event.getState();
-
-			if (state.getBlock() instanceof BedBlock) {
-				System.out.println("bed");
 			}
 		}
 

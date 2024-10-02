@@ -20,7 +20,7 @@ public class Utils {
         HitResult hitResult = Minecraft.getInstance().hitResult;
         if (hitResult instanceof BlockHitResult blockHitResult) {
             BlockPos hitPos = blockHitResult.getBlockPos();
-            return aimedPos.equals(hitPos) && clazz.isInstance(level.getBlockState(hitPos).getBlock());
+            return clazz.isInstance(level.getBlockState(hitPos).getBlock()) && aimedPos.equals(hitPos);
         }
         return false;
     }

@@ -1,92 +1,182 @@
 {
   "variants": {
-    "facing=east,part=keyboard_left": {
+    "delay=false,facing=east,part=keyboard_left": {
       "model": "bettersound:block/piano_keyboard_left",
       "y": 90
     },
-    "facing=east,part=keyboard_middle": {
+    "delay=false,facing=east,part=keyboard_middle": {
       "model": "bettersound:block/piano_keyboard_middle",
       "y": 90
     },
-    "facing=east,part=keyboard_right": {
+    "delay=false,facing=east,part=keyboard_right": {
       "model": "bettersound:block/piano_keyboard_right",
       "y": 90
     },
-    "facing=east,part=pedal": {
+    "delay=false,facing=east,part=pedal": {
       "model": "bettersound:block/piano_pedal",
       "y": 90
     },
-    "facing=east,part=pedal_left": {
+    "delay=false,facing=east,part=pedal_left": {
       "model": "bettersound:block/piano_pedal_left",
       "y": 90
     },
-    "facing=east,part=pedal_right": {
+    "delay=false,facing=east,part=pedal_right": {
       "model": "bettersound:block/piano_pedal_right",
       "y": 90
     },
-    "facing=north,part=keyboard_left": {
+    "delay=false,facing=north,part=keyboard_left": {
       "model": "bettersound:block/piano_keyboard_left"
     },
-    "facing=north,part=keyboard_middle": {
+    "delay=false,facing=north,part=keyboard_middle": {
       "model": "bettersound:block/piano_keyboard_middle"
     },
-    "facing=north,part=keyboard_right": {
+    "delay=false,facing=north,part=keyboard_right": {
       "model": "bettersound:block/piano_keyboard_right"
     },
-    "facing=north,part=pedal": {
+    "delay=false,facing=north,part=pedal": {
       "model": "bettersound:block/piano_pedal"
     },
-    "facing=north,part=pedal_left": {
+    "delay=false,facing=north,part=pedal_left": {
       "model": "bettersound:block/piano_pedal_left"
     },
-    "facing=north,part=pedal_right": {
+    "delay=false,facing=north,part=pedal_right": {
       "model": "bettersound:block/piano_pedal_right"
     },
-    "facing=south,part=keyboard_left": {
+    "delay=false,facing=south,part=keyboard_left": {
       "model": "bettersound:block/piano_keyboard_left",
       "y": 180
     },
-    "facing=south,part=keyboard_middle": {
+    "delay=false,facing=south,part=keyboard_middle": {
       "model": "bettersound:block/piano_keyboard_middle",
       "y": 180
     },
-    "facing=south,part=keyboard_right": {
+    "delay=false,facing=south,part=keyboard_right": {
       "model": "bettersound:block/piano_keyboard_right",
       "y": 180
     },
-    "facing=south,part=pedal": {
+    "delay=false,facing=south,part=pedal": {
       "model": "bettersound:block/piano_pedal",
       "y": 180
     },
-    "facing=south,part=pedal_left": {
+    "delay=false,facing=south,part=pedal_left": {
       "model": "bettersound:block/piano_pedal_left",
       "y": 180
     },
-    "facing=south,part=pedal_right": {
+    "delay=false,facing=south,part=pedal_right": {
       "model": "bettersound:block/piano_pedal_right",
       "y": 180
     },
-    "facing=west,part=keyboard_left": {
+    "delay=false,facing=west,part=keyboard_left": {
       "model": "bettersound:block/piano_keyboard_left",
       "y": 270
     },
-    "facing=west,part=keyboard_middle": {
+    "delay=false,facing=west,part=keyboard_middle": {
       "model": "bettersound:block/piano_keyboard_middle",
       "y": 270
     },
-    "facing=west,part=keyboard_right": {
+    "delay=false,facing=west,part=keyboard_right": {
       "model": "bettersound:block/piano_keyboard_right",
       "y": 270
     },
-    "facing=west,part=pedal": {
+    "delay=false,facing=west,part=pedal": {
       "model": "bettersound:block/piano_pedal",
       "y": 270
     },
-    "facing=west,part=pedal_left": {
+    "delay=false,facing=west,part=pedal_left": {
       "model": "bettersound:block/piano_pedal_left",
       "y": 270
     },
-    "facing=west,part=pedal_right": {
+    "delay=false,facing=west,part=pedal_right": {
+      "model": "bettersound:block/piano_pedal_right",
+      "y": 270
+    },
+    "delay=true,facing=east,part=keyboard_left": {
+      "model": "bettersound:block/piano_keyboard_left",
+      "y": 90
+    },
+    "delay=true,facing=east,part=keyboard_middle": {
+      "model": "bettersound:block/piano_keyboard_middle",
+      "y": 90
+    },
+    "delay=true,facing=east,part=keyboard_right": {
+      "model": "bettersound:block/piano_keyboard_right",
+      "y": 90
+    },
+    "delay=true,facing=east,part=pedal": {
+      "model": "bettersound:block/piano_pedal_down",
+      "y": 90
+    },
+    "delay=true,facing=east,part=pedal_left": {
+      "model": "bettersound:block/piano_pedal_left",
+      "y": 90
+    },
+    "delay=true,facing=east,part=pedal_right": {
+      "model": "bettersound:block/piano_pedal_right",
+      "y": 90
+    },
+    "delay=true,facing=north,part=keyboard_left": {
+      "model": "bettersound:block/piano_keyboard_left"
+    },
+    "delay=true,facing=north,part=keyboard_middle": {
+      "model": "bettersound:block/piano_keyboard_middle"
+    },
+    "delay=true,facing=north,part=keyboard_right": {
+      "model": "bettersound:block/piano_keyboard_right"
+    },
+    "delay=true,facing=north,part=pedal": {
+      "model": "bettersound:block/piano_pedal_down"
+    },
+    "delay=true,facing=north,part=pedal_left": {
+      "model": "bettersound:block/piano_pedal_left"
+    },
+    "delay=true,facing=north,part=pedal_right": {
+      "model": "bettersound:block/piano_pedal_right"
+    },
+    "delay=true,facing=south,part=keyboard_left": {
+      "model": "bettersound:block/piano_keyboard_left",
+      "y": 180
+    },
+    "delay=true,facing=south,part=keyboard_middle": {
+      "model": "bettersound:block/piano_keyboard_middle",
+      "y": 180
+    },
+    "delay=true,facing=south,part=keyboard_right": {
+      "model": "bettersound:block/piano_keyboard_right",
+      "y": 180
+    },
+    "delay=true,facing=south,part=pedal": {
+      "model": "bettersound:block/piano_pedal_down",
+      "y": 180
+    },
+    "delay=true,facing=south,part=pedal_left": {
+      "model": "bettersound:block/piano_pedal_left",
+      "y": 180
+    },
+    "delay=true,facing=south,part=pedal_right": {
+      "model": "bettersound:block/piano_pedal_right",
+      "y": 180
+    },
+    "delay=true,facing=west,part=keyboard_left": {
+      "model": "bettersound:block/piano_keyboard_left",
+      "y": 270
+    },
+    "delay=true,facing=west,part=keyboard_middle": {
+      "model": "bettersound:block/piano_keyboard_middle",
+      "y": 270
+    },
+    "delay=true,facing=west,part=keyboard_right": {
+      "model": "bettersound:block/piano_keyboard_right",
+      "y": 270
+    },
+    "delay=true,facing=west,part=pedal": {
+      "model": "bettersound:block/piano_pedal_down",
+      "y": 270
+    },
+    "delay=true,facing=west,part=pedal_left": {
+      "model": "bettersound:block/piano_pedal_left",
+      "y": 270
+    },
+    "delay=true,facing=west,part=pedal_right": {
       "model": "bettersound:block/piano_pedal_right",
       "y": 270
     }

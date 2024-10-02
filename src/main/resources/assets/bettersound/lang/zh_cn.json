@@ -30,6 +30,8 @@
   "block.bettersound.note_block.title": "键盘",
   "block.bettersound.piano_block": "钢琴方块",
   "block.bettersound.piano_block.title": "键盘",
-  "block.bettersound.confine_pedal": "制音踏板"
+  "block.bettersound.confine_pedal": "制音踏板",
+  "block.bettersound.tone_block": "音阶方块",
+  "block.bettersound.piano_stool_block": "琴凳"
 
 }

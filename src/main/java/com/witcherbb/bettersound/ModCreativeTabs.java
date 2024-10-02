@@ -17,7 +17,9 @@ public class ModCreativeTabs {
                         //完整方块
                         output.accept(ModItems.ITEM_JUKEBOX_CONTROLLER.get());
                         output.accept(ModItems.ITEM_PIANO_BLOCK.get());
+                        output.accept(ModItems.ITEM_TONE_BLOCK.get());
                         //不完整方块(越往下越不完整)
+                        output.accept(ModItems.ITEM_PIANO_STOOL_BLOCK.get());
                         output.accept(ModItems.ITEM_CONFINE_PEDAL.get());
                         //唱片
                         int size = ModItems.music_discs_list.size();

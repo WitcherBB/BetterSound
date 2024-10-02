@@ -47,6 +47,8 @@ public class ModItems {
 	public static final RegistryObject<Item> ITEM_JUKEBOX_CONTROLLER = registerBlockItem(ModBlocks.JUKEBOX_CONTROLLER, new Item.Properties());
 	public static final RegistryObject<Item> ITEM_EXAMPLE_BLOCK_ITEM = registerBlockItem(ModBlocks.EXAMPLE_BLOCK, new Item.Properties());
 	public static final RegistryObject<Item> ITEM_PIANO_BLOCK = registerBlockItem(ModBlocks.PIANO_BLOCK, new Item.Properties());
+	public static final RegistryObject<Item> ITEM_TONE_BLOCK = registerBlockItem(ModBlocks.TONE_BLOCK, new Item.Properties());
+	public static final RegistryObject<Item> ITEM_PIANO_STOOL_BLOCK = registerBlockItem(ModBlocks.PIANO_STOOL_BLOCK, new Item.Properties());
 	public static final RegistryObject<Item> ITEM_CONFINE_PEDAL = registerBlockItem(ModBlocks.CONFINE_PEDAL, new Item.Properties());
 
 	public static final RegistryObject<Item> ITEM_TUNER = ITEMS.register("tuner", TunerItem::new);

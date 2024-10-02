@@ -16,7 +16,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,8 +27,7 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
     };
     public static final Map<Integer, String> toneNameMap = new TreeMap<>();
-    private boolean isSoundDelay = true;
-    private String toneName = "";
+    private boolean isSoundDelay = false;
 
     static {
         for (int i = 0; i < 88; i++) {
@@ -72,7 +70,6 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
 
     @Override
     public void tick() {
-        this.toneName = toneNameMap.get(this.getBlockState().getValue(PianoBlock.TONE));
         if (this.level == null || this.level.isClientSide) return;
         this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
     }
@@ -93,14 +90,6 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
 
     public void setSoundDelay(boolean soundDelay) {
         isSoundDelay = soundDelay;
-    }
-
-    public void setToneName(String toneName) {
-        this.toneName = toneName;
-    }
-
-    public String getToneName() {
-        return toneName;
     }
 
     private static Component getComponent(int id) {

@@ -1,0 +1,10 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "bettersound:include/bahnschrift.ttf",
+      "oversample": 4.0,
+      "size": 10.0
+    }
+  ]
+}

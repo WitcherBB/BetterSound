@@ -7,7 +7,6 @@ import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
@@ -35,7 +34,7 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos pos, int tone,
         ctx.get().enqueueWork(() -> {
             ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).getmodSoundManager();
             if (Minecraft.getInstance().level != null) {
-                BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.pos);
+                net.minecraft.world.level.block.entity.BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.pos);
                 if (packet.stop) {
                     soundManager.tryToStopPianoSound(packet.playerUUID, packet.pos, packet.tone);
                 }

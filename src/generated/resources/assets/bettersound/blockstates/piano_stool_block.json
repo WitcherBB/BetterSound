@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "bettersound:block/piano_stool_block",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "bettersound:block/piano_stool_block"
+    },
+    "facing=south": {
+      "model": "bettersound:block/piano_stool_block",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bettersound:block/piano_stool_block",
+      "y": 270
+    }
+  }
+}
