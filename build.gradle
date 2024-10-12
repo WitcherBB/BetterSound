@@ -161,6 +161,10 @@ dependencies {
     // https://mvnrepository.com/artifact/junit/junit
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 
+    // https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core
+    implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
+
+
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

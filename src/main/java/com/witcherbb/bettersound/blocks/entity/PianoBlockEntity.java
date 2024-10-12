@@ -1,8 +1,9 @@
 package com.witcherbb.bettersound.blocks.entity;
 
-import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.menu.inventory.PianoBlockMenu;
+import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
+import com.witcherbb.bettersound.music.nbs.NBSPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -22,12 +23,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class PianoBlockEntity extends BlockEntity implements MenuProvider, TickableBlockEntity {
+public class PianoBlockEntity extends BlockEntity implements MenuProvider, TickableBlockEntity, NBSAutoPlayer {
     private static final String[] keyNames = new String[]{
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
     };
     public static final Map<Integer, String> toneNameMap = new TreeMap<>();
     private boolean isSoundDelay = false;
+
+    private final NBSPlayer nbsPlayer;
 
     static {
         for (int i = 0; i < 88; i++) {
@@ -37,6 +40,7 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
 
     public PianoBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntityTypes.PIANO_BLOCK_ENTITY_TYPE.get(), pPos, pBlockState);
+        this.nbsPlayer = new NBSPlayer(this);
     }
 
     @Override
@@ -72,6 +76,7 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
     public void tick() {
         if (this.level == null || this.level.isClientSide) return;
         this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
+        this.nbsPlayer.tick();
     }
 
     @Override
@@ -112,5 +117,10 @@ public class PianoBlockEntity extends BlockEntity implements MenuProvider, Ticka
         } else {
             return Component.nullToEmpty(keyNames[id] + depth);
         }
+    }
+
+    @Override
+    public NBSPlayer getNBSPlayer() {
+        return this.nbsPlayer;
     }
 }

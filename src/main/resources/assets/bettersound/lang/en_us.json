@@ -36,6 +36,16 @@
   "block.bettersound.piano_block.title": "Keyboard",
   "block.bettersound.sustain_pedal": "Sustain Pedal",
   "block.bettersound.tone_block": "Tone Block",
-  "block.bettersound.piano_stool_block": "Piano Stool"
+  "block.bettersound.piano_stool_block": "Piano Stool",
 
+  "key.categories.bettersound.keyboard": "Piano Keyboard",
+  "key.bettersound.piano_pedal": "Sustain Pedal",
+  "key.bettersound.keyboard.1": "Keyboard 1",
+
+  "exception.bettersound.fileisnotnbs": "%s is not NBS file!",
+  "exception.bettersound.nbsnotfound": "%s was not found",
+  "wrong.bettersound.nbs.isnotautoplayer": "The block could not play NBS song",
+  "wrong.bettersound.nbs.hasnosong":"There are no songs in this block",
+  "wrong.bettersound.nbs.isnotplaying":"%s has been paused",
+  "bettersound.nbssuccess": "%s is playing"
 }

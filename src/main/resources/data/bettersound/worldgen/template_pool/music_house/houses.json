@@ -1,0 +1,14 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "bettersound:music_house/house",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      },
+      "weight": 150
+    }
+  ]
+}

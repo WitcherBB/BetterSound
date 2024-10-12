@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ToneBlock extends BaseEntityBlock {
-    public static IntegerProperty TONE = IntegerProperty.create("tone", 0, 87);
+    public static IntegerProperty TONE = IntegerProperty.create("tones", 0, 87);
     public static BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     protected ToneBlock(Properties pProperties) {

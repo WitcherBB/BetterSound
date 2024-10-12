@@ -36,6 +36,15 @@
   "block.bettersound.piano_block.title": "键盘",
   "block.bettersound.sustain_pedal": "延音踏板",
   "block.bettersound.tone_block": "音阶方块",
-  "block.bettersound.piano_stool_block": "琴凳"
+  "block.bettersound.piano_stool_block": "琴凳",
 
+  "key.categories.bettersound.keyboard": "钢琴键盘",
+  "key.bettersound.piano_pedal": "延音踏板",
+  "key.bettersound.keyboard.1": "键盘1",
+  "exception.bettersound.fileisnotnbs": "%s 不是NBS文件！",
+  "exception.bettersound.nbsnotfound": "%s 未找到",
+  "wrong.bettersound.nbs.isnotautoplayer": "该方块不能播放NBS",
+  "wrong.bettersound.nbs.hasnosong": "该方块没有歌曲！",
+  "wrong.bettersound.nbs.isnotplaying": "%s 已经暂停",
+  "bettersound.nbssuccess": "正在播放 %s"
 }

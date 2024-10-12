@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +20,7 @@ public class ModSoundManager {
         this.minecraft = minecraft;
     }
 
-    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, Integer tone, boolean isForUI, boolean isShort) {
+    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, int tone, boolean isForUI, boolean isShort) {
         PianoSoundInstance soundInstance;
         if (isForUI) {
             soundInstance = PianoSoundInstance.forUI(soundEvent, pos, playerUUID, tone);
@@ -32,13 +31,19 @@ public class ModSoundManager {
         playingPianoNotes.put(pos, playerUUID, tone, soundInstance);
     }
 
-    private void stopPianoSound(UUID playerUUID, BlockPos pos, Integer tone) {
+    public void playPianoSoundWithVolume(SoundEvent soundEvent, float volume, UUID playerUUID, BlockPos pos, int tone, boolean isShort) {
+        PianoSoundInstance soundInstance = PianoSoundInstance.forBlock(soundEvent, volume, pos, playerUUID, tone, isShort);
+        minecraft.getSoundManager().play(soundInstance);
+        playingPianoNotes.put(pos, playerUUID, tone, soundInstance);
+    }
+
+    private void stopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
         PianoSoundInstance soundInstance = playingPianoNotes.removeFirst(pos, playerUUID, tone);
         if (soundInstance != null)
             soundInstance.setStoped();
     }
 
-    public void tryToStopPianoSound(UUID playerUUID, BlockPos pos, Integer tone) {
+    public void tryToStopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
         if (playingPianoNotes.get(pos, playerUUID, tone) == null) return;
         this.stopPianoSound(playerUUID, pos, tone);
     }

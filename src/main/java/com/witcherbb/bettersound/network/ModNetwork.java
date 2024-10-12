@@ -3,6 +3,7 @@ package com.witcherbb.bettersound.network;
 import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.network.protocol.*;
+import com.witcherbb.bettersound.network.protocol.nbs.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -85,6 +86,18 @@ public class ModNetwork {
                 .decoder(SToneKeyPressedPacket::decode)
                 .consumerMainThread(SToneKeyPressedPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(SBlockEntityDataChangePacket.class, id())
+                .encoder(SBlockEntityDataChangePacket::encode)
+                .decoder(SBlockEntityDataChangePacket::decode)
+                .consumerMainThread(SBlockEntityDataChangePacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(SNBSPlayPacket.class, id())
+                .encoder(SNBSPlayPacket::encode)
+                .decoder(SNBSPlayPacket::decode)
+                .consumerMainThread(SNBSPlayPacket::handle)
+                .add();
     }
 
     private static void addClientPacket() {
@@ -117,6 +130,36 @@ public class ModNetwork {
                 .encoder(CToneBlockStopPacket::encode)
                 .decoder(CToneBlockStopPacket::decode)
                 .consumerMainThread(CToneBlockStopPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CCommandPlayNBSPacket.class, id())
+                .encoder(CCommandPlayNBSPacket::encode)
+                .decoder(CCommandPlayNBSPacket::decode)
+                .consumerMainThread(CCommandPlayNBSPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CPianoBlockPlayMultipleNotesPacket.class, id())
+                .encoder(CPianoBlockPlayMultipleNotesPacket::encode)
+                .decoder(CPianoBlockPlayMultipleNotesPacket::decode)
+                .consumerMainThread(CPianoBlockPlayMultipleNotesPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CNBSStopPacket.class, id())
+                .encoder(CNBSStopPacket::encode)
+                .decoder(CNBSStopPacket::decode)
+                .consumerMainThread(CNBSStopPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CNBSPausePacket.class, id())
+                .encoder(CNBSPausePacket::encode)
+                .decoder(CNBSPausePacket::decode)
+                .consumerMainThread(CNBSPausePacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CNBSPlayOnPacket.class, id())
+                .encoder(CNBSPlayOnPacket::encode)
+                .decoder(CNBSPlayOnPacket::decode)
+                .consumerMainThread(CNBSPlayOnPacket::handle)
                 .add();
     }
 

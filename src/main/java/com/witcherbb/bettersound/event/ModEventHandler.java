@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.event;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
@@ -7,13 +8,23 @@ import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
+import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
+import com.witcherbb.bettersound.server.commands.ModCommands;
+import com.witcherbb.bettersound.server.commands.PlayNBSCommand;
+import com.witcherbb.bettersound.world.structure.ModStructureAdder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -21,13 +32,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -69,6 +85,11 @@ public class ModEventHandler {
 			}
 		}
 
+		@SubscribeEvent
+		public static void onRegisterBindings(RegisterKeyMappingsEvent event) {
+//			event.register(ModKeyMapping.FIRST.get());
+		}
+
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -93,11 +114,31 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	static class ForgeServerEvents {
 		@SubscribeEvent
+		public static void onCommandRegister(RegisterCommandsEvent event) {
+			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+			Commands.CommandSelection selection = event.getCommandSelection();
+			CommandBuildContext context = event.getBuildContext();
+
+			ModCommands.register(dispatcher, selection, context);
+		}
+
+		@SubscribeEvent
 		public static void onLevelLoad(LevelEvent.Load event) {
 			Level level = (Level) event.getLevel();
 			if (level.getLevelData() instanceof PrimaryLevelData levelData) {
 				BetterSound.currentLevelName = levelData.getLevelName();
 			}
+			if (level.isClientSide) {
+				((MinecraftExtender) Minecraft.getInstance()).betterSound$getNBSLoader().load();
+			}
+		}
+
+		@SubscribeEvent
+		public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+			Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
+			Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
+
+			ModStructureAdder.bootstrap(templatePoolRegistry, processorListRegistry);
 		}
 
 		@SubscribeEvent

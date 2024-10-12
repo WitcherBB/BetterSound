@@ -26,30 +26,37 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     private int tone;
     private UUID playerUUID;
     private BlockPos pos;
+    private final float firstVolume;
 
+    private static final float FULL_VOLUME = 3.0F;
 
     public static PianoSoundInstance forUI(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone) {
-        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, 3.0F, 1.0F, 0, 0, 0, true, false);
+        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, FULL_VOLUME, 1.0F, 0, 0, 0, true, false);
         instance.setPos(pos);
         instance.setPlayerUUID(playerUUID);
         instance.setTone(tone);
         return instance;
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, double x, double y, double z, UUID playerUUID, int tone, boolean isShort) {
-        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, 3.0F, 1.0F, x, y, z, false, isShort);
+    public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
+        return forBlock(soundEvent, FULL_VOLUME, pos.getX(), pos.getY(), pos.getZ(), playerUUID, tone, isShort);
+    }
+
+    public static PianoSoundInstance forBlock(SoundEvent soundEvent, float volume, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
+        return forBlock(soundEvent, volume, pos.getX(), pos.getY(), pos.getZ(), playerUUID, tone, isShort);
+    }
+
+    public static PianoSoundInstance forBlock(SoundEvent soundEvent, float volume, double x, double y, double z, UUID playerUUID, int tone, boolean isShort) {
+        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, volume, 1.0F, x, y, z, false, isShort);
         instance.setPlayerUUID(playerUUID);
         instance.setTone(tone);
         return instance;
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
-        return forBlock(soundEvent, pos.getX(), pos.getY(), pos.getZ(), playerUUID, tone, isShort);
-    }
-
     private PianoSoundInstance(SoundEvent soundEvent, float volume, float pitch, double x, double y, double z, boolean relative, boolean isShort) {
         super(soundEvent, SoundSource.RECORDS, SoundInstance.createUnseededRandom());
         this.volume = volume;
+        this.firstVolume = volume;
         this.pitch = pitch;
         this.relative = relative;
         this.x = x;
@@ -82,7 +89,7 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     }
 
     private float getDeltaVolume(int tick) {
-        return -1.74F / (tick * tick) - 0.01F;
+        return -1.74F / (tick * tick) * this.firstVolume / FULL_VOLUME - 0.01F;
     }
 
     public void setPos(BlockPos pos) {

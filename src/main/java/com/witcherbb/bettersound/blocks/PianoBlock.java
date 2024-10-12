@@ -24,10 +24,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -48,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PianoBlock extends BaseEntityBlock implements CombinedBlock<PianoPart> {
-    public static final IntegerProperty TONE = IntegerProperty.create("tone", 0, 87);
+    public static final IntegerProperty TONE = IntegerProperty.create("tones", 0, 87);
     public static final EnumProperty<PianoPart> PART = EnumProperty.create("part", PianoPart.class);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty DELAY = BooleanProperty.create("delay");
@@ -215,6 +212,16 @@ public class PianoBlock extends BaseEntityBlock implements CombinedBlock<PianoPa
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    public BlockState rotate(BlockState pState, Rotation pRot) {
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
 
     @Override

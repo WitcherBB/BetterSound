@@ -1,12 +1,15 @@
 package com.witcherbb.bettersound.client.gui.screen.inventory;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
+import com.witcherbb.bettersound.client.ModKeyMapping;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.menu.inventory.PianoBlockMenu;
+import com.witcherbb.bettersound.network.protocol.SBlockEntityDataChangePacket;
 import com.witcherbb.bettersound.network.protocol.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.SPianoKeyReleasedPacket;
 import net.minecraft.client.Minecraft;
@@ -17,6 +20,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -119,7 +123,7 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
     }
 
     private void loadButtons() {
-        //将琴键移除组件
+        //移除琴键组件
         this.removeCurrentButtons();
         this.currentKeys.clear();
         //往currentKeys里添加琴键
@@ -143,7 +147,7 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
             keys.get(button1.id + 1).update(16, this.leftPos);
             currentKeys.add(keys.get(button1.id + 1));
         }
-        //将琴键添加到组件中
+        //添加琴键到组件中
         List<PianoKeyButton> list = this.orderedButtons();
         int size = list.size();
         for (int i = 0; i < size; i++) {
@@ -195,6 +199,32 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
     }
 
     @Override
+    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        if (ModKeyMapping.FIRST.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            this.keys.get(1).press();
+            return true;
+        } else if (ModKeyMapping.KEY_PIANO_PEDAL.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            this.pedalPressed(true);
+            return true;
+        }
+
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
+        if (ModKeyMapping.FIRST.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            this.keys.get(1).release();
+            return true;
+        } else if (ModKeyMapping.KEY_PIANO_PEDAL.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            this.pedalPressed(false);
+            return true;
+        }
+
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    }
+
+    @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
         if (this.buttonMove(pDelta)) {
             this.loadButtons();
@@ -231,6 +261,12 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
     @Override
     public void onClose() {
         super.onClose();
+    }
+
+    private void pedalPressed(boolean isPressed) {
+        CompoundTag nbt = blockEntity.saveWithoutMetadata();
+        nbt.putBoolean("IsSoundDelay", isPressed);
+        ModNetwork.sendToServer(new SBlockEntityDataChangePacket(blockEntity.getBlockPos(), nbt));
     }
 
     protected class PianoKeyButton extends AbstractButton {
@@ -295,12 +331,7 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
 
         @Override
         public void onPress() {
-            this.pressed = true;
-            if (minecraft != null) {
-                BlockPos pos = PianoBlockScreen.this.blockEntity.getBlockPos();
-                ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id));
-                minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
-            }
+            this.press();
         }
 
         @Override
@@ -367,6 +398,19 @@ public class PianoBlockScreen extends AbstractContainerScreen<PianoBlockMenu> {
 
         @Override
         public void onRelease(double pMouseX, double pMouseY) {
+            this.release();
+        }
+
+        public void press() {
+            this.pressed = true;
+            if (minecraft != null) {
+                BlockPos pos = PianoBlockScreen.this.blockEntity.getBlockPos();
+                ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id));
+                minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, true, false);
+            }
+        }
+
+        public void release() {
             this.pressed = false;
             BlockPos pos = PianoBlockScreen.this.blockEntity.getBlockPos();
             if (!fatherInstance.blockEntity.isSoundDelay())

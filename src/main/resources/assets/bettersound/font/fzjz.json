@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "bettersound:include/fzjz.ttf",
+      "oversample": 20.0,
+      "size": 10.0,
+      "shift": [0.0, 1.0]
+    }
+  ]
+}
