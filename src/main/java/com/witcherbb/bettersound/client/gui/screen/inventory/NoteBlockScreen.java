@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.NoteBlockEntity;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.SNoteBlockPlayNotePacket;
+import com.witcherbb.bettersound.network.protocol.server.SNoteBlockPlayNotePacket;
 import com.witcherbb.bettersound.menu.inventory.NoteBlockMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

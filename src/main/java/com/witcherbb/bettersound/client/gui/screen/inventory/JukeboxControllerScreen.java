@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.SJukeboxControllerNamePacket;
+import com.witcherbb.bettersound.network.protocol.server.SJukeboxControllerNamePacket;
 import com.witcherbb.bettersound.menu.inventory.JukeboxControllerMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

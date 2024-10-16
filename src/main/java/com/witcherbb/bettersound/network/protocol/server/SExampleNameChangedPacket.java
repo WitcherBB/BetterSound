@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol;
+package com.witcherbb.bettersound.network.protocol.server;
 
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.ExampleBlockEntity;
@@ -12,20 +12,14 @@ import net.minecraftforge.network.NetworkEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
-public class SExampleNameChangedPacket {
-	private final String name;
-
-	public SExampleNameChangedPacket(String name) {
-		this.name = name;
-	}
-
-	public SExampleNameChangedPacket(FriendlyByteBuf buf) {
-		this(buf.toString(StandardCharsets.UTF_8));
-	}
-
+public record SExampleNameChangedPacket(String name) {
 
 	public void encode(FriendlyByteBuf pBuffer) {
 		pBuffer.writeBytes(this.name.getBytes(StandardCharsets.UTF_8));
+	}
+
+	public static SExampleNameChangedPacket decode(FriendlyByteBuf buf) {
+		return new SExampleNameChangedPacket(buf.toString(StandardCharsets.UTF_8));
 	}
 
 	public static void handle(SExampleNameChangedPacket packet, Supplier<NetworkEvent.Context> ctx) {
@@ -41,14 +35,12 @@ public class SExampleNameChangedPacket {
 				}
 				ExampleBlockEntity blockEntity = exampleMenu.getBlockEntity();
 				CompoundTag nbt = blockEntity.getUpdateTag();
-				nbt.putString("Name", packet.getName());
+				nbt.putString("Name", packet.name());
 				blockEntity.load(nbt);
 			}
 		});
 		ctx.get().setPacketHandled(true);
 	}
 
-	public String getName() {
-		return name;
-	}
+
 }

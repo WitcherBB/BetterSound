@@ -4,7 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.nbs.CCommandPlayNBSPacket;
+import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
+import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSReloadPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -26,6 +27,8 @@ public class PlayNBSCommand {
             return stop(ctx.getSource(), BlockPosArgument.getBlockPos(ctx, "target"));
         })).then(Commands.literal("pause").executes(ctx -> {
             return pause(ctx.getSource(), BlockPosArgument.getBlockPos(ctx, "target"));
+        })).then(Commands.literal("reload").executes(ctx -> {
+            return reload(ctx.getSource());
         }))));
     }
 
@@ -74,6 +77,13 @@ public class PlayNBSCommand {
             return -1;
         }
 
+        return 0;
+    }
+
+    private static int reload(CommandSourceStack pSource) {
+        ServerPlayer player = pSource.getPlayer();
+        if (player == null) return -1;
+        ModNetwork.sendToPlayer(new CNBSReloadPacket(), player);
         return 0;
     }
 }

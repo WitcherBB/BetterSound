@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol;
+package com.witcherbb.bettersound.network.protocol.server;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,17 +11,10 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SNoteBlockPlayNotePacket {
-    private final int note;
-    private final BlockPos pos;
+public record SNoteBlockPlayNotePacket(int note, BlockPos pos) {
 
-    public SNoteBlockPlayNotePacket(int note, BlockPos pos) {
-        this.note = note;
-        this.pos = pos;
-    }
-
-    public SNoteBlockPlayNotePacket(FriendlyByteBuf buf) {
-        this(buf.readByte(), buf.readBlockPos());
+    public static SNoteBlockPlayNotePacket decode(FriendlyByteBuf buf) {
+        return new SNoteBlockPlayNotePacket(buf.readByte(), buf.readBlockPos());
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -48,5 +41,4 @@ public class SNoteBlockPlayNotePacket {
         });
         ctx.get().setPacketHandled(true);
     }
-
 }

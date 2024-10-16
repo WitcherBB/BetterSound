@@ -19,7 +19,7 @@ public class ModPacketDistributor {
         return packet -> {
             List<ServerPlayer> players = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers();
             ServerPlayer exceptedPlayer = serverPlayerSupplier.get();
-            players.forEach((player) -> {
+            players.forEach(player -> {
                 if (player != exceptedPlayer) {
                     player.connection.send(packet);
                 }

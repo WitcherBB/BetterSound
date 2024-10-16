@@ -2,8 +2,15 @@ package com.witcherbb.bettersound.network;
 
 import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.BetterSound;
-import com.witcherbb.bettersound.network.protocol.*;
-import com.witcherbb.bettersound.network.protocol.nbs.*;
+import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
+import com.witcherbb.bettersound.network.protocol.client.nbs.*;
+import com.witcherbb.bettersound.network.protocol.server.*;
+import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
+import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
+import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -47,7 +54,7 @@ public class ModNetwork {
 
         INSTANCE.messageBuilder(SExampleNameChangedPacket.class, id())
                 .encoder(SExampleNameChangedPacket::encode)
-                .decoder(SExampleNameChangedPacket::new)
+                .decoder(SExampleNameChangedPacket::decode)
                 .consumerMainThread(SExampleNameChangedPacket::handle)
                 .add();
 
@@ -59,7 +66,7 @@ public class ModNetwork {
 
         INSTANCE.messageBuilder(SNoteBlockPlayNotePacket.class, id())
                 .encoder(SNoteBlockPlayNotePacket::encode)
-                .decoder(SNoteBlockPlayNotePacket::new)
+                .decoder(SNoteBlockPlayNotePacket::decode)
                 .consumerMainThread(SNoteBlockPlayNotePacket::handle)
                 .add();
 
@@ -73,18 +80,6 @@ public class ModNetwork {
                 .encoder(SPianoKeyReleasedPacket::encode)
                 .decoder(SPianoKeyReleasedPacket::decode)
                 .consumerMainThread(SPianoKeyReleasedPacket::handle)
-                .add();
-
-        INSTANCE.messageBuilder(SToneKeyReleasedPacket.class, id())
-                .encoder(SToneKeyReleasedPacket::encode)
-                .decoder(SToneKeyReleasedPacket::decode)
-                .consumerMainThread(SToneKeyReleasedPacket::handle)
-                .add();
-
-        INSTANCE.messageBuilder(SToneKeyPressedPacket.class, id())
-                .encoder(SToneKeyPressedPacket::encode)
-                .decoder(SToneKeyPressedPacket::decode)
-                .consumerMainThread(SToneKeyPressedPacket::handle)
                 .add();
 
         INSTANCE.messageBuilder(SBlockEntityDataChangePacket.class, id())
@@ -120,18 +115,6 @@ public class ModNetwork {
                 .consumerMainThread(CPianoBlockStopPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CToneBlockPlayNotePacket.class, id())
-                .encoder(CToneBlockPlayNotePacket::encode)
-                .decoder(CToneBlockPlayNotePacket::decode)
-                .consumerMainThread(CToneBlockPlayNotePacket::handle)
-                .add();
-
-        INSTANCE.messageBuilder(CToneBlockStopPacket.class, id())
-                .encoder(CToneBlockStopPacket::encode)
-                .decoder(CToneBlockStopPacket::decode)
-                .consumerMainThread(CToneBlockStopPacket::handle)
-                .add();
-
         INSTANCE.messageBuilder(CCommandPlayNBSPacket.class, id())
                 .encoder(CCommandPlayNBSPacket::encode)
                 .decoder(CCommandPlayNBSPacket::decode)
@@ -160,6 +143,12 @@ public class ModNetwork {
                 .encoder(CNBSPlayOnPacket::encode)
                 .decoder(CNBSPlayOnPacket::decode)
                 .consumerMainThread(CNBSPlayOnPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(CNBSReloadPacket.class, id())
+                .encoder(CNBSReloadPacket::encode)
+                .decoder(CNBSReloadPacket::decode)
+                .consumerMainThread(CNBSReloadPacket::handle)
                 .add();
     }
 

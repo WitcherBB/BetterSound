@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public class LastToneMap extends HashMap<BlockPos, HashMap<UUID, List<Integer>>> {
     private LastToneMap() {
-
     }
 
     public void put(BlockPos pos, UUID uuid, Integer tone) {

@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol;
+package com.witcherbb.bettersound.network.protocol.server;
 
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public record SJukeboxControllerNamePacket(String name, String dimension) {

@@ -3,13 +3,14 @@ package com.witcherbb.bettersound.client.resources.sounds;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.mixins.extenders.SoundInstanceExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.SPianoKeyReleasedPacket;
+import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,8 +31,16 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
 
     private static final float FULL_VOLUME = 3.0F;
 
-    public static PianoSoundInstance forUI(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone) {
-        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, FULL_VOLUME, 1.0F, 0, 0, 0, true, false);
+    public static PianoSoundInstance forUI(SoundEvent soundEvent, BlockPos pos, Vec3 relative, UUID playerUUID, int tone) {
+        return forUI(soundEvent, pos, relative, playerUUID, tone, FULL_VOLUME);
+    }
+
+    public static PianoSoundInstance forUI(SoundEvent soundEvent, BlockPos pos, Vec3 relative, UUID playerUUID, int tone, float volume) {
+        return forUIRelative(soundEvent, pos, Vec3.ZERO, playerUUID, tone, volume);
+    }
+
+    public static PianoSoundInstance forUIRelative(SoundEvent soundEvent, BlockPos pos, Vec3 relative, UUID playerUUID, int tone, float volume) {
+        PianoSoundInstance instance = new PianoSoundInstance(soundEvent, volume, 1.0F, relative.x, relative.y, relative.z, true, false);
         instance.setPos(pos);
         instance.setPlayerUUID(playerUUID);
         instance.setTone(tone);
@@ -39,14 +48,18 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     }
 
     public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
-        return forBlock(soundEvent, FULL_VOLUME, pos.getX(), pos.getY(), pos.getZ(), playerUUID, tone, isShort);
+        return forPosition(soundEvent, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, playerUUID, tone, FULL_VOLUME, isShort);
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, float volume, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
-        return forBlock(soundEvent, volume, pos.getX(), pos.getY(), pos.getZ(), playerUUID, tone, isShort);
+    public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, float volume, boolean isShort) {
+        return forPosition(soundEvent, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, playerUUID, tone, volume, isShort);
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, float volume, double x, double y, double z, UUID playerUUID, int tone, boolean isShort) {
+    public static PianoSoundInstance forPosition(SoundEvent soundEvent, Vec3 vec3, UUID playerUUID, int tone, float volume, boolean isShort) {
+        return forPosition(soundEvent, vec3.x, vec3.y, vec3.z, playerUUID, tone, volume, isShort);
+    }
+
+    public static PianoSoundInstance forPosition(SoundEvent soundEvent, double x, double y, double z, UUID playerUUID, int tone, float volume, boolean isShort) {
         PianoSoundInstance instance = new PianoSoundInstance(soundEvent, volume, 1.0F, x, y, z, false, isShort);
         instance.setPlayerUUID(playerUUID);
         instance.setTone(tone);
@@ -89,7 +102,7 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     }
 
     private float getDeltaVolume(int tick) {
-        return -1.74F / (tick * tick) * this.firstVolume / FULL_VOLUME - 0.01F;
+        return -1.74F / (tick * tick) * this.firstVolume / FULL_VOLUME - 0.015F;
     }
 
     public void setPos(BlockPos pos) {

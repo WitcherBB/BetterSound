@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol;
+package com.witcherbb.bettersound.network.protocol.client;
 
 import com.witcherbb.bettersound.client.gui.screen.inventory.JukeboxScreen;
 import com.witcherbb.bettersound.common.utils.Util;
@@ -8,12 +8,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class CJukeboxNameConfirmPacket {
-    private final Util.Status status;
-
-    public CJukeboxNameConfirmPacket(Util.Status status) {
-        this.status = status;
-    }
+public record CJukeboxNameConfirmPacket(Util.Status status) {
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeEnum(this.status);

@@ -14,6 +14,18 @@ public class Note {
         this.volume = volume;
     }
 
+    public static byte[] getTones(List<Note> notes) {
+        return Util.toArray(notes.stream().parallel().map(Note::getPitch).toList());
+    }
+
+    public static byte[] getVolumes(List<Note> notes) {
+        return Util.toArray(notes.stream().parallel().map(Note::getVolume).toList());
+    }
+
+    public static float toPianoSoundVolume(byte volume) {
+        return volume * 3.0F / 100;
+    }
+
     public byte getPitch() {
         return pitch;
     }
@@ -33,14 +45,6 @@ public class Note {
 
     public void changeVolume(byte volume) {
         this.volume = volume;
-    }
-
-    public static byte[] getTones(List<Note> notes) {
-        return Util.toArray(notes.stream().parallel().map(Note::getPitch).toList());
-    }
-
-    public static byte[] getVolumes(List<Note> notes) {
-        return Util.toArray(notes.stream().parallel().map(Note::getVolume).toList());
     }
 
     // 实现编译码在网络中传递

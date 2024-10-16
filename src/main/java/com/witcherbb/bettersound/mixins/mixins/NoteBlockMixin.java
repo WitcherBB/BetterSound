@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
 import com.witcherbb.bettersound.blocks.entity.NoteBlockEntity;
+import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.items.TunerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(NoteBlock.class)
-public abstract class NoteBlockMixin extends Block implements EntityBlock {
+public abstract class NoteBlockMixin extends Block implements EntityBlock, SpectatorInvalidBlock {
 
 	public NoteBlockMixin(Properties pProperties) {
 		super(pProperties);

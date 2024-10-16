@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
+import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.blocks.utils.Tickers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -37,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = JukeboxBlock.class)
-public abstract class JukeboxMixin extends BaseEntityBlock{
+public abstract class JukeboxMixin extends BaseEntityBlock implements SpectatorInvalidBlock {
 
 	@Unique
 	private static final VoxelShape betterSound$OUTSIDE = Shapes.block();

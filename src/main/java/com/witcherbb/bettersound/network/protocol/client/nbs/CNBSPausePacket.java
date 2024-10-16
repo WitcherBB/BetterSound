@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol.nbs;
+package com.witcherbb.bettersound.network.protocol.client.nbs;
 
 import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
 import com.witcherbb.bettersound.music.nbs.NBSPlayer;

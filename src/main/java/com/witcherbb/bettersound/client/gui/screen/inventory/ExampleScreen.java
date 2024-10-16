@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.ExampleBlockEntity;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.SExampleNameChangedPacket;
+import com.witcherbb.bettersound.network.protocol.server.SExampleNameChangedPacket;
 import com.witcherbb.bettersound.menu.inventory.ExampleMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

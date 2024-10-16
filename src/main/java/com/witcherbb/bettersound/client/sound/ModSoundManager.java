@@ -5,6 +5,7 @@ import com.witcherbb.bettersound.client.resources.sounds.PianoSoundInstance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,21 +21,20 @@ public class ModSoundManager {
         this.minecraft = minecraft;
     }
 
-    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, int tone, boolean isForUI, boolean isShort) {
-        PianoSoundInstance soundInstance;
-        if (isForUI) {
-            soundInstance = PianoSoundInstance.forUI(soundEvent, pos, playerUUID, tone);
-        } else {
-            soundInstance = PianoSoundInstance.forBlock(soundEvent, pos, playerUUID, tone, isShort);
-        }
-        minecraft.getSoundManager().play(soundInstance);
-        playingPianoNotes.put(pos, playerUUID, tone, soundInstance);
+    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, int tone, float volume, boolean isForUI, boolean isShort) {
+        this.playPianoSound(soundEvent, playerUUID, Vec3.atCenterOf(pos), tone, volume, isForUI, isShort);
     }
 
-    public void playPianoSoundWithVolume(SoundEvent soundEvent, float volume, UUID playerUUID, BlockPos pos, int tone, boolean isShort) {
-        PianoSoundInstance soundInstance = PianoSoundInstance.forBlock(soundEvent, volume, pos, playerUUID, tone, isShort);
+    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, Vec3 pos, int tone, float volume, boolean isForUI, boolean isShort) {
+        PianoSoundInstance soundInstance;
+        BlockPos blockPos = BlockPos.containing(pos);
+        if (isForUI) {
+            soundInstance = PianoSoundInstance.forUI(soundEvent, blockPos, Vec3.ZERO, playerUUID, tone, volume);
+        } else {
+            soundInstance = PianoSoundInstance.forPosition(soundEvent, pos, playerUUID, tone, volume, isShort);
+        }
         minecraft.getSoundManager().play(soundInstance);
-        playingPianoNotes.put(pos, playerUUID, tone, soundInstance);
+        playingPianoNotes.put(blockPos, playerUUID, tone, soundInstance);
     }
 
     private void stopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
@@ -44,7 +44,7 @@ public class ModSoundManager {
     }
 
     public void tryToStopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
-        if (playingPianoNotes.get(pos, playerUUID, tone) == null) return;
+        if (playingPianoNotes.getFirst(pos, playerUUID, tone) == null) return;
         this.stopPianoSound(playerUUID, pos, tone);
     }
 

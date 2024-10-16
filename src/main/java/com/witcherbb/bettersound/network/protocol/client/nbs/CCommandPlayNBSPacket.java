@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.network.protocol.nbs;
+package com.witcherbb.bettersound.network.protocol.client.nbs;
 
 import com.witcherbb.bettersound.exception.NBSNotFoundException;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
@@ -35,7 +35,7 @@ public record CCommandPlayNBSPacket(String filename, BlockPos pos) {
                 if (entity instanceof NBSAutoPlayer autoPlayer) {
                     autoPlayer.getNBSPlayer().play(song);
                     if (mc.player != null) {
-                        mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.nbssuccess", song.fileName)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));
+                        mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.nbs.success", song.fileName)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));
                     }
                 }
             } catch (NBSNotFoundException e) {

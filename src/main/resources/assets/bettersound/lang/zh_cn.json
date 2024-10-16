@@ -40,11 +40,13 @@
 
   "key.categories.bettersound.keyboard": "钢琴键盘",
   "key.bettersound.piano_pedal": "延音踏板",
-  "key.bettersound.keyboard.1": "键盘1",
+  "key.bettersound.keyboard.key": "琴键",
+
   "exception.bettersound.fileisnotnbs": "%s 不是NBS文件！",
   "exception.bettersound.nbsnotfound": "%s 未找到",
   "wrong.bettersound.nbs.isnotautoplayer": "该方块不能播放NBS",
   "wrong.bettersound.nbs.hasnosong": "该方块没有歌曲！",
   "wrong.bettersound.nbs.isnotplaying": "%s 已经暂停",
-  "bettersound.nbssuccess": "正在播放 %s"
+  "bettersound.nbs.success": "正在播放 %s",
+  "bettersound.nbs.loadscs": "NBS文件重新加载成功！"
 }

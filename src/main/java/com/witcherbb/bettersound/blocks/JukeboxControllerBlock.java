@@ -2,6 +2,7 @@ package com.witcherbb.bettersound.blocks;
 
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
+import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.common.data.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.common.data.pojo.JukeboxEntityData;
 import net.minecraft.core.BlockPos;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class JukeboxControllerBlock extends BaseEntityBlock {
+public class JukeboxControllerBlock extends BaseEntityBlock implements SpectatorInvalidBlock {
     public static final BooleanProperty OPENED = BooleanProperty.create("opened");
 
     public JukeboxControllerBlock() {

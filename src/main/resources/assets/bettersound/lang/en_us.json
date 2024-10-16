@@ -40,12 +40,13 @@
 
   "key.categories.bettersound.keyboard": "Piano Keyboard",
   "key.bettersound.piano_pedal": "Sustain Pedal",
-  "key.bettersound.keyboard.1": "Keyboard 1",
+  "key.bettersound.keyboard.key": "Key",
 
   "exception.bettersound.fileisnotnbs": "%s is not NBS file!",
   "exception.bettersound.nbsnotfound": "%s was not found",
   "wrong.bettersound.nbs.isnotautoplayer": "The block could not play NBS song",
   "wrong.bettersound.nbs.hasnosong":"There are no songs in this block",
   "wrong.bettersound.nbs.isnotplaying":"%s has been paused",
-  "bettersound.nbssuccess": "%s is playing"
+  "bettersound.nbs.success": "%s is playing",
+  "bettersound.nbs.loadscs": "NBS files have been reloaded successfully!"
 }

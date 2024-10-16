@@ -3,6 +3,8 @@ package com.witcherbb.bettersound.event;
 import com.mojang.brigadier.CommandDispatcher;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
+import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
+import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
 import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
 import com.witcherbb.bettersound.common.init.DataManager;
@@ -14,7 +16,6 @@ import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
 import com.witcherbb.bettersound.server.commands.ModCommands;
-import com.witcherbb.bettersound.server.commands.PlayNBSCommand;
 import com.witcherbb.bettersound.world.structure.ModStructureAdder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -55,8 +56,9 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 	static class ModClientEvents {
 		@SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
+        public static void onClientSetup(FMLClientSetupEvent event) {
+			ModOptions.getOptions().load();
+
             MenuScreens.register(ModMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
             MenuScreens.register(ModMenuTypes.EXAMPLE_MENU.get(), ExampleScreen::new);
 			MenuScreens.register(ModMenuTypes.JUKEBOX_CONTROLLER_MENU.get(), JukeboxControllerScreen::new);
@@ -87,7 +89,7 @@ public class ModEventHandler {
 
 		@SubscribeEvent
 		public static void onRegisterBindings(RegisterKeyMappingsEvent event) {
-//			event.register(ModKeyMapping.FIRST.get());
+
 		}
 
 	}
@@ -126,7 +128,7 @@ public class ModEventHandler {
 		public static void onLevelLoad(LevelEvent.Load event) {
 			Level level = (Level) event.getLevel();
 			if (level.getLevelData() instanceof PrimaryLevelData levelData) {
-				BetterSound.currentLevelName = levelData.getLevelName();
+				BetterSound.getInstance().currentLevelName = levelData.getLevelName();
 			}
 			if (level.isClientSide) {
 				((MinecraftExtender) Minecraft.getInstance()).betterSound$getNBSLoader().load();
@@ -169,6 +171,13 @@ public class ModEventHandler {
 			}
 		}
 
+		@SubscribeEvent
+		public static void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
+			Level level = event.getLevel();
+			if (event.getEntity().isSpectator() && level.getBlockState(event.getHitVec().getBlockPos()).getBlock() instanceof SpectatorInvalidBlock) {
+				event.setCanceled(true);
+			}
+		}
 	}
 
 }
