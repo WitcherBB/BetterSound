@@ -37,6 +37,7 @@
   "block.bettersound.sustain_pedal": "延音踏板",
   "block.bettersound.tone_block": "音阶方块",
   "block.bettersound.piano_stool_block": "琴凳",
+  "block.bettersound.piano.use_keymap": "按键控制",
 
   "key.categories.bettersound.keyboard": "钢琴键盘",
   "key.bettersound.piano_pedal": "延音踏板",
@@ -47,6 +48,7 @@
   "wrong.bettersound.nbs.isnotautoplayer": "该方块不能播放NBS",
   "wrong.bettersound.nbs.hasnosong": "该方块没有歌曲！",
   "wrong.bettersound.nbs.isnotplaying": "%s 已经暂停",
+  "wrong.bettersound.nbs.isplaying": "播放器正在播放",
   "bettersound.nbs.success": "正在播放 %s",
   "bettersound.nbs.loadscs": "NBS文件重新加载成功！"
 }

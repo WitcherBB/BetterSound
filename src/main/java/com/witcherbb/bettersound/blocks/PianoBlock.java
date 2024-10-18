@@ -10,6 +10,7 @@ import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
+import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,7 +48,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
     public static final EnumProperty<PianoPart> PART = EnumProperty.create("part", PianoPart.class);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty DELAY = BooleanProperty.create("delay");
-    private static final PianoPart LAST_PART = PianoPart.PEDAL_L, MIDDEL_PART = PianoPart.KEYBOARD_M;
+    public static final PianoPart LAST_PART = PianoPart.PEDAL_L, MIDDEL_PART = PianoPart.KEYBOARD_M;
 
     protected static final VoxelShape N_PEDAL_SHAPE;
     protected static final VoxelShape N_PEDAL_L_SHAPE;
@@ -325,23 +326,34 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
     public void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos) {
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
-            Vec3 target = this.getVoicePosition(sourceState, pPos, tone);
+            Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
                 ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), target, tone, volume, false, false), pPlayer);
             } else
                 ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, target, tone, volume, false, false));
-            pLevel.blockEvent(this.getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, 0);
+            pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, tone);
         }
     }
 
     public void stopSound(@Nullable ServerPlayer pPlayer, int tone, Level pLevel, BlockPos pPos) {
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
-            Vec3 target = this.getVoicePosition(sourceState, pPos, tone);
+            Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
                 ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), target, tone, (byte) 0, true, false), pPlayer);
             } else
                 ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, target, tone, (byte) 0, true, false));
+        }
+    }
+
+    @Override
+    protected void spawnParticles(Level pLevel, BlockPos pPos, int tone) {
+        if (pLevel.isClientSide) {
+            BlockState state = pLevel.getBlockState(pPos);
+            Vec3 target = getVoicePosition(state, pPos, tone)
+                    .relative(Direction.UP, 0.8)
+                    .relative(state.getValue(FACING), 0.5);
+            pLevel.addParticle(ModParticleTypes.BLACK_NOTE.get(), target.x, target.y, target.z, 0, 0.1D, 0);
         }
     }
 
@@ -372,7 +384,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         };
     }
 
-    private boolean isBlack(int tone) {
+    private static boolean isBlack(int tone) {
         if (tone < 3) {
             return tone == 2;
         }
@@ -381,15 +393,16 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         return blacks.contains((tone - 3) % 12);
     }
 
-    private Vec3 getVoicePosition(BlockState sourceState, BlockPos sourcePos, int tone) {
+    private static Vec3 getVoicePosition(BlockState sourceState, BlockPos sourcePos, int tone) {
         Direction facing = sourceState.getValue(FACING);
-        double keyDelta = 2.5 / 52.0;
-        return Vec3.atCenterOf(this.getVoiceSectionPos(sourceState, sourcePos, MIDDEL_PART)) // 获取钢琴中声部的位置
+        double keyDelta = 2.5 / 88.0;
+        return Vec3.atCenterOf(getVoiceSectionPos(sourceState, sourcePos, MIDDEL_PART)) // 获取钢琴中声部的位置
                 .relative(facing.getOpposite(), 0.5) // 钢琴背部发声
-                .relative(facing.getCounterClockWise(),  (tone - (this.isBlack(tone) ? 44.0 : 43.5)) * keyDelta); // 根据音调定位横向的发声位置
+                .relative(Direction.DOWN, 0.5)
+                .relative(facing.getCounterClockWise(),  (tone - (isBlack(tone) ? 44.0 : 43.5)) * keyDelta); // 根据音调定位横向的发声位置
     }
 
-    private BlockPos getVoiceSectionPos(BlockState sourceState, BlockPos sourcePos, PianoPart target) {
+    public static BlockPos getVoiceSectionPos(BlockState sourceState, BlockPos sourcePos, PianoPart target) {
         Direction facing = sourceState.getValue(FACING);
         Direction clockWise = facing.getClockWise();
         Direction counterClockWise = facing.getCounterClockWise();

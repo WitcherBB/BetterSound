@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.client.piano;
 
+import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
@@ -43,9 +44,8 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, Vec3 pos, int tone, byt
                 BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(blockPos);
                 if (packet.stop) {
                     soundManager.tryToStopPianoSound(packet.playerUUID, blockPos, packet.tone);
-                }
-                else {
-                    if (entity instanceof PianoBlockEntity blockEntity)
+                } else {
+                    if (entity instanceof AbstractPianoBlockEntity blockEntity)
                         soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID, packet.pos, packet.tone, Note.toPianoSoundVolume(packet.volume), packet.isForUI, !blockEntity.isSoundDelay());
                 }
             }

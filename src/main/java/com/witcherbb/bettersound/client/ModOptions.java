@@ -43,9 +43,9 @@ public final class ModOptions {
 
     private static final Integer[] BLACK_KEYS;
     private static final Integer[] WHITE_KEYS;
-    public final Map<Lazy<KeyMapping>, Integer> keys = new HashMap<>();
 
-    public final Lazy<KeyMapping> KEY_PIANO_SUSTAIN_PEDAL = Lazy.of(() ->
+    public final Map<Lazy<KeyMapping>, Integer> keys = new HashMap<>();
+    public Lazy<KeyMapping> keyPianoSustainPedal = Lazy.of(() ->
             new KeyMapping(
                     "key.bettersound.piano_pedal",
                     KeyConflictContext.GUI,
@@ -244,8 +244,35 @@ public final class ModOptions {
     }
 
     private void processOptions(Options.FieldAccess accessor) {
-        //TODO write or read keybinds
+        this.processKeyMapping(accessor);
+    }
 
+    private void processKeyMapping(Options.FieldAccess accessor) {
+        this.keys.forEach((keyMappingLazy, tone) -> {
+            String s = keyMappingLazy.get().saveString() + (keyMappingLazy.get().getKeyModifier() != net.minecraftforge.client.settings.KeyModifier.NONE ? ":" + keyMappingLazy.get().getKeyModifier() : "");
+            String s1 = accessor.process("key_" + keyMappingLazy.get().getName() + "." + tone, s);
+            if (!s.equals(s1)) {
+                if (s1.indexOf(':') != -1) {
+                    String[] pts = s1.split(":");
+                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.valueFromString(pts[1]), InputConstants.getKey(pts[0].substring(0, 32)));
+                } else
+                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.NONE, InputConstants.getKey(s1.substring(0, 32)));
+            }
+        });
+        String s = keyPianoSustainPedal.get().saveString() + (keyPianoSustainPedal.get().getKeyModifier() != net.minecraftforge.client.settings.KeyModifier.NONE ? ":" + keyPianoSustainPedal.get().getKeyModifier() : "");
+        String s1 = accessor.process("key_" + keyPianoSustainPedal.get().getName(), s);
+        if (!s.equals(s1)) {
+            if (s1.indexOf(':') != -1) {
+                String[] pts = s1.split(":");
+                keyPianoSustainPedal.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.valueFromString(pts[1]), InputConstants.getKey(pts[0]));
+            } else
+                keyPianoSustainPedal.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.NONE, InputConstants.getKey(s1));
+        }
+    }
+
+    public void setKey(KeyMapping pKeyBinding, InputConstants.Key pInput) {
+        pKeyBinding.setKey(pInput);
+        this.save();
     }
 
     static boolean isTrue(String value) {

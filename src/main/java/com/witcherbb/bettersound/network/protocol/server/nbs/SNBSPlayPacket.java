@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.server.nbs;
 
-import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
+import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSongTrack;
 import net.minecraft.core.BlockPos;
@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public record SNBSPlayPacket(BlockPos pos, Map<Integer, List<Note>> noteMap, short speed, byte timeSignature) {
+public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, short speed, byte timeSignature) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
+        buf.writeUtf(name);
         buf.writeMap(this.noteMap,
                 FriendlyByteBuf::writeInt,
                 (buf1, notes) -> {
@@ -32,7 +33,7 @@ public record SNBSPlayPacket(BlockPos pos, Map<Integer, List<Note>> noteMap, sho
         buf.writeByte(timeSignature);
     }
     public static SNBSPlayPacket decode(FriendlyByteBuf buf) {
-        return new SNBSPlayPacket(buf.readBlockPos(), buf.readMap(
+        return new SNBSPlayPacket(buf.readBlockPos(), buf.readUtf(), buf.readMap(
                 FriendlyByteBuf::readInt,
                 buf1 -> {
                     List<Note> notes = new ArrayList<>();
@@ -42,7 +43,7 @@ public record SNBSPlayPacket(BlockPos pos, Map<Integer, List<Note>> noteMap, sho
                     }
                     return notes;
                 }
-        ), buf.readByte(), buf.readByte());
+        ), buf.readShort(), buf.readByte());
     }
 
     public static void handle(SNBSPlayPacket packet, Supplier<NetworkEvent.Context> ctx) {
@@ -51,8 +52,8 @@ public record SNBSPlayPacket(BlockPos pos, Map<Integer, List<Note>> noteMap, sho
             if (sender == null) return;
             Level level = sender.level();
             BlockEntity entity = level.getBlockEntity(packet.pos);
-            if (entity instanceof NBSAutoPlayer nbsAutoPlayer) {
-                nbsAutoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.noteMap, packet.speed, packet.timeSignature * 4));
+            if (entity instanceof AutoPlayer autoPlayer) {
+                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.speed, packet.timeSignature * 4));
             }
         });
         ctx.get().setPacketHandled(true);

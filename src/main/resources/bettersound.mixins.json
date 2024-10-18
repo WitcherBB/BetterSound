@@ -20,6 +20,7 @@
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
+    "OptionsMixin",
     "SoundEngineMixin",
     "SoundInstanceMixin"
   ],

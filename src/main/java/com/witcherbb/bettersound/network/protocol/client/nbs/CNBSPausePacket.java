@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
-import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
+import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.music.nbs.NBSPlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,7 @@ public record CNBSPausePacket(BlockPos pos) {
             Level level = mc.level;
             if (level != null) {
                 BlockEntity blockEntity = level.getBlockEntity(packet.pos);
-                if (blockEntity instanceof NBSAutoPlayer autoPlayer) {
+                if (blockEntity instanceof AutoPlayer autoPlayer) {
                     NBSPlayer nbsPlayer = autoPlayer.getNBSPlayer();
                     if (!nbsPlayer.hasSong() && mc.player != null) {
                         mc.player.sendSystemMessage(Component.translatable("wrong.bettersound.nbs.hasnosong").withStyle(ChatFormatting.RED));

@@ -2,7 +2,10 @@ package com.witcherbb.bettersound.client.gui.screen.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
+import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
+import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
@@ -19,11 +22,13 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
@@ -241,6 +246,22 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
     @Override
     public void onClose() {
         this.blockEntity.updateFirstWhiteKey(this);
+        BlockPos pos = this.blockEntity.getBlockPos();
+        BlockState state = this.level.getBlockState(pos);
+
+        if (state.getBlock() instanceof PianoBlock pianoBlock) {
+            Direction combinedDir = pianoBlock.getCombinedDirection(state.getValue(PianoBlock.PART), state.getValue(PianoBlock.FACING));
+            BlockPos blockPos = pos.relative(combinedDir);
+
+            while (level.getBlockEntity(blockPos) instanceof AbstractPianoBlockEntity pianoBlockEntity && (pianoBlockEntity.getFirstWhiteKey() != this.firstWhiteKey)) {
+                BlockState state1 = level.getBlockState(blockPos);
+                if (state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_L || state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_M || state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_R) {
+                    pianoBlockEntity.updateFirstWhiteKey(this);
+                }
+                combinedDir = pianoBlock.getCombinedDirection(state1.getValue(PianoBlock.PART), state1.getValue(PianoBlock.FACING));
+                blockPos = blockPos.relative(combinedDir);
+            }
+        }
         super.onClose();
     }
 

@@ -1,10 +1,12 @@
 package com.witcherbb.bettersound.music.nbs;
 
 import com.witcherbb.bettersound.blocks.PianoBlock;
+import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSongTrack;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPlayOnPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
@@ -17,9 +19,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.List;
+import java.util.Objects;
 
 public class NBSPlayer {
-    protected static final short LAST_DELAY = 3000;
+    protected static final short LAST_DELAY = 3000; // ms
     private final BlockEntity blockEntity;
     private final Block block;
 
@@ -42,11 +45,13 @@ public class NBSPlayer {
         if (this.isPlaying && this.track != null) {
             this.tick++;
             List<Note> notes;
+            boolean flag = (this.tick / this.track.speed()) % this.track.subsectionLength() == 0;
+
             if ((notes = this.track.getNotes(this.tick)) != null) {
                 // play notes
                 Note[] noteArray = notes.toArray(Note[]::new);
-                if (this.tick % this.track.getSubsectionLength() == 0) {
-                    this.stopNote(noteArray);
+                if (flag) {
+                    this.stopNote();
                 }
                 this.playNote(noteArray);
 
@@ -72,27 +77,24 @@ public class NBSPlayer {
         }
     }
 
-    private void stopNote(Note[] notes) {
+    private void stopNote() {
         if (this.block instanceof PianoBlock pianoBlock) {
-            for (int i = 0; i < notes.length; i++) {
-                Note note = notes[i];
-                Level level = this.blockEntity.getLevel();
-                if (level != null) {
-                    pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), false);
-                    pianoBlock.stopSound(null, note.getPitch(), level, this.blockEntity.getBlockPos());
-                }
+            Level level = this.blockEntity.getLevel();
+            if (level != null) {
+                pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), false);
             }
         }
     }
 
     /** Client side */
     @OnlyIn(Dist.CLIENT)
-    public void play(PianoSong song) {
-        if (this.blockEntity.getLevel() != null && this.blockEntity.getLevel().isClientSide && !this.isPlaying) {
+    public void play(PianoSong song) throws PlayerIsPlayingMusicException {
+        if (this.isPlaying) throw new PlayerIsPlayingMusicException();
+        if (this.blockEntity.getLevel() != null && this.blockEntity.getLevel().isClientSide) {
             this.playing = song;
             this.isPlaying = true;
             // 发给服务端数据包
-            ModNetwork.sendToServer(new SNBSPlayPacket(this.blockEntity.getBlockPos(), song.getNoteMap(), song.speed, song.timeSignature));
+            ModNetwork.sendToServer(new SNBSPlayPacket(this.blockEntity.getBlockPos(), song.fileName, song.getNoteMap(), song.speed, song.timeSignature));
         }
     }
 
@@ -100,6 +102,7 @@ public class NBSPlayer {
     public void play(PianoSongTrack track) {
         if (this.blockEntity.getLevel() != null && !this.blockEntity.getLevel().isClientSide) {
             if (!this.isPlaying) {
+                if (this.track == null || !this.track.name().equals(track.name())) this.tick = -1;
                 this.track = track;
                 this.noteCount = this.track.length();
                 this.isPlaying = true;
@@ -117,9 +120,10 @@ public class NBSPlayer {
         } else {
             ModNetwork.broadcast(new CNBSStopPacket(this.blockEntity.getBlockPos()));
 
+            //TODO level关闭以后继续执行可能导致异常
             new Thread(() -> {
                 try{
-                    Thread.sleep(3000);
+                    Thread.sleep(LAST_DELAY);
                     if (this.block instanceof PianoBlock pianoBlock) {
                         ServerLifecycleHooks.getCurrentServer().submit(() -> {
                             pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), false);

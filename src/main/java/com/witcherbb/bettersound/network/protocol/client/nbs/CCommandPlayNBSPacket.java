@@ -1,8 +1,10 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.exception.NBSNotFoundException;
+import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
-import com.witcherbb.bettersound.music.nbs.NBSAutoPlayer;
+import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -30,17 +32,18 @@ public record CCommandPlayNBSPacket(String filename, BlockPos pos) {
             MinecraftExtender extender = (MinecraftExtender) mc;
             if (mc.level == null) return;
             try {
+                BlockPos target = PianoBlock.getVoiceSectionPos(mc.level.getBlockState(packet.pos), packet.pos, PianoBlock.MIDDEL_PART);
                 PianoSong song = extender.betterSound$getNBSLoader().findSong(packet.filename);
-                BlockEntity entity = mc.level.getBlockEntity(packet.pos);
-                if (entity instanceof NBSAutoPlayer autoPlayer) {
+                BlockEntity entity = mc.level.getBlockEntity(target);
+                if (entity instanceof AutoPlayer autoPlayer) {
                     autoPlayer.getNBSPlayer().play(song);
                     if (mc.player != null) {
                         mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.nbs.success", song.fileName)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));
                     }
                 }
-            } catch (NBSNotFoundException e) {
+            } catch (NBSNotFoundException | PlayerIsPlayingMusicException e) {
                 if (mc.player != null) {
-                    mc.player.sendSystemMessage(Component.empty().append(e.getMessage()).withStyle(ChatFormatting.RED));
+                    mc.player.sendSystemMessage(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
                 }
             }
         });

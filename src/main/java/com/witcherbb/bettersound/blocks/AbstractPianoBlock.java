@@ -51,7 +51,7 @@ public abstract class AbstractPianoBlock extends BaseEntityBlock implements Spec
     /** Server side */
     public abstract void stopSound(@Nullable ServerPlayer pPlayer, int tone, Level pLevel, BlockPos pPos);
 
-    protected void spawnParticles(Level pLevel, BlockPos pPos) {
+    protected void spawnParticles(Level pLevel, BlockPos pPos, int tone) {
         if (pLevel.isClientSide) {
             int count = 8;
             int directionCount = 4;
@@ -82,7 +82,7 @@ public abstract class AbstractPianoBlock extends BaseEntityBlock implements Spec
     @Override
     public boolean triggerEvent(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, int pId, int pParam) {
         super.triggerEvent(pState, pLevel, pPos, pId, pParam);
-        this.spawnParticles(pLevel, pPos);
+        this.spawnParticles(pLevel, pPos, pParam);
         return true;
     }
 
