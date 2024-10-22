@@ -27,7 +27,8 @@ public abstract class AbstractPianoBlockEntity extends BlockEntity implements Me
     };
     public static final Map<Integer, String> toneNameMap = new TreeMap<>();
     private boolean isSoundDelay = false;
-    @OnlyIn(Dist.CLIENT)
+
+    //client
     private int firstWhiteKey = 39;
 
     static {
@@ -88,12 +89,12 @@ public abstract class AbstractPianoBlockEntity extends BlockEntity implements Me
         isSoundDelay = soundDelay;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    // client
     public int getFirstWhiteKey() {
         return this.firstWhiteKey;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    //client
     public void updateFirstWhiteKey(AbstractPianoScreen screen) {
         this.firstWhiteKey = screen.getFirstWhiteKey();
     }

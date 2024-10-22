@@ -13,6 +13,7 @@ import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedP
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -46,49 +47,49 @@ public class ModNetwork {
 
     private static void addServerPacket() {
 
-        INSTANCE.messageBuilder(SJukeboxNamePacket.class, id())
+        INSTANCE.messageBuilder(SJukeboxNamePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SJukeboxNamePacket::encode)
                 .decoder(SJukeboxNamePacket::decode)
                 .consumerMainThread(SJukeboxNamePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SExampleNameChangedPacket.class, id())
+        INSTANCE.messageBuilder(SExampleNameChangedPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SExampleNameChangedPacket::encode)
                 .decoder(SExampleNameChangedPacket::decode)
                 .consumerMainThread(SExampleNameChangedPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SJukeboxControllerNamePacket.class, id())
+        INSTANCE.messageBuilder(SJukeboxControllerNamePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SJukeboxControllerNamePacket::encode)
                 .decoder(SJukeboxControllerNamePacket::decode)
                 .consumerMainThread(SJukeboxControllerNamePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SNoteBlockPlayNotePacket.class, id())
+        INSTANCE.messageBuilder(SNoteBlockPlayNotePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SNoteBlockPlayNotePacket::encode)
                 .decoder(SNoteBlockPlayNotePacket::decode)
                 .consumerMainThread(SNoteBlockPlayNotePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SPianoKeyPressedPacket.class, id())
+        INSTANCE.messageBuilder(SPianoKeyPressedPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SPianoKeyPressedPacket::encode)
                 .decoder(SPianoKeyPressedPacket::decode)
                 .consumerMainThread(SPianoKeyPressedPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SPianoKeyReleasedPacket.class, id())
+        INSTANCE.messageBuilder(SPianoKeyReleasedPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SPianoKeyReleasedPacket::encode)
                 .decoder(SPianoKeyReleasedPacket::decode)
                 .consumerMainThread(SPianoKeyReleasedPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SBlockEntityDataChangePacket.class, id())
+        INSTANCE.messageBuilder(SBlockEntityDataChangePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SBlockEntityDataChangePacket::encode)
                 .decoder(SBlockEntityDataChangePacket::decode)
                 .consumerMainThread(SBlockEntityDataChangePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(SNBSPlayPacket.class, id())
+        INSTANCE.messageBuilder(SNBSPlayPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(SNBSPlayPacket::encode)
                 .decoder(SNBSPlayPacket::decode)
                 .consumerMainThread(SNBSPlayPacket::handle)
@@ -97,55 +98,55 @@ public class ModNetwork {
 
     private static void addClientPacket() {
 
-        INSTANCE.messageBuilder(CJukeboxNameConfirmPacket.class, id())
+        INSTANCE.messageBuilder(CJukeboxNameConfirmPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CJukeboxNameConfirmPacket::encode)
                 .decoder(CJukeboxNameConfirmPacket::decode)
                 .consumerMainThread(CJukeboxNameConfirmPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CPianoBlockPlayNotePacket.class, id())
+        INSTANCE.messageBuilder(CPianoBlockPlayNotePacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CPianoBlockPlayNotePacket::encode)
                 .decoder(CPianoBlockPlayNotePacket::decode)
                 .consumerMainThread(CPianoBlockPlayNotePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CPianoBlockStopPacket.class, id())
+        INSTANCE.messageBuilder(CPianoBlockStopPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CPianoBlockStopPacket::encode)
                 .decoder(CPianoBlockStopPacket::decode)
                 .consumerMainThread(CPianoBlockStopPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CCommandPlayNBSPacket.class, id())
+        INSTANCE.messageBuilder(CCommandPlayNBSPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CCommandPlayNBSPacket::encode)
                 .decoder(CCommandPlayNBSPacket::decode)
                 .consumerMainThread(CCommandPlayNBSPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CPianoBlockPlayMultipleNotesPacket.class, id())
+        INSTANCE.messageBuilder(CPianoBlockPlayMultipleNotesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CPianoBlockPlayMultipleNotesPacket::encode)
                 .decoder(CPianoBlockPlayMultipleNotesPacket::decode)
                 .consumerMainThread(CPianoBlockPlayMultipleNotesPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CNBSStopPacket.class, id())
+        INSTANCE.messageBuilder(CNBSStopPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CNBSStopPacket::encode)
                 .decoder(CNBSStopPacket::decode)
                 .consumerMainThread(CNBSStopPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CNBSPausePacket.class, id())
+        INSTANCE.messageBuilder(CNBSPausePacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CNBSPausePacket::encode)
                 .decoder(CNBSPausePacket::decode)
                 .consumerMainThread(CNBSPausePacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CNBSPlayOnPacket.class, id())
+        INSTANCE.messageBuilder(CNBSPlayOnPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CNBSPlayOnPacket::encode)
                 .decoder(CNBSPlayOnPacket::decode)
                 .consumerMainThread(CNBSPlayOnPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(CNBSReloadPacket.class, id())
+        INSTANCE.messageBuilder(CNBSReloadPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(CNBSReloadPacket::encode)
                 .decoder(CNBSReloadPacket::decode)
                 .consumerMainThread(CNBSReloadPacket::handle)

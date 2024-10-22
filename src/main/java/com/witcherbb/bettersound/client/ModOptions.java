@@ -13,9 +13,10 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.witcherbb.bettersound.BetterSound;
-import com.witcherbb.bettersound.client.gui.screen.inventory.AbstractPianoScreen;
+import com.witcherbb.bettersound.client.gui.PianoUtil;
 import net.minecraft.client.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -26,9 +27,7 @@ import org.slf4j.Logger;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -39,13 +38,14 @@ public final class ModOptions {
     public static final File genPath;
     private static final ModOptions instance;
     private static final Splitter OPTION_SPLITTER = Splitter.on(':').limit(2);
+    private final Fonts fonts = new Fonts();
     private final File optionsFile;
 
     private static final Integer[] BLACK_KEYS;
     private static final Integer[] WHITE_KEYS;
 
-    public final Map<Lazy<KeyMapping>, Integer> keys = new HashMap<>();
-    public Lazy<KeyMapping> keyPianoSustainPedal = Lazy.of(() ->
+    private final Map<Lazy<KeyMapping>, Integer> pianokeys = new LinkedHashMap<>();
+    private final Lazy<KeyMapping> keyPianoSustainPedal = Lazy.of(() ->
             new KeyMapping(
                     "key.bettersound.piano_pedal",
                     KeyConflictContext.GUI,
@@ -53,6 +53,8 @@ public final class ModOptions {
                     GLFW.GLFW_KEY_SPACE,
                     "key.categories.bettersound.keyboard"
             ));
+
+    public final List<Lazy<KeyMapping>> keymappings = new ArrayList<>();
 
     public ModOptions() {
         this.optionsFile = new File(genPath, "options.txt");
@@ -64,12 +66,30 @@ public final class ModOptions {
             }
         }
 
+        fonts.putVanillaFont("alt");
+        fonts.putVanillaFont("default");
+        fonts.putVanillaFont("illageralt");
+        fonts.putVanillaFont("uniform");
+
+        fonts.putModFont("fzjz");
+        fonts.putModFont("bahnschrift");
+
         int whiteCount = 0;
         int blackCount = 0;
+        for (int i = 0; i < 27; i++) {
+            pianokeys.put(Lazy.of(() ->
+                    new KeyMapping(
+                            "key.bettersound.keyboard.key",
+                            KeyConflictContext.GUI,
+                            InputConstants.Type.KEYSYM,
+                            GLFW.GLFW_KEY_UNKNOWN,
+                            "key.categories.bettersound.keyboard"
+                    )), i);
+        }
         for (int i = 27; i < 66; i++) {
             try {
-                int key = AbstractPianoScreen.blacks().contains(i) ? BLACK_KEYS[blackCount++] : WHITE_KEYS[whiteCount++];
-                keys.put(Lazy.of(() ->
+                int key = PianoUtil.isBlackey(i) ? BLACK_KEYS[blackCount++] : WHITE_KEYS[whiteCount++];
+                pianokeys.put(Lazy.of(() ->
                         new KeyMapping(
                                 "key.bettersound.keyboard.key",
                                 KeyConflictContext.GUI,
@@ -80,6 +100,18 @@ public final class ModOptions {
             } catch (IndexOutOfBoundsException ignored) {
             }
         }
+        for (int i = 66; i < 88; i++) {
+            pianokeys.put(Lazy.of(() ->
+                    new KeyMapping(
+                            "key.bettersound.keyboard.key",
+                            KeyConflictContext.GUI,
+                            InputConstants.Type.KEYSYM,
+                            GLFW.GLFW_KEY_UNKNOWN,
+                            "key.categories.bettersound.keyboard"
+                    )), i);
+        }
+        keymappings.addAll(pianokeys.keySet());
+        keymappings.add(keyPianoSustainPedal);
     }
 
     public static ModOptions getOptions() {
@@ -248,15 +280,15 @@ public final class ModOptions {
     }
 
     private void processKeyMapping(Options.FieldAccess accessor) {
-        this.keys.forEach((keyMappingLazy, tone) -> {
+        this.pianokeys.forEach((keyMappingLazy, tone) -> {
             String s = keyMappingLazy.get().saveString() + (keyMappingLazy.get().getKeyModifier() != net.minecraftforge.client.settings.KeyModifier.NONE ? ":" + keyMappingLazy.get().getKeyModifier() : "");
             String s1 = accessor.process("key_" + keyMappingLazy.get().getName() + "." + tone, s);
             if (!s.equals(s1)) {
                 if (s1.indexOf(':') != -1) {
                     String[] pts = s1.split(":");
-                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.valueFromString(pts[1]), InputConstants.getKey(pts[0].substring(0, 32)));
+                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.valueFromString(pts[1]), InputConstants.getKey(pts[0]));
                 } else
-                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.NONE, InputConstants.getKey(s1.substring(0, 32)));
+                    keyMappingLazy.get().setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.NONE, InputConstants.getKey(s1));
             }
         });
         String s = keyPianoSustainPedal.get().saveString() + (keyPianoSustainPedal.get().getKeyModifier() != net.minecraftforge.client.settings.KeyModifier.NONE ? ":" + keyPianoSustainPedal.get().getKeyModifier() : "");
@@ -281,6 +313,28 @@ public final class ModOptions {
 
     static boolean isFalse(String pValue) {
         return "false".equals(pValue);
+    }
+
+    public Map<Lazy<KeyMapping>, Integer> getPianokeys() {
+        return pianokeys;
+    }
+
+    public Lazy<KeyMapping> getKeyPianoSustainPedal() {
+        return keyPianoSustainPedal;
+    }
+
+    public ResourceLocation getFont(String name) {
+        String[] strings = name.split(":");
+        if (strings.length == 1) return fonts.getVanillaFont(name);
+        else if (strings.length == 2) {
+            if (strings[0].equals("minecraft")) return fonts.getVanillaFont(strings[1]);
+            else return fonts.getModFont(strings[1]);
+        }
+        return null;
+    }
+
+    public ResourceLocation getVanillaFont(String name) {
+        return fonts.getVanillaFont(name);
     }
 
     static {
@@ -335,5 +389,30 @@ public final class ModOptions {
         };
 
         instance = new ModOptions();
+    }
+
+    static class Fonts {
+        private final Map<String, ResourceLocation> modFonts = new HashMap<>();
+        private final Map<String, ResourceLocation> vanillaFonts = new HashMap<>();
+
+        void putVanillaFont(String fontName) {
+            vanillaFonts.put(fontName, new ResourceLocation(fontName));
+        }
+
+        void putModFont(String fontName) {
+            modFonts.put(fontName, new ResourceLocation(BetterSound.MODID, fontName));
+        }
+
+        void put(ResourceLocation location) {
+            modFonts.put(location.getPath(), location);
+        }
+
+        ResourceLocation getModFont(String name) {
+            return modFonts.get(name);
+        }
+
+        ResourceLocation getVanillaFont(String name) {
+            return modFonts.get(name);
+        }
     }
 }

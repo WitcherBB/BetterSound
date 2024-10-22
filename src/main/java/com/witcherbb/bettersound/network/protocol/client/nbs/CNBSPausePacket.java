@@ -4,6 +4,7 @@ import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.music.nbs.NBSPlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -25,7 +26,7 @@ public record CNBSPausePacket(BlockPos pos) {
     public static void handle(CNBSPausePacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
-            Level level = mc.level;
+            ClientLevel level = mc.level;
             if (level != null) {
                 BlockEntity blockEntity = level.getBlockEntity(packet.pos);
                 if (blockEntity instanceof AutoPlayer autoPlayer) {

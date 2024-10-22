@@ -7,8 +7,6 @@ import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SBlockEntityDataChangePacket;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.network.chat.Component;
@@ -19,7 +17,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Lazy;
 
-import java.awt.*;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,11 +46,11 @@ public class PianoBlockScreen extends AbstractPianoScreen {
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (this.keyCtrledCheckbox.selected()) {
-            if (modOptions.keyPianoSustainPedal.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            if (modOptions.getKeyPianoSustainPedal().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
                 if (!this.pedalPressed) this.pressPedal(true);
                 return true;
             }
-            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.keys.entrySet();
+            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
             for (Map.Entry<Lazy<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
                 if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
@@ -72,11 +69,11 @@ public class PianoBlockScreen extends AbstractPianoScreen {
     @Override
     public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
         if (this.keyCtrledCheckbox.selected()) {
-            if (modOptions.keyPianoSustainPedal.get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            if (modOptions.getKeyPianoSustainPedal().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
                 if (this.pedalPressed) this.pressPedal(false);
                 return true;
             }
-            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.keys.entrySet();
+            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
             for (Map.Entry<Lazy<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
                 if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {

@@ -4,9 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
-import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.client.ModOptions;
+import com.witcherbb.bettersound.client.gui.PianoUtil;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
@@ -21,6 +21,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.CommonComponents;
@@ -37,10 +38,9 @@ import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractPianoScreen extends AbstractContainerScreen<AbstractPianoMenu> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BetterSound.MODID, "textures/gui/piano_block.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(BetterSound.MODID, "textures/gui/piano_keyboard.png");
     private static final int textureWidth = 300;
     private static final int textureHeight = 300;
-    private static final List<Integer> BLACKS;
     private static final List<Integer> KEYS_C = new ArrayList<>(List.of(3, 15, 27, 39, 51, 63, 75, 87));
     protected final List<PianoKeyButton> keys = new ArrayList<>();
     protected final List<PianoKeyButton> currentKeys = new ArrayList<>();
@@ -53,26 +53,12 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
     protected MinecraftExtender minecraftExtender;
     protected final ModOptions modOptions = ModOptions.getOptions();
 
-    static {
-        BLACKS = new ArrayList<>();
-        BLACKS.add(1);
-        int c = 3;
-        for (int i = 0; i < 7; i++, c += 12) {
-            int key = c + 1;
-            BLACKS.addAll(List.of(key, key += 2, key += 3, key += 2, key + 2));
-        }
-    }
-
-    public static List<Integer> blacks() {
-        return BLACKS;
-    }
-
     public AbstractPianoScreen(AbstractPianoMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.level = pMenu.getLevel();
         this.blockEntity = pMenu.getPianoBlockEntity();
         this.firstWhiteKey = this.blockEntity.getFirstWhiteKey();
-        if (BLACKS.contains(this.firstWhiteKey)) {
+        if (PianoUtil.isBlackey(this.firstWhiteKey)) {
             this.firstWhiteKey -= 1;
         }
     }
@@ -89,12 +75,12 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         super.init();
 
         this.initButton();
+        this.clicked = false;
     }
 
     @Override
     public void resize(@NotNull Minecraft pMinecraft, int pWidth, int pHeight) {
         super.resize(pMinecraft, pWidth, pHeight);
-        this.initButton();
     }
 
     @Override
@@ -121,7 +107,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
     private void initButton() {
         keys.clear();
         for (int i = 0; i < 88; i++) {
-            if (BLACKS.contains(i))
+            if (PianoUtil.isBlackey(i))
                 this.keys.add(new PianoKeyButton(KeyCategory.BLACK, i));
             else this.keys.add(new PianoKeyButton(KeyCategory.WHITE, i));
         }
@@ -140,9 +126,9 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         //往currentKeys里添加琴键
         int whiteCount = 0;
         for (int i = 0; i < 88; i++) {
-            boolean flag = BLACKS.contains(i);
+            boolean flag = PianoUtil.isBlackey(i);
             PianoKeyButton button = this.keys.get(i);
-            if (i == firstWhiteKey - 1 && BLACKS.contains(i)) {
+            if (i == firstWhiteKey - 1 && PianoUtil.isBlackey(i)) {
                 currentKeys.add(button);
                 button.update(-1, this.leftPos);
             } else if (i >= firstWhiteKey && whiteCount < 16) {
@@ -154,7 +140,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             }
         }
         PianoKeyButton button1 = currentKeys.get(currentKeys.size() - 1);
-        if (BLACKS.contains(button1.id + 1)) {
+        if (PianoUtil.isBlackey(button1.id + 1)) {
             keys.get(button1.id + 1).update(16, this.leftPos);
             currentKeys.add(keys.get(button1.id + 1));
         }
@@ -174,8 +160,8 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         for (int i = 0; i < size; i++) {
             PianoKeyButton key = lKeys.get(i);
             PianoKeyButton thatKey = lKeys.get(index);
-            if (BLACKS.contains(key.id)) {
-                if (BLACKS.contains(thatKey.id)) {
+            if (PianoUtil.isBlackey(key.id)) {
+                if (PianoUtil.isBlackey(thatKey.id)) {
                     if (index < i)
                         i--;
                 } else {
@@ -197,7 +183,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
      */
     protected boolean buttonMove(double delta) {
         this.firstWhiteKey -= (int) delta;
-        if (BLACKS.contains(this.firstWhiteKey))
+        if (PianoUtil.isBlackey(this.firstWhiteKey))
             this.firstWhiteKey -= (int) delta;
         if (this.firstWhiteKey < 0) {
             this.firstWhiteKey = 0;
@@ -277,18 +263,13 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
         private boolean pressed = false;
 
-        private static final String[] keyNames = new String[]{
-                "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
-        };
-
         public PianoKeyButton(KeyCategory keyCategory, int id) {
-            super(0, AbstractPianoScreen.this.topPos + 35, keyCategory == KeyCategory.WHITE ? 17 : 10, keyCategory == KeyCategory.WHITE ? 70 : 40, CommonComponents.GUI_DONE);
+            super(0, AbstractPianoScreen.this.topPos + 35, keyCategory == KeyCategory.WHITE ? 17 : 10, keyCategory == KeyCategory.WHITE ? 70 : 40, PianoUtil.getKeyName(id));
             this.keyCategory = keyCategory;
             this.id = id;
             if (keyCategory == KeyCategory.BLACK) zIndex = 3;
             else zIndex = 2;
 
-            this.setMessage(getComponent(this.id));
             this.setTooltip(Tooltip.create(this.getMessage()));
         }
 
@@ -379,18 +360,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         }
 
         @Override
-        public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-            if (this.active && this.visible) {
-                if (this.isValidClickButton(pButton)) {
-                    boolean flag = this.clicked(pMouseX, pMouseY);
-                    if (flag) {
-                        this.onClick(pMouseX, pMouseY);
-                        return true;
-                    }
-                }
-
-            }
-            return false;
+        public void playDownSound(SoundManager pHandler) {
         }
 
         @Override
@@ -430,11 +400,11 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
          * */
         protected byte blackAround() {
             byte b = 0b00;
-            if (!BLACKS.contains(this.id)) {
-                if (BLACKS.contains(this.id - 1)) {
+            if (!PianoUtil.isBlackey(this.id)) {
+                if (PianoUtil.isBlackey(this.id - 1)) {
                     b |= 0b10;
                 }
-                if (BLACKS.contains(this.id + 1)) {
+                if (PianoUtil.isBlackey(this.id + 1)) {
                     b |= 0b01;
                 }
             }
@@ -451,34 +421,14 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             if (position == -1) {
                 x = firstWhite;
                 this.width = blackWidth / 2;
-            } else if (position == 16 && BLACKS.contains(this.id)) {
+            } else if (position == 16 && PianoUtil.isBlackey(this.id)) {
                 x -= blackWidth / 2;
                 this.width = blackWidth / 2;
-            } else if (BLACKS.contains(this.id)) {
+            } else if (PianoUtil.isBlackey(this.id)) {
                 x -= 5;
                 this.width = blackWidth;
             }
             this.setX(x);
-        }
-
-        private static Component getComponent(int id) {
-            int length = keyNames.length;
-
-            if (id < 0 || id >= 88) {
-                return Component.literal("Invalid key ID");
-            } else if (id < 3) {
-                return switch (id) {
-                    case 0 -> Component.literal("A0");
-                    case 1 -> Component.literal("A#/Bb0");
-                    case 2 -> Component.literal("B0");
-                    default -> Component.empty();
-                };
-            }
-
-            int effectiveId = (id - 3) % length;
-            int depth = (id - 3) / length + 1;
-
-            return Component.literal(keyNames[effectiveId] + depth);
         }
     }
 

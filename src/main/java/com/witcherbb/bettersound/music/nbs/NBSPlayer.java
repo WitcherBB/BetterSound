@@ -22,13 +22,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class NBSPlayer {
-    protected static final short LAST_DELAY = 3000; // ms
+    protected static final short LAST_DELAY = 60; // tick
     private final BlockEntity blockEntity;
     private final Block block;
 
     private int tick = -1;
     /** Client side */
-    @OnlyIn(Dist.CLIENT)
     private PianoSong playing;
     /** Server side */
     private PianoSongTrack track;
@@ -59,8 +58,11 @@ public class NBSPlayer {
                     this.stop();
                 }
             }
-        } else if (!this.isPlaying) {
-
+        } else if (!this.isPlaying && this.tick >= 0) {
+            Level level = this.blockEntity.getLevel();
+            if (--this.tick == -1 && this.block instanceof PianoBlock pianoBlock && level != null) {
+                pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), false);
+            }
         }
     }
 
@@ -120,22 +122,8 @@ public class NBSPlayer {
         } else {
             ModNetwork.broadcast(new CNBSStopPacket(this.blockEntity.getBlockPos()));
 
-            //TODO level关闭以后继续执行可能导致异常
-            new Thread(() -> {
-                try{
-                    Thread.sleep(LAST_DELAY);
-                    if (this.block instanceof PianoBlock pianoBlock) {
-                        ServerLifecycleHooks.getCurrentServer().submit(() -> {
-                            pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), false);
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
             this.track = null;
-            this.tick = -1;
+            this.tick = LAST_DELAY;
         }
     }
 
@@ -169,7 +157,7 @@ public class NBSPlayer {
         return level.isClientSide ? this.playing != null : this.track != null;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    //client
     public String getSongName() {
         return this.playing.fileName;
     }
