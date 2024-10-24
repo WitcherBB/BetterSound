@@ -227,3 +227,22 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
+tasks.register("cleanCache").configure {
+    description = 'Clean cache'
+    group = 'help'
+    doLast {
+        try {
+            File file1 = new File("build/tmp/.cache/expanded")
+            boolean flag = true;
+            if (file1.exists() && file1.isDirectory()) {
+                flag = file1.deleteDir()
+            }
+            if (flag) println("\033[32;4m" + "Clean Successfully!" + "\033[0m")
+            else println("\033[31;4m" + "Clean Failure!" + "\033[0m")
+        } catch (Exception e) {
+            println("\033[31;4m" + "Clean Failure!\n" + e.message + "\033[0m")
+        }
+
+    }
+}

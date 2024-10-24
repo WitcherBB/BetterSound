@@ -16,6 +16,7 @@ import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
 import net.minecraft.client.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -66,14 +67,6 @@ public final class ModOptions {
             }
         }
 
-        fonts.putVanillaFont("alt");
-        fonts.putVanillaFont("default");
-        fonts.putVanillaFont("illageralt");
-        fonts.putVanillaFont("uniform");
-
-        fonts.putModFont("fzjz");
-        fonts.putModFont("bahnschrift");
-
         int whiteCount = 0;
         int blackCount = 0;
         for (int i = 0; i < 27; i++) {
@@ -120,6 +113,15 @@ public final class ModOptions {
 
     public void load() {
         try {
+            FileToIdConverter fonts = FileToIdConverter.json("font");
+            for (ResourceLocation font : fonts.listMatchingResources(Minecraft.getInstance().getResourceManager()).keySet()) {
+                String s = font.getPath().split("/")[1];
+                if (!s.endsWith(".json")) continue;
+                String fontname = s.split(".json")[0];
+                if (font.getNamespace().equals("minecraft")) this.fonts.putVanillaFont(fontname);
+                else this.fonts.putModFont(font.getNamespace(), fontname);
+            }
+
             if (!this.optionsFile.exists()) {
                 return;
             }
@@ -328,7 +330,7 @@ public final class ModOptions {
         if (strings.length == 1) return fonts.getVanillaFont(name);
         else if (strings.length == 2) {
             if (strings[0].equals("minecraft")) return fonts.getVanillaFont(strings[1]);
-            else return fonts.getModFont(strings[1]);
+            else return fonts.getModFont(strings[0], strings[1]);
         }
         return null;
     }
@@ -399,16 +401,16 @@ public final class ModOptions {
             vanillaFonts.put(fontName, new ResourceLocation(fontName));
         }
 
-        void putModFont(String fontName) {
-            modFonts.put(fontName, new ResourceLocation(BetterSound.MODID, fontName));
+        void putModFont(String modid, String fontName) {
+            modFonts.put(modid + ":" + fontName, new ResourceLocation(BetterSound.MODID, fontName));
         }
 
         void put(ResourceLocation location) {
             modFonts.put(location.getPath(), location);
         }
 
-        ResourceLocation getModFont(String name) {
-            return modFonts.get(name);
+        ResourceLocation getModFont(String modid, String fontname) {
+            return modFonts.get(modid + ":" + fontname);
         }
 
         ResourceLocation getVanillaFont(String name) {

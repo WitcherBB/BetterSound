@@ -24,7 +24,7 @@ public class Config
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Common configuration settings")
                     .push("common");
-
+            builder.define("version", "0.0.0.0-demo");
             builder.pop();
         }
     }

@@ -7,6 +7,7 @@ import com.witcherbb.bettersound.common.data.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.menu.inventory.JukeboxMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.world.WorldUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -46,7 +47,7 @@ public record SJukeboxNamePacket(String name, String dimension) {
 				boolean existFlag = provider.exists(packet.name, packet.dimension);
 				if (!packet.name.isEmpty() && existFlag) {
 					JukeboxBlockEntity blockEntity = jukeboxMenu.getBlockEntity();
-					CompoundTag nbt = blockEntity.getUpdateTag();
+					CompoundTag nbt = blockEntity.saveWithoutMetadata();
 					String oldName = nbt.getString("Name");
 					String oldDimension = blockEntity.getLevel().dimension().location().getPath();
 					nbt.putString("Name", packet.name);
@@ -54,7 +55,7 @@ public record SJukeboxNamePacket(String name, String dimension) {
 
 					BlockPos blockPos = blockEntity.getBlockPos();
 					JukeboxControllerBlockEntity.removeFromList(oldName, oldDimension, blockPos);
-					JukeboxControllerBlockEntity.putPos2List(nbt.getString("Name"), sender.level().dimension().location().getPath(), blockPos);
+					JukeboxControllerBlockEntity.putPos2List(nbt.getString("Name"), WorldUtil.getDimensionName(sender.level()), blockPos);
 					ModNetwork.sendToPlayer(new CJukeboxNameConfirmPacket(Util.Status.SUCCESS), sender);
 				} else if (packet.name.isEmpty()) {
 					ModNetwork.sendToPlayer(new CJukeboxNameConfirmPacket(Util.Status.NULL), sender);

@@ -45,12 +45,14 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
     protected final int rowLeftMin;
     protected final PianoKeyBindsScreen keyBindsScreen;
     protected final List<PianoKeyEntry> keyEntries = new ArrayList<>();
+    protected String font;
     protected int whiteCountInRow;
     protected int keyboardWidth;
 
     public PianoKeyBindList(PianoKeyBindsScreen keyBindsScreen, Minecraft minecraft) {
         super(minecraft, keyBindsScreen.width, keyBindsScreen.height, 0, keyBindsScreen.height, 70);
         this.keyBindsScreen = keyBindsScreen;
+        this.font = "bettersound:fzjz";
         this.setRenderBackground(false);
         this.setRenderTopAndBottom(false);
 
@@ -333,7 +335,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
         public void reload() {
             this.keyButton.setMessage(ComponentModifier.start(this.key.getTranslatedKeyMessage())
-                    .withFont("bettersound:fzjz").end());
+                    .withFont(font).end());
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
@@ -347,7 +349,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
             if (PianoKeyBindList.this.keyBindsScreen.selected != null && PianoKeyBindList.this.keyBindsScreen.selected == this.key) {
                 this.keyButton.setMessage(ComponentModifier.start(Component.literal("> <"))
-                        .withFont("bettersound:fzjz").end());
+                        .withFont(font).end());
             }
         }
     }
@@ -378,7 +380,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         @Override
         public void reload() {
             this.keyname = ComponentModifier.start(this.key.getTranslatedKeyMessage())
-                    .withFont("bettersound:fzjz").end();
+                    .withFont(font).end();
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
@@ -392,7 +394,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
             if (PianoKeyBindList.this.keyBindsScreen.selected != null && PianoKeyBindList.this.keyBindsScreen.selected == this.key) {
                 this.keyname = ComponentModifier.start(Component.literal("> <"))
-                        .withFont("bettersound:fzjz").end();
+                        .withFont(font).end();
             }
 
             if (PianoKeyBindList.this.keyBindsScreen.selected == null && this.key.isUnbound()

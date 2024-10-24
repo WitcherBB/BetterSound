@@ -15,7 +15,7 @@ import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
-import com.witcherbb.bettersound.server.commands.ModCommands;
+import com.witcherbb.bettersound.commands.ModCommands;
 import com.witcherbb.bettersound.world.structure.ModStructureAdder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;

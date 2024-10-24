@@ -251,6 +251,11 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         super.onClose();
     }
 
+    @Override
+    public void removed() {
+        super.removed();
+    }
+
     protected class PianoKeyButton extends AbstractButton {
         private static final byte NORM_VOLUME = (byte) 100;
         private final KeyCategory keyCategory;
@@ -370,11 +375,11 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
         public void press() {
             this.pressed = true;
+            BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (minecraft != null) {
-                BlockPos pos = fatherInstance.blockEntity.getBlockPos();
-                ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id, NORM_VOLUME));
                 minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
             }
+            ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id, NORM_VOLUME));
         }
 
         public void release() {
