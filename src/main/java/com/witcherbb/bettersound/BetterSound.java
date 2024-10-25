@@ -24,8 +24,6 @@ public final class BetterSound
     public static final Logger LOGGER = LogUtils.getLogger();
     public static BetterSound instance;
 
-    public String currentLevelName = "";
-
     public BetterSound()
     {
         instance = this;

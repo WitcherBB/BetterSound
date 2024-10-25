@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.mixins.extenders;
 
-import com.witcherbb.bettersound.common.data.ModDataManager;
+import com.witcherbb.bettersound.common.ModToneManager;
 
 public interface MinecraftServerExtender {
-    ModDataManager betterSound$getModDataManager();
+    ModToneManager betterSound$getModDataManager();
 }

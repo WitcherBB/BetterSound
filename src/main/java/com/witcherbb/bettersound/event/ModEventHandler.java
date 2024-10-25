@@ -54,9 +54,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-	static class ModClientEvents {
+	public static class ModClientEvents {
 		@SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
+        public void onClientSetup(FMLClientSetupEvent event) {
 			ModOptions.getOptions().load();
 
             MenuScreens.register(ModMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
@@ -67,15 +67,17 @@ public class ModEventHandler {
 			MenuScreens.register(ModMenuTypes.TONE_BLOCK_MENU.get(), ToneBlockScreen::new);
 
 			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
+
+			((MinecraftExtender) Minecraft.getInstance()).betterSound$getNBSLoader().load();
         }
 
 		@SubscribeEvent
-		public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+		public void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
 			event.registerSpriteSet(ModParticleTypes.BLACK_NOTE.get(), BlackNoteParticle.BlackNoteParticleFactory::new);
 		}
 
 		@SubscribeEvent
-		public static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
+		public void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
 			if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
 				event.accept(ModItems.ITEM_SUSTAIN_PEDAL);
 				event.accept(ModItems.ITEM_TONE_BLOCK);
@@ -88,35 +90,35 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public static void onRegisterBindings(RegisterKeyMappingsEvent event) {
+		public void onRegisterBindings(RegisterKeyMappingsEvent event) {
 
 		}
 
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-	static class ModServerEvents {
+	public static class ModServerEvents {
 
 		@SubscribeEvent
-		public static void onCommonSetup(FMLCommonSetupEvent event) {
+		public void onCommonSetup(FMLCommonSetupEvent event) {
 			ModNetwork.register();
 		}
 
 		@SubscribeEvent
-		public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+		public void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
 
 		}
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-	static class ForgeClientEvents {
+	public static class ForgeClientEvents {
 
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-	static class ForgeServerEvents {
+	public static class ForgeServerEvents {
 		@SubscribeEvent
-		public static void onCommandRegister(RegisterCommandsEvent event) {
+		public void onCommandRegister(RegisterCommandsEvent event) {
 			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 			Commands.CommandSelection selection = event.getCommandSelection();
 			CommandBuildContext context = event.getBuildContext();
@@ -125,18 +127,20 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public static void onLevelLoad(LevelEvent.Load event) {
+		public void onLevelLoad(LevelEvent.Load event) {
 			Level level = (Level) event.getLevel();
 			if (level.getLevelData() instanceof PrimaryLevelData levelData) {
-				BetterSound.getInstance().currentLevelName = levelData.getLevelName();
-			}
-			if (level.isClientSide) {
-				((MinecraftExtender) Minecraft.getInstance()).betterSound$getNBSLoader().load();
+				DataManager.init(levelData.getLevelName());
 			}
 		}
 
 		@SubscribeEvent
-		public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+		public void onLevelSave(LevelEvent.Save event) {
+			DataManager.save();
+		}
+
+		@SubscribeEvent
+		public void onServerAboutToStart(ServerAboutToStartEvent event) {
 			Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
 			Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
 
@@ -144,17 +148,15 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public static void onServerStarting(ServerStartingEvent event) {
-			DataManager.init();
+		public void onServerStarting(ServerStartingEvent event) {
 		}
 
 		@SubscribeEvent
-		public static void onServerEnding(ServerStoppingEvent event) {
-			DataManager.save();
+		public void onServerEnding(ServerStoppingEvent event) {
 		}
 
 		@SubscribeEvent
-		public static void onPlayerLeftClick(PlayerInteractEvent.LeftClickBlock event) {
+		public void onPlayerLeftClick(PlayerInteractEvent.LeftClickBlock event) {
 			if (event.getAction() == PlayerInteractEvent.LeftClickBlock.Action.START) {
 				BlockPos pos = event.getPos();
 				Level level = event.getLevel();
@@ -172,7 +174,7 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public static void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
+		public void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
 			Level level = event.getLevel();
 			if (event.getEntity().isSpectator() && level.getBlockState(event.getHitVec().getBlockPos()).getBlock() instanceof SpectatorInvalidBlock) {
 				event.setCanceled(true);

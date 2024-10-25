@@ -3,8 +3,7 @@ package com.witcherbb.bettersound.blocks;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
-import com.witcherbb.bettersound.common.data.JukeboxEntityDataProvider;
-import com.witcherbb.bettersound.common.data.pojo.JukeboxEntityData;
+import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -30,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class JukeboxControllerBlock extends BaseEntityBlock implements SpectatorInvalidBlock {
     public static final BooleanProperty OPENED = BooleanProperty.create("opened");
@@ -50,7 +50,7 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
 					jukeboxControllerBlockEntity.load(nbt);
 					String name = nbt.getString("Name");
 					if (!name.isEmpty()) {
-						JukeboxControllerBlockEntity.getProvider().addControllerPos(name, pLevel.dimension().location().getPath(), JukeboxEntityData.createPos(pPos));
+						JukeboxControllerBlockEntity.getProvider().addControllerPos(name, pLevel.dimension().location().getPath(), pPos);
 					}
 				}
 			}
@@ -139,37 +139,29 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
     }
 
     public static void startPlaying(String name, Level level) {
-		List<JukeboxEntityData.Pos> posList = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath());
+		List<BlockPos> posList = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath());
 		int size = posList.size();
 		for (int i = 0; i < size; i++) {
-			JukeboxBlockEntity jukeboxBlockEntity = JukeboxEntityData.getBlockEntity(level, posList.get(i));
-			if (jukeboxBlockEntity != null) {
-				//play
-				jukeboxBlockEntity.setFirstItem(jukeboxBlockEntity.getFirstItem());
-//				jukeboxBlockEntity.startPlaying();
-			}
+			Optional<JukeboxBlockEntity> blockEntityOptional = level.getBlockEntity(posList.get(i), BlockEntityType.JUKEBOX);
+			blockEntityOptional.ifPresent((blockEntity) -> blockEntity.setFirstItem(blockEntity.getFirstItem()));
 		}
 	}
 
 	public static void stopPlaying(String name, Level level) {
-        JukeboxEntityData.Pos[] posArray = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(new JukeboxEntityData.Pos[0]);
-		int size = posArray.length;
+        List<BlockPos> posList = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath());
+		int size = posList.size();
 		for (int i = 0; i < size; i++) {
-			JukeboxBlockEntity jukeboxBlockEntity = JukeboxEntityData.getBlockEntity(level, posArray[i]);
-			if (jukeboxBlockEntity != null) {
-				//stop
-				jukeboxBlockEntity.removeItem(100, 0);
-//				jukeboxBlockEntity.stopPlaying();
-			}
+			Optional<JukeboxBlockEntity> blockEntityOptional = level.getBlockEntity(posList.get(i), BlockEntityType.JUKEBOX);
+			blockEntityOptional.ifPresent(JukeboxBlockEntity::removeFirstItem);
 		}
 	}
 
 	public static boolean checkAnyOpened(String name, Level level) {
 		JukeboxEntityDataProvider provider = JukeboxControllerBlockEntity.getProvider();
-		JukeboxEntityData.Pos[] posArray = provider.getControllerPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(new JukeboxEntityData.Pos[0]);
+		BlockPos[] posArray = provider.getControllerPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(BlockPos[]::new);
 		int size = posArray.length;
 		for (int i = 0; i < size; i++) {
-			if (level.getBlockState(posArray[i].toBlockPos()).getValue(JukeboxControllerBlock.OPENED)) {
+			if (level.getBlockState(posArray[i]).getValue(JukeboxControllerBlock.OPENED)) {
 				return true;
 			}
 		}

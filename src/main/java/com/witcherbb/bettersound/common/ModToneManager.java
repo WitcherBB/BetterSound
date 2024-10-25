@@ -1,11 +1,11 @@
-package com.witcherbb.bettersound.common.data;
+package com.witcherbb.bettersound.common;
 
 import com.witcherbb.bettersound.common.utils.LastToneMap;
 import net.minecraft.core.BlockPos;
 
 import java.util.UUID;
 
-public class ModDataManager {
+public class ModToneManager {
     private final LastToneMap lastToneMap = LastToneMap.create();
 
     public LastToneMap getLastToneMap() {

@@ -1,4 +1,4 @@
 package com.witcherbb.bettersound.common.data.pojo;
 
-public class BaseEntityData {
+public abstract class BaseEntityData {
 }

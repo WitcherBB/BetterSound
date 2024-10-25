@@ -1,16 +1,12 @@
 package com.witcherbb.bettersound.blocks.entity;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
-import com.witcherbb.bettersound.common.data.JukeboxEntityDataProvider;
-import com.witcherbb.bettersound.common.data.pojo.JukeboxEntityData;
+import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.menu.inventory.JukeboxControllerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -25,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,7 +98,7 @@ public class JukeboxControllerBlockEntity extends BlockEntity implements MenuPro
 			int size = this.jukeboxPoses.size();
 			for (int i = 0; i < size; i++) {
 				Optional<JukeboxBlockEntity> blockEntity = this.level.getBlockEntity(this.jukeboxPoses.get(i), BlockEntityType.JUKEBOX);
-                blockEntity.ifPresent(JukeboxBlockEntity::startPlaying);
+                blockEntity.ifPresent(jukeboxBlockEntity -> jukeboxBlockEntity.setFirstItem(jukeboxBlockEntity.getFirstItem()));
 			}
 		}
 	}
@@ -111,34 +108,33 @@ public class JukeboxControllerBlockEntity extends BlockEntity implements MenuPro
 			int size = this.jukeboxPoses.size();
 			for (int i = 0; i < size; i++) {
 				Optional<JukeboxBlockEntity> blockEntity = this.level.getBlockEntity(this.jukeboxPoses.get(i), BlockEntityType.JUKEBOX);
-				blockEntity.ifPresent(JukeboxBlockEntity::stopPlaying);
+				blockEntity.ifPresent(ContainerSingleItem::removeFirstItem);
 			}
 		}
 	}
 
 	public static void putPos2List(String name, String dimension, BlockPos blockPos) {
-		JukeboxEntityData.Pos pos = new JukeboxEntityData.Pos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 		//TODO provider统一管理各个名称的控制器，便于唯一检查。数据存放方法不变，不再写进json文件，而是写进nbs文件，自定义Codec。
-
-		provider.addPos(name, dimension, pos);
+		provider.getControllerPosListByNameAndDimension(name, dimension);
+		provider.addPos(name, dimension, blockPos);
 	}
 
 	public static void removeFromList(String name, String dimension, BlockPos blockPos) {
-		JukeboxEntityData.Pos pos = new JukeboxEntityData.Pos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-		provider.removePos(name, dimension, pos);
+		//TODO 直接在this.jukeboxPoses里面remove
+
+//		provider.removePos(name, dimension, blockPos);
 	}
 
 	public static void removeControllerAndJukebox(String name, Level level, BlockPos blockPos) {
 		BlockEntity entity = level.getBlockEntity(blockPos);
 		if (entity instanceof JukeboxControllerBlockEntity) {
 			JukeboxEntityDataProvider provider = JukeboxControllerBlockEntity.getProvider();
-			JukeboxEntityData.Pos[] posArray = provider.getPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(new JukeboxEntityData.Pos[0]);
-			if (provider.removeControllerPos(name, level.dimension().location().getPath(), JukeboxEntityData.createPos(blockPos))) {
+			BlockPos[] posArray = provider.getPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(BlockPos[]::new);
+			if (provider.removeControllerPos(name, level.dimension().location().getPath(), blockPos)) {
 				int size = posArray.length;
 				for (int i = 0; i < size; i++) {
-					JukeboxEntityData.Pos pos = posArray[i];
-					BlockPos blockPos1 = new BlockPos(pos.x(), pos.y(), pos.z());
-					BlockEntity blockEntity = level.getBlockEntity(blockPos1);
+					BlockPos pos = posArray[i];
+					BlockEntity blockEntity = level.getBlockEntity(pos);
 					if (blockEntity instanceof JukeboxBlockEntity jukeboxBlockEntity) {
 						CompoundTag nbt = jukeboxBlockEntity.getUpdateTag();
 						nbt.putString("Name", "");

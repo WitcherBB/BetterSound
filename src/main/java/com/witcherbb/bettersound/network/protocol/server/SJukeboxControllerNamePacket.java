@@ -43,7 +43,7 @@ public record SJukeboxControllerNamePacket(String name, String dimension) {
 					nbt.putString("Name", packet.getName());
 					blockEntity.load(nbt);
 					if (!packet.getName().isEmpty()) {
-						JukeboxControllerBlockEntity.getProvider().addData(new JukeboxEntityData(packet.getName(), packet.dimension), JukeboxEntityData.createPos(blockEntity.getBlockPos()));
+						JukeboxControllerBlockEntity.getProvider().addData(new JukeboxEntityData(packet.getName(), packet.dimension), blockEntity.getBlockPos());
 					}
 					if (blockEntity.getLevel() != null && !oldName.isEmpty() && !oldName.equals(packet.getName())) {
 						JukeboxControllerBlockEntity.removeControllerAndJukebox(oldName, blockEntity.getLevel(), blockEntity.getBlockPos());

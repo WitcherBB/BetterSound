@@ -1,5 +1,7 @@
 package com.witcherbb.test;
 
+import com.witcherbb.tool.Scanner;
+import com.witcherbb.tool.annotation.Data;
 import cpw.mods.bootstraplauncher.BootstrapLauncher;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -11,6 +13,12 @@ public class MainTest {
     @Test
     public void test() {
         System.out.println(check(Comparable.class));
+    }
+
+    @Test
+    public void test1() {
+        Scanner scanner = new Scanner();
+        System.out.println(scanner.getClassByAnnotation(Data.class));
     }
 
     public int getZero(float num, int start, float offset) {

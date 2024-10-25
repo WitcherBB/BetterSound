@@ -3,7 +3,7 @@ package com.witcherbb.bettersound.network.protocol.server;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.common.data.JukeboxEntityDataProvider;
+import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.menu.inventory.JukeboxMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;

@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
 import com.mojang.datafixers.DataFixer;
-import com.witcherbb.bettersound.common.data.ModDataManager;
+import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
@@ -21,15 +21,15 @@ import java.net.Proxy;
 public abstract class MinecraftServerMixin implements MinecraftServerExtender {
 
     @Unique
-    private ModDataManager betterSound$modDataManager;
+    private ModToneManager betterSound$modToneManager;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void MinecraftServer0(Thread pServerThread, LevelStorageSource.LevelStorageAccess pStorageSource, PackRepository pPackRepository, WorldStem pWorldStem, Proxy pProxy, DataFixer pFixerUpper, Services pServices, ChunkProgressListenerFactory pProgressListenerFactory, CallbackInfo ci) {
-        this.betterSound$modDataManager = new ModDataManager();
+        this.betterSound$modToneManager = new ModToneManager();
     }
 
     @Override
-    public ModDataManager betterSound$getModDataManager() {
-        return this.betterSound$modDataManager;
+    public ModToneManager betterSound$getModDataManager() {
+        return this.betterSound$modToneManager;
     }
 }

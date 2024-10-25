@@ -1,25 +1,32 @@
 package com.witcherbb.bettersound.common.data.pojo;
 
-import com.witcherbb.bettersound.BetterSound;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.witcherbb.tool.annotation.Data;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class JukeboxEntityData extends BaseEntityData{
-	private String name;
-	private String dimension;
-	private List<Pos> controllerPosList;
-	private List<Pos> posList;
+public final class JukeboxEntityData extends BaseEntityData{
+	public static final Codec<JukeboxEntityData> CODEC = RecordCodecBuilder.create(instance ->
+		instance.group(
+				Codec.STRING.fieldOf("name").forGetter(JukeboxEntityData::getName),
+				Codec.STRING.fieldOf("dimension").forGetter(JukeboxEntityData::getDimension),
+				BlockPos.CODEC.listOf().fieldOf("controllerPosList").forGetter(JukeboxEntityData::getControllerPosList),
+				BlockPos.CODEC.listOf().fieldOf("posList").forGetter(JukeboxEntityData::getPosList)
+		).apply(instance, JukeboxEntityData::new)
+	);
+	private final String name;
+	private final String dimension;
+	private List<BlockPos> controllerPosList;
+	private List<BlockPos> posList;
 
 
-	private static final String[] AXIS = new String[]{"\"x\":", "\"y\":", "\"z\":"};
 
 	public JukeboxEntityData(String name, String dimension) {
 		this.name = name;
@@ -28,31 +35,30 @@ public class JukeboxEntityData extends BaseEntityData{
 		this.dimension = dimension;
 	}
 
-	public static Pos createPos(BlockPos blockPos) {
-		return new Pos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+	private JukeboxEntityData(String name, String dimension, List<BlockPos> controllerPosList, List<BlockPos> posList) {
+		this.name = name;
+        this.posList = posList;
+        this.controllerPosList = controllerPosList;
+        this.dimension = dimension;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public List<Pos> getPosList() {
+	public List<BlockPos> getPosList() {
 		return posList;
 	}
 
-	public void setPosList(List<Pos> posList) {
+	public void setPosList(List<BlockPos> posList) {
 		this.posList = posList;
 	}
 
-	public List<Pos> getControllerPosList() {
+	public List<BlockPos> getControllerPosList() {
 		return controllerPosList;
 	}
 
-	public void setControllerPosList(List<Pos> controllerPosList) {
+	public void setControllerPosList(List<BlockPos> controllerPosList) {
 		this.controllerPosList = controllerPosList;
 	}
 
@@ -60,75 +66,36 @@ public class JukeboxEntityData extends BaseEntityData{
 		return dimension;
 	}
 
-	public boolean addBlockPos(Pos pos) {
-		return this.posList.add(pos);
+	public void addBlockPos(BlockPos pos) {
+		this.posList.add(pos);
 	}
 
-	public boolean removeBlockPos(Pos pos) {
-		return this.posList.remove(pos);
+	public void removeBlockPos(BlockPos pos) {
+		this.posList.remove(pos);
 	}
 
-	public boolean addControllerPos(Pos pos) {
-		return this.controllerPosList.add(pos);
+	public void addControllerPos(BlockPos pos) {
+		this.controllerPosList.add(pos);
 	}
 
-	public boolean removeControllerPos(Pos pos) {
-		return this.controllerPosList.remove(pos);
+	public void removeControllerPos(BlockPos pos) {
+		this.controllerPosList.remove(pos);
 	}
 
-	public static JukeboxBlockEntity getBlockEntity(Level level, Pos pos) {
-		BlockEntity blockEntity = level.getBlockEntity(new BlockPos(pos.x, pos.y, pos.z));
-		if (blockEntity instanceof JukeboxBlockEntity jukeboxBlockEntity)
-			return jukeboxBlockEntity;
-		return null;
+	public boolean same(String name, String dimension) {
+		return this.name.equals(name) && this.dimension.equals(dimension);
 	}
 
-    public record Pos(int x, int y, int z) {
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof Pos pos) {
-				return (pos.x == this.x) && (pos.y == this.y) && (pos.z == this.z);
-			}
-			return false;
-		}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		JukeboxEntityData that = (JukeboxEntityData) o;
+		return Objects.equals(name, that.name) && Objects.equals(dimension, that.dimension);
+	}
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(x, y, z);
-		}
-
-		public BlockPos toBlockPos() {
-			return new BlockPos(this.x, this.y, this.z);
-		}
-
-		@Override
-		public String toString() {
-			String module = "{\"x\":%d, \"y\":%d, \"z\":%d}";
-			return module.formatted(x, y, z);
-		}
-
-		@Nullable
-		public static Pos parse(String s) {
-			s = StringUtils.strip(s, "{}");
-			String[] axisArray = s.split(",");
-			Integer[] posValues = new Integer[3];
-			if (axisArray.length != AXIS.length) {
-				BetterSound.LOGGER.error("parse wrong: length wrong");
-				return null;
-			}
-			for (int i = 0; i < AXIS.length; i++) {
-				if (!axisArray[i].contains(AXIS[i])) {
-					BetterSound.LOGGER.error("parse wrong: content wrong");
-					return null;
-				}
-				try {
-					posValues[i] = Integer.valueOf(axisArray[i].split(AXIS[i])[1]);
-				} catch (Exception e) {
-					BetterSound.LOGGER.error("parse wrong: content wrong");
-					return null;
-				}
-			}
-			return new Pos(posValues[0], posValues[1], posValues[2]);
-		}
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, dimension, controllerPosList, posList);
 	}
 }
