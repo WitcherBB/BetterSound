@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.client.resources.sounds;
 
+import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.mixins.extenders.SoundInstanceExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
@@ -10,6 +11,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -28,8 +30,10 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     private UUID playerUUID;
     private BlockPos pos;
     private final float firstVolume;
+    private final float range;
 
     private static final float FULL_VOLUME = 3.0F;
+    public static final Minecraft MC = Minecraft.getInstance();
 
     public static PianoSoundInstance forUI(SoundEvent soundEvent, BlockPos pos, Vec3 relative, UUID playerUUID, int tone) {
         return forUI(soundEvent, pos, relative, playerUUID, tone, FULL_VOLUME);
@@ -68,10 +72,12 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
 
     private PianoSoundInstance(SoundEvent soundEvent, float volume, float pitch, double x, double y, double z, boolean relative, boolean isShort) {
         super(soundEvent, SoundSource.RECORDS, SoundInstance.createUnseededRandom());
+        this.range = soundEvent.getRange(volume);
         this.volume = volume;
         this.firstVolume = volume;
         this.pitch = pitch;
         this.relative = relative;
+        this.looping = false;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -99,6 +105,14 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
         this.wasSet = true;
         this.lastTick = this.tickCount;
         this.volumeAttenuation = true;
+    }
+
+    @Override
+    public boolean canPlaySound() {
+        if (!this.relative && MC.player != null) {
+            return MC.player.position().distanceToSqr(this.x, this.y, this.z) < this.range * this.range;
+        }
+        return super.canPlaySound();
     }
 
     private float getDeltaVolume(int tick) {

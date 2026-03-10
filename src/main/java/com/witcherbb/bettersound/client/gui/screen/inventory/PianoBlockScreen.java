@@ -20,6 +20,7 @@ import net.minecraftforge.common.util.Lazy;
 import java.util.Map;
 import java.util.Set;
 
+//TODO 添加搜索音轨文件界面，直接通过UI界面导入nbs或者midi文件
 @OnlyIn(Dist.CLIENT)
 public class PianoBlockScreen extends AbstractPianoScreen {
     protected static final Component KEY_CONTROLL = Component.translatable("block.bettersound.piano.use_keymap").withStyle(Style.EMPTY.withFont(new ResourceLocation(BetterSound.MODID, "fzjz")));

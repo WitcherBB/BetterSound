@@ -44,7 +44,8 @@ public class JukeboxMenu extends AbstractContainerMenu {
 					public boolean mayPlace(@NotNull ItemStack stack) {
 						return super.mayPlace(stack);
 					}
-        }));
+				})
+		);
 
 //		addDataSlots(data);
 	}

@@ -26,8 +26,6 @@ public final class JukeboxEntityData extends BaseEntityData{
 	private List<BlockPos> controllerPosList;
 	private List<BlockPos> posList;
 
-
-
 	public JukeboxEntityData(String name, String dimension) {
 		this.name = name;
 		this.posList = new ArrayList<>();
@@ -37,8 +35,8 @@ public final class JukeboxEntityData extends BaseEntityData{
 
 	private JukeboxEntityData(String name, String dimension, List<BlockPos> controllerPosList, List<BlockPos> posList) {
 		this.name = name;
-        this.posList = posList;
-        this.controllerPosList = controllerPosList;
+        this.posList = new ArrayList<>(posList);
+        this.controllerPosList = new ArrayList<>(controllerPosList);
         this.dimension = dimension;
 	}
 

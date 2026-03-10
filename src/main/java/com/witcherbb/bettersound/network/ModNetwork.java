@@ -43,6 +43,7 @@ public class ModNetwork {
 
         addServerPacket();
         addClientPacket();
+        System.out.println("网络已注册！！");
     }
 
     private static void addServerPacket() {

@@ -84,17 +84,17 @@ public class ToneBlock extends AbstractPianoBlock implements SpectatorInvalidBlo
 
     public void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos) {
         if (pPlayer != null) {
-            ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), tone, volume, false, false), pPlayer);
+            ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), Vec3.atCenterOf(pPos), tone, volume, false, false), pPlayer);
         } else
-            ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), tone, volume, false, false));
+            ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), Vec3.atCenterOf(pPos), tone, volume, false, false));
         pLevel.blockEvent(pPos, this, 0, 0);
     }
 
     public void stopSound(@Nullable ServerPlayer pPlayer, int tone, Level pLevel, BlockPos pPos) {
         if (pPlayer != null) {
-            ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), tone, (byte) 0, true, false), pPlayer);
+            ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), Vec3.atCenterOf(pPos), tone, (byte) 0, true, false), pPlayer);
         }
-        else ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), tone, (byte) 0, true, false));
+        else ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), Vec3.atCenterOf(pPos), tone, (byte) 0, true, false));
     }
 
     @Override

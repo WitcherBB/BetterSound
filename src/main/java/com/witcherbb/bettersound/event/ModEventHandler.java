@@ -56,7 +56,7 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 	public static class ModClientEvents {
 		@SubscribeEvent
-        public void onClientSetup(FMLClientSetupEvent event) {
+        public static void onClientSetup(FMLClientSetupEvent event) {
 			ModOptions.getOptions().load();
 
             MenuScreens.register(ModMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
@@ -72,12 +72,12 @@ public class ModEventHandler {
         }
 
 		@SubscribeEvent
-		public void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+		public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
 			event.registerSpriteSet(ModParticleTypes.BLACK_NOTE.get(), BlackNoteParticle.BlackNoteParticleFactory::new);
 		}
 
 		@SubscribeEvent
-		public void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
+		public static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
 			if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
 				event.accept(ModItems.ITEM_SUSTAIN_PEDAL);
 				event.accept(ModItems.ITEM_TONE_BLOCK);
@@ -90,7 +90,7 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public void onRegisterBindings(RegisterKeyMappingsEvent event) {
+		public static void onRegisterBindings(RegisterKeyMappingsEvent event) {
 
 		}
 
@@ -99,13 +99,19 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 	public static class ModServerEvents {
 
-		@SubscribeEvent
-		public void onCommonSetup(FMLCommonSetupEvent event) {
-			ModNetwork.register();
+		static {
+			// 验证类是否被加载
+			System.out.println("===== ModServerEvents 类已加载 =====");
 		}
 
 		@SubscribeEvent
-		public void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+		public static void onCommonSetup(FMLCommonSetupEvent event) {
+//			ModNetwork.register();
+			event.enqueueWork(ModNetwork::register);
+		}
+
+		@SubscribeEvent
+		public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
 
 		}
 	}
@@ -118,7 +124,7 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class ForgeServerEvents {
 		@SubscribeEvent
-		public void onCommandRegister(RegisterCommandsEvent event) {
+		public static void onCommandRegister(RegisterCommandsEvent event) {
 			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 			Commands.CommandSelection selection = event.getCommandSelection();
 			CommandBuildContext context = event.getBuildContext();
@@ -127,7 +133,7 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public void onLevelLoad(LevelEvent.Load event) {
+		public static void onLevelLoad(LevelEvent.Load event) {
 			Level level = (Level) event.getLevel();
 			if (level.getLevelData() instanceof PrimaryLevelData levelData) {
 				DataManager.init(levelData.getLevelName());
@@ -135,12 +141,12 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public void onLevelSave(LevelEvent.Save event) {
+		public static void onLevelSave(LevelEvent.Save event) {
 			DataManager.save();
 		}
 
 		@SubscribeEvent
-		public void onServerAboutToStart(ServerAboutToStartEvent event) {
+		public static void onServerAboutToStart(ServerAboutToStartEvent event) {
 			Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
 			Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
 
@@ -148,15 +154,15 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public void onServerStarting(ServerStartingEvent event) {
+		public static void onServerStarting(ServerStartingEvent event) {
 		}
 
 		@SubscribeEvent
-		public void onServerEnding(ServerStoppingEvent event) {
+		public static void onServerEnding(ServerStoppingEvent event) {
 		}
 
 		@SubscribeEvent
-		public void onPlayerLeftClick(PlayerInteractEvent.LeftClickBlock event) {
+		public static void onPlayerLeftClick(PlayerInteractEvent.LeftClickBlock event) {
 			if (event.getAction() == PlayerInteractEvent.LeftClickBlock.Action.START) {
 				BlockPos pos = event.getPos();
 				Level level = event.getLevel();
@@ -174,7 +180,7 @@ public class ModEventHandler {
 		}
 
 		@SubscribeEvent
-		public void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
+		public static void onPlayerRightClick(PlayerInteractEvent.RightClickBlock event) {
 			Level level = event.getLevel();
 			if (event.getEntity().isSpectator() && level.getBlockState(event.getHitVec().getBlockPos()).getBlock() instanceof SpectatorInvalidBlock) {
 				event.setCanceled(true);

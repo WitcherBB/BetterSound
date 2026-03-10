@@ -87,7 +87,6 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
 				}
 			}
 		}
-
     }
 
 	private static boolean hasNeighborSignalExceptJukebox(Level level, BlockPos pos) {
@@ -152,7 +151,7 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
 		int size = posList.size();
 		for (int i = 0; i < size; i++) {
 			Optional<JukeboxBlockEntity> blockEntityOptional = level.getBlockEntity(posList.get(i), BlockEntityType.JUKEBOX);
-			blockEntityOptional.ifPresent(JukeboxBlockEntity::removeFirstItem);
+			blockEntityOptional.ifPresent(be -> be.removeItem(100, be.getMaxStackSize()));
 		}
 	}
 

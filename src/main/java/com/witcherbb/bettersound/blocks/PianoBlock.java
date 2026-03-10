@@ -328,9 +328,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), target, tone, volume, false, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), target, tone, volume, false, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, target, tone, volume, false, false));
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), target, tone, volume, false, false));
             pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, tone);
         }
     }
@@ -340,9 +340,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), target, tone, (byte) 0, true, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), target, tone, (byte) 0, true, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, target, tone, (byte) 0, true, false));
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), target, tone, (byte) 0, true, false));
         }
     }
 

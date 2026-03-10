@@ -1,6 +1,8 @@
 package com.witcherbb.bettersound.common.data.impl;
 
 import com.google.gson.reflect.TypeToken;
+import com.mojang.datafixers.util.Pair;
+import com.witcherbb.bettersound.common.data.AbstractJukeboxDataProvider;
 import com.witcherbb.bettersound.common.data.ListDataProvider;
 import com.witcherbb.bettersound.common.data.pojo.JukeboxEntityData;
 import net.minecraft.core.BlockPos;
@@ -8,8 +10,9 @@ import net.minecraft.core.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
-public class JukeboxEntityDataProvider extends ListDataProvider<JukeboxEntityData> {
+public class JukeboxEntityDataProvider extends AbstractJukeboxDataProvider {
 
 	public JukeboxEntityDataProvider() {
 		super("jukebox_data", new TypeToken<List<JukeboxEntityData>>(){}.getType(), JukeboxEntityData.CODEC);
@@ -28,28 +31,12 @@ public class JukeboxEntityDataProvider extends ListDataProvider<JukeboxEntityDat
 
 	@Override
 	public boolean exists(JukeboxEntityData data) {
-		List<JukeboxEntityData> dataList = this.data;
-		int size = dataList.size();
-		for (int i = 0; i < size; i++) {
-			JukeboxEntityData data1 = dataList.get(i);
-			if (data1.getDimension().equals(data.getDimension()) && data1.getName().equals(data.getName())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
+        return exists(data.getName(), data.getDimension());
+    }
 
 	public boolean exists(String name, String dimension) {
-		JukeboxEntityData[] dataArray = this.data.toArray(new JukeboxEntityData[0]);
-		boolean exsists = false;
-		int size = dataArray.length;
-		for (int i = 0; i < size; i++) {
-			if (dataArray[i].getName().equals(name) && dataArray[i].getDimension().equals(dimension)) {
-				exsists = true;
-			}
-		}
-		return exsists;
+		Set<Pair<String, String>> keySet = this.data.keySet();
+		return keySet.contains(new Pair<>(name, dimension));
 	}
 
 	public void addPos(String name, String dimension, BlockPos pos) {
@@ -58,73 +45,51 @@ public class JukeboxEntityDataProvider extends ListDataProvider<JukeboxEntityDat
 	}
 
 	public void addControllerPos(String name, String dimension, BlockPos pos) {
-		JukeboxEntityData[] dataArray = this.data.toArray(new JukeboxEntityData[0]);
-		int size = dataArray.length;
-		for (int i = 0; i < size; i++) {
-			if (dataArray[i].getName().equals(name) && dataArray[i].getDimension().equals(dimension)) {
-				dataArray[i].addControllerPos(pos);
-				return;
-			}
-		}
+		var key = new Pair<>(name, dimension);
+		if (!this.data.containsKey(key)) return;
+		var jd = this.data.get(key);
+		if (jd.getControllerPosList().contains(pos)) return;
+		jd.addControllerPos(pos);
 	}
 
 	public boolean removeControllerPos(String name, String dimension, BlockPos pos) {
-		List<JukeboxEntityData> dataList = this.data;
+		var key = new Pair<>(name, dimension);
 		List<BlockPos> controllerPoses = List.of();
-		JukeboxEntityData foundData = null;
+		JukeboxEntityData foundData = this.data.get(key);
+		if (!Objects.isNull(foundData)) {
+			controllerPoses = foundData.getControllerPosList();
+		}
 
-		for (int i = 0; i < dataList.size(); i++) {
-			JukeboxEntityData data1 = dataList.get(i);
-			if (data1.same(name, dimension)) {
-				foundData = data1;
-				controllerPoses = foundData.getControllerPosList();
-				break;
-			}
-		}
-		// foundData 和 controllerPoses 同时改变， 所以只判断一个即可
 		if (Objects.isNull(foundData) || controllerPoses.isEmpty()) return false;
-		for (int i = 0; i < controllerPoses.size(); i++) {
-			BlockPos controllerPos = controllerPoses.get(i);
-			if (controllerPos.equals(pos)) {
-				controllerPoses.remove(controllerPos);
-				if (controllerPoses.isEmpty()) {
-					this.removeData(foundData);
-					return true;
-				}
-			}
+		controllerPoses.remove(pos);
+		if (controllerPoses.isEmpty()) {
+			this.removeData(foundData);
+			return true;
 		}
+
 		return false;
 	}
 
 	public List<BlockPos> getPosListByNameAndDimension(String name, String dimension) {
-		JukeboxEntityData[] dataArray = this.data.toArray(new JukeboxEntityData[0]);
-		int size = dataArray.length;
-		for (int i = 0; i < size; i++) {
-			if (dataArray[i].getName().equals(name) && dataArray[i].getDimension().equals(dimension)) {
-				return dataArray[i].getPosList();
-			}
+		var key = new Pair<>(name, dimension);
+		if (this.data.containsKey(key)) {
+			return this.data.get(key).getPosList();
 		}
 		return new ArrayList<>();
 	}
 
 	public List<BlockPos> getControllerPosListByNameAndDimension(String name, String dimension) {
-		JukeboxEntityData[] dataArray = this.data.toArray(new JukeboxEntityData[0]);
-		int size = dataArray.length;
-		for (int i = 0; i < size; i++) {
-			if (dataArray[i].getName().equals(name) && dataArray[i].getDimension().equals(dimension)) {
-				return dataArray[i].getControllerPosList();
-			}
+		var key = new Pair<>(name, dimension);
+		if (this.data.containsKey(key)) {
+			return this.data.get(key).getControllerPosList();
 		}
 		return new ArrayList<>();
 	}
 
 	public void addPosListByNameAndDimension(String name, String dimension, BlockPos pos) {
-		JukeboxEntityData[] dataArray = this.data.toArray(new JukeboxEntityData[0]);
-		int size = dataArray.length;
-		for (int i = 0; i < size; i++) {
-			if (dataArray[i].getName().equals(name) && dataArray[i].getDimension().equals(dimension)) {
-				dataArray[i].addBlockPos(pos);
-			}
+		var key = new Pair<>(name, dimension);
+		if (this.data.containsKey(key)) {
+			this.data.get(key).addBlockPos(pos);
 		}
 	}
 }

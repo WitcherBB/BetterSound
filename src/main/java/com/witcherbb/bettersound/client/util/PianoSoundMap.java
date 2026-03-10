@@ -19,7 +19,7 @@ public class PianoSoundMap {
         TreeMap<Integer, List<PianoSoundInstance>> instanceMap = uuidMap.computeIfAbsent(playerUUID, uuidK -> new TreeMap<>());
         instanceMap.computeIfAbsent(tone, k -> new ArrayList<>()).add(instance);
 //        uuidMap.put(playerUUID, instanceMap);
-//        this.soundMap.put(pos, uuidMap);
+//        this.soundMap.put(voicePos, uuidMap);
     }
 
     public @Nullable PianoSoundInstance removeFirst(BlockPos pos, UUID playerUUID, int tone) {

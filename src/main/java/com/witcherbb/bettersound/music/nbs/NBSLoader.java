@@ -25,8 +25,7 @@ public class NBSLoader {
         File[] files = this.dir.listFiles();
         if (files == null) return;
         for (File file : files) {
-            try {
-                NBSReader reader = new NBSReader(file);
+            try (NBSReader reader = new NBSReader(file)) {
                 PianoSong song = reader.readPiano();
                 songs.put(song.fileName, song);
             } catch (Exception e) {

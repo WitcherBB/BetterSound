@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
-public class BinaryFileReader {
+public class BinaryFileReader implements Closeable {
     private final FileInputStream fis;
     private final ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -41,5 +41,10 @@ public class BinaryFileReader {
     public int readInt() throws IOException {
         buffer.clear().put(readBytes(Integer.BYTES));
         return buffer.rewind().getInt();
+    }
+
+    @Override
+    public void close() throws IOException {
+        fis.close();
     }
 }

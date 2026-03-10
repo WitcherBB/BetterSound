@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +66,7 @@ public class JukeboxControllerBlockEntity extends BlockEntity implements MenuPro
 	public void load(@NotNull CompoundTag nbt) {
 		super.load(nbt);
 		this.name = nbt.getString("Name");
-		this.jukeboxPoses = POS_CODEC.parse(NbtOps.INSTANCE, nbt.get("ConnectedJukebox")).result().orElseGet(ArrayList::new);
+		this.jukeboxPoses = new ArrayList<>(POS_CODEC.parse(NbtOps.INSTANCE, nbt.get("ConnectedJukebox")).result().orElseGet(ArrayList::new));
 	}
 
 	@Override
@@ -107,25 +109,36 @@ public class JukeboxControllerBlockEntity extends BlockEntity implements MenuPro
 		if (this.level != null && this.level.isClientSide) {
 			int size = this.jukeboxPoses.size();
 			for (int i = 0; i < size; i++) {
-				Optional<JukeboxBlockEntity> blockEntity = this.level.getBlockEntity(this.jukeboxPoses.get(i), BlockEntityType.JUKEBOX);
-				blockEntity.ifPresent(ContainerSingleItem::removeFirstItem);
+				Optional<JukeboxBlockEntity> blockEntityOptional = this.level.getBlockEntity(this.jukeboxPoses.get(i), BlockEntityType.JUKEBOX);
+				blockEntityOptional.ifPresent(be -> be.removeItem(100, be.getMaxStackSize()));
 			}
 		}
 	}
 
-	public static void putPos2List(String name, String dimension, BlockPos blockPos) {
-		//TODO provider统一管理各个名称的控制器，便于唯一检查。数据存放方法不变，不再写进json文件，而是写进nbs文件，自定义Codec。
-		provider.getControllerPosListByNameAndDimension(name, dimension);
+	public static void putPos(String name, String dimension, BlockPos blockPos, Level level) {
+		// provider统一管理各个名称的控制器，便于唯一检查。数据存放方法不变，不再写进json文件，而是写进nbs文件，自定义Codec。
 		provider.addPos(name, dimension, blockPos);
+		var ctrlList = provider.get(name, dimension).getControllerPosList();
+		for (BlockPos ctPos : ctrlList) {
+			var be = level.getBlockEntity(ctPos);
+			if (be instanceof JukeboxControllerBlockEntity ctBE)
+				ctBE.jukeboxPoses.add(blockPos);
+		}
 	}
 
-	public static void removeFromList(String name, String dimension, BlockPos blockPos) {
-		//TODO 直接在this.jukeboxPoses里面remove
-
-//		provider.removePos(name, dimension, blockPos);
+	public static void removePos(String name, String dimension, BlockPos blockPos, Level level) {
+		// 直接在this.jukeboxPoses里面remove
+		var jdDT = provider.get(name, dimension);
+		jdDT.removeBlockPos(blockPos);
+		var ctrlList = jdDT.getControllerPosList();
+		for (BlockPos ctPos : ctrlList) {
+			var be = level.getBlockEntity(ctPos);
+			if (be instanceof JukeboxControllerBlockEntity ctBE)
+				ctBE.jukeboxPoses.remove(blockPos);
+		}
 	}
 
-	public static void removeControllerAndJukebox(String name, Level level, BlockPos blockPos) {
+	public static void removeControllerAndJukebox(String name, @NotNull Level level, BlockPos blockPos) {
 		BlockEntity entity = level.getBlockEntity(blockPos);
 		if (entity instanceof JukeboxControllerBlockEntity) {
 			JukeboxEntityDataProvider provider = JukeboxControllerBlockEntity.getProvider();

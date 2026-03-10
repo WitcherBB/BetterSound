@@ -54,8 +54,9 @@ public record SJukeboxNamePacket(String name, String dimension) {
 					blockEntity.load(nbt);
 
 					BlockPos blockPos = blockEntity.getBlockPos();
-					JukeboxControllerBlockEntity.removeFromList(oldName, oldDimension, blockPos);
-					JukeboxControllerBlockEntity.putPos2List(nbt.getString("Name"), WorldUtil.getDimensionName(sender.level()), blockPos);
+					if (!oldName.isEmpty())
+						JukeboxControllerBlockEntity.removePos(oldName, oldDimension, blockPos, sender.level());
+					JukeboxControllerBlockEntity.putPos(nbt.getString("Name"), WorldUtil.getDimensionName(sender.level()), blockPos, sender.level());
 					ModNetwork.sendToPlayer(new CJukeboxNameConfirmPacket(Util.Status.SUCCESS), sender);
 				} else if (packet.name.isEmpty()) {
 					ModNetwork.sendToPlayer(new CJukeboxNameConfirmPacket(Util.Status.NULL), sender);

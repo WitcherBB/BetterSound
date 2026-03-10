@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.witcherbb.bettersound.common.LevelDataFile;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class ModDataProvider<D> {

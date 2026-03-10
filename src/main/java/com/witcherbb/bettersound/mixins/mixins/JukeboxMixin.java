@@ -72,7 +72,7 @@ public abstract class JukeboxMixin extends BaseEntityBlock implements SpectatorI
 					jukeboxBlockEntity.load(nbt);
 					String name = nbt.getString("Name");
 					if (!name.isEmpty()) {
-						JukeboxControllerBlockEntity.putPos2List(name, pLevel.dimension().location().getPath(), pPos);
+						JukeboxControllerBlockEntity.putPos(name, pLevel.dimension().location().getPath(), pPos, pLevel);
 					}
 				}
 			}
@@ -90,7 +90,7 @@ public abstract class JukeboxMixin extends BaseEntityBlock implements SpectatorI
 	))
 	public void onRemove0(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving, CallbackInfo ci) {
 		CompoundTag nbt = pLevel.getBlockEntity(pPos).getUpdateTag();
-		JukeboxControllerBlockEntity.removeFromList(nbt.getString("Name"), pLevel.dimension().location().getPath(), pPos);
+		JukeboxControllerBlockEntity.removePos(nbt.getString("Name"), pLevel.dimension().location().getPath(), pPos, pLevel);
 	}
 
 	@Inject(method = "createBlockStateDefinition", at = @At("HEAD"), cancellable = true)

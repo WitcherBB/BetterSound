@@ -3,6 +3,8 @@ package com.witcherbb.bettersound.common.data;
 import com.mojang.serialization.Codec;
 import com.witcherbb.bettersound.common.data.pojo.BaseEntityData;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public abstract class ListDataProvider<T extends BaseEntityData> extends ModData
 
 	@Override
 	public void setData(List<T> list) {
-		this.data = list;
+		this.data = new ArrayList<>(list);
 	}
 
 	/**

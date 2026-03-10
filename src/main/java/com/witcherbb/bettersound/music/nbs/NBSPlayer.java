@@ -6,7 +6,6 @@ import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSongTrack;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPlayOnPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
@@ -16,10 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.List;
-import java.util.Objects;
 
 public class NBSPlayer {
     protected static final short LAST_DELAY = 60; // tick
@@ -28,7 +25,7 @@ public class NBSPlayer {
 
     private int tick = -1;
     /** Client side */
-    private PianoSong playing;
+    private PianoSong playingSong;
     /** Server side */
     private PianoSongTrack track;
     private boolean isPlaying;
@@ -43,10 +40,10 @@ public class NBSPlayer {
     public void tick() {
         if (this.isPlaying && this.track != null) {
             this.tick++;
-            List<Note> notes;
+            List<Note> notes = this.track.getNotes(this.tick);
             boolean flag = (this.tick / this.track.speed()) % this.track.subsectionLength() == 0;
 
-            if ((notes = this.track.getNotes(this.tick)) != null) {
+            if (notes != null) {
                 // play notes
                 Note[] noteArray = notes.toArray(Note[]::new);
                 if (flag) {
@@ -93,7 +90,7 @@ public class NBSPlayer {
     public void play(PianoSong song) throws PlayerIsPlayingMusicException {
         if (this.isPlaying) throw new PlayerIsPlayingMusicException();
         if (this.blockEntity.getLevel() != null && this.blockEntity.getLevel().isClientSide) {
-            this.playing = song;
+            this.playingSong = song;
             this.isPlaying = true;
             // 发给服务端数据包
             ModNetwork.sendToServer(new SNBSPlayPacket(this.blockEntity.getBlockPos(), song.fileName, song.getNoteMap(), song.speed, song.timeSignature));
@@ -114,11 +111,11 @@ public class NBSPlayer {
 
     /** Both side */
     public void stop() {
+        this.isPlaying = false;
         Level level = this.blockEntity.getLevel();
         if (level == null) return;
-        this.isPlaying = false;
         if (level.isClientSide) {
-            this.playing = null;
+            this.playingSong = null;
         } else {
             ModNetwork.broadcast(new CNBSStopPacket(this.blockEntity.getBlockPos()));
 
@@ -154,11 +151,11 @@ public class NBSPlayer {
     public boolean hasSong() {
         Level level = this.blockEntity.getLevel();
         if (level == null) return false;
-        return level.isClientSide ? this.playing != null : this.track != null;
+        return level.isClientSide ? this.playingSong != null : this.track != null;
     }
 
     //client
     public String getSongName() {
-        return this.playing.fileName;
+        return this.playingSong.fileName;
     }
 }

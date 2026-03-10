@@ -4,11 +4,12 @@ import com.witcherbb.bettersound.exception.FileIsNotNBSException;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import com.witcherbb.bettersound.music.util.BinaryFileReader;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class NBSReader {
+public class NBSReader implements Closeable {
     private BinaryFileReader reader;
     private final String fileName;
 
@@ -95,4 +96,8 @@ public class NBSReader {
         this.reader = new BinaryFileReader(file);
     }
 
+    @Override
+    public void close() throws IOException {
+        reader.close();
+    }
 }

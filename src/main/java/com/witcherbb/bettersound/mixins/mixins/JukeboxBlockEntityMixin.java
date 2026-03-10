@@ -20,6 +20,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
@@ -59,6 +60,10 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 		protected void onContentsChanged(int slot) {
 			JukeboxBlockEntityMixin.this.items.set(0, this.getStackInSlot(0));
 			JukeboxBlockEntityMixin.this.setChanged();
+
+			if (level != null && !level.isClientSide) {
+				level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+			}
 		}
 
 		@Override
@@ -71,7 +76,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 	private static final int betterSound$SLOT1 = 0;
 
 	@Unique
-	private LazyOptional<IItemHandler> betterSound$lazyItemHnadler = LazyOptional.empty();
+	private LazyOptional<IItemHandler> betterSound$lazyItemHandler = LazyOptional.empty();
 
 	@Unique
 	protected ContainerData betterSound$data;
@@ -107,7 +112,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 	@Override
 	public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ITEM_HANDLER) {
-			return betterSound$lazyItemHnadler.cast();
+			return betterSound$lazyItemHandler.cast();
 		}
 		return super.getCapability(cap, side);
 	}
@@ -115,10 +120,10 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		betterSound$lazyItemHnadler = LazyOptional.of(() -> betterSound$itemHandler);
+		this.betterSound$lazyItemHandler = LazyOptional.of(() -> this.betterSound$itemHandler);
 	}
 
-	@Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;set(ILjava/lang/Object;)Ljava/lang/Object;", shift =At.Shift.AFTER))
+	@Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;set(ILjava/lang/Object;)Ljava/lang/Object;", shift =At.Shift.NONE))
 	public void load0(CompoundTag pTag, CallbackInfo ci) {
 		this.betterSound$itemHandler.setStackInSlot(betterSound$SLOT1, ItemStack.of(pTag.getCompound("RecordItem")));
 	}
@@ -167,7 +172,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Cle
 	@Override
 	public void invalidateCaps() {
 		super.invalidateCaps();
-		betterSound$lazyItemHnadler.invalidate();
+		betterSound$lazyItemHandler.invalidate();
 	}
 
 	@Override
