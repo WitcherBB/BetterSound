@@ -3,12 +3,15 @@ package com.witcherbb.bettersound.music.nbs;
 import com.witcherbb.bettersound.exception.FileIsNotNBSException;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import com.witcherbb.bettersound.music.util.BinaryFileReader;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+@OnlyIn(Dist.CLIENT)
 public class NBSReader implements Closeable {
     private BinaryFileReader reader;
     private final String fileName;
@@ -71,11 +74,12 @@ public class NBSReader implements Closeable {
                     reader.readByte();
                     tone = (byte) (((tone * 100) + reader.readShort()) / 100);
                 }
-                if (instrument != 0) {
-                    pianoSong.addNote(tick, (byte) -1, (byte) 0, layer);
-                    continue;
+                // 非钢琴乐器（鼓、贝斯等）无法由钢琴演奏，直接跳过。
+                // 不再插入 tone=-1 的哨兵音符：它会随网络包发给客户端，
+                // 导致 pianoSounds.get(-1) 越界崩溃。
+                if (instrument == 0) {
+                    pianoSong.addNote(tick, tone, volume, layer);
                 }
-                pianoSong.addNote(tick, tone, volume, layer);
             }
         }
         for (short i = 0; i < pianoSong.layerCount; i++) {

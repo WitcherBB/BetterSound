@@ -7,9 +7,9 @@ import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
+import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,7 +49,6 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
     protected final Level level;
     protected final AbstractPianoBlockEntity blockEntity;
-    protected MinecraftExtender minecraftExtender;
     protected final ModOptions modOptions = ModOptions.getOptions();
 
     public AbstractPianoScreen(AbstractPianoMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
@@ -69,7 +67,6 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
     @Override
     protected void init() {
-        this.minecraftExtender = ((MinecraftExtender) this.minecraft);
         this.imageWidth = 300;
         this.imageHeight = 145;
         super.init();
@@ -377,7 +374,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             this.pressed = true;
             BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (minecraft != null) {
-                minecraftExtender.betterSound$getmodSoundManager().playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
+                ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
             }
             ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id, NORM_VOLUME));
         }
@@ -387,7 +384,7 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (!fatherInstance.blockEntity.isSoundDelay())
                 if (minecraft != null) {
-                    minecraftExtender.betterSound$getmodSoundManager().tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
+                    ModSoundManager.INSTANCE.tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
                 }
             ModNetwork.sendToServer(new SPianoKeyReleasedPacket(pos, this.id, !fatherInstance.blockEntity.isSoundDelay()));
         }

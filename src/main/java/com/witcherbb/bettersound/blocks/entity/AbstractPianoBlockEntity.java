@@ -13,8 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +31,7 @@ public abstract class AbstractPianoBlockEntity extends BlockEntity implements Me
 
     static {
         for (int i = 0; i < 88; i++) {
-            toneNameMap.put(i, getComponent(i).getString());
+            toneNameMap.put(i, getToneName(i));
         }
     }
 
@@ -99,23 +97,23 @@ public abstract class AbstractPianoBlockEntity extends BlockEntity implements Me
         this.firstWhiteKey = screen.getFirstWhiteKey();
     }
 
-    private static Component getComponent(int id) {
+    private static String getToneName(int id) {
         int length = keyNames.length;
 
         if (id < 0 || id >= 88) {
-            return Component.literal("Invalid key ID");
+            return "";
         } else if (id < 3) {
             return switch (id) {
-                case 0 -> Component.literal("A0");
-                case 1 -> Component.literal("A#/Bb0");
-                case 2 -> Component.literal("B0");
-                default -> Component.empty();
+                case 0 -> "A0";
+                case 1 -> "A#/Bb0";
+                case 2 -> "B0";
+                default -> "";
             };
         }
-
+        id -= 3;
         int effectiveId = id % length;
         int depth = id / length + 1;
 
-        return Component.literal(keyNames[effectiveId] + depth);
+        return keyNames[effectiveId] + depth;
     }
 }

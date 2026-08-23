@@ -11,6 +11,7 @@ import com.witcherbb.bettersound.network.protocol.server.*;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -43,7 +44,7 @@ public class ModNetwork {
 
         addServerPacket();
         addClientPacket();
-        System.out.println("网络已注册！！");
+        LogUtils.getLogger().info("网络已注册！！");
     }
 
     private static void addServerPacket() {

@@ -20,7 +20,6 @@ public class ToneBlockEntity extends AbstractPianoBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        this.toneName = toneNameMap.get(this.getBlockState().getValue(ToneBlock.TONE));
     }
 
     @Override
@@ -33,6 +32,6 @@ public class ToneBlockEntity extends AbstractPianoBlockEntity {
     }
 
     public String getToneName() {
-        return toneName;
+        return toneNameMap.get(this.getBlockState().getValue(ToneBlock.TONE));
     }
 }

@@ -1,10 +1,16 @@
 package com.witcherbb.bettersound.music.nbs.bean;
 
 import com.witcherbb.bettersound.common.utils.Util;
+import it.unimi.dsi.fastutil.bytes.Byte2ByteFunctions;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 public class Note {
+    public static final int FIELD_NUM = 3;
+
     private byte pitch;
     private byte volume;
     private byte layer = 0;
@@ -14,12 +20,16 @@ public class Note {
         this.volume = volume;
     }
 
-    public static byte[] getTones(List<Note> notes) {
-        return Util.toArray(notes.stream().parallel().map(Note::getPitch).toList());
+    public static byte[] getTones(Note[] notes) {
+        return ArrayUtils.toPrimitive(Arrays.stream(notes).parallel()
+                .map(Note::getPitch)
+                .toArray(Byte[]::new));
     }
 
-    public static byte[] getVolumes(List<Note> notes) {
-        return Util.toArray(notes.stream().parallel().map(Note::getVolume).toList());
+    public static byte[] getVolumes(Note[] notes) {
+        return ArrayUtils.toPrimitive(Arrays.stream(notes).parallel()
+                .map(Note::getVolume)
+                .toArray(Byte[]::new));
     }
 
     public static float toPianoSoundVolume(byte volume) {

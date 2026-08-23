@@ -37,7 +37,7 @@ public class CodecTest {
                 List.of(new BlockPos(1, 1, 1), new BlockPos(2, 3, 4))).result();
         tag1.ifPresent(pTag -> {
             CompoundTag iTag = new CompoundTag();
-            iTag.put("poses", pTag);
+            iTag.put("positions", pTag);
             System.out.println(iTag);
         });
     }

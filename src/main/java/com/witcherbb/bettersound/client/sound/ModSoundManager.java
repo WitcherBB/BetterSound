@@ -2,6 +2,7 @@ package com.witcherbb.bettersound.client.sound;
 
 import com.witcherbb.bettersound.client.util.PianoSoundMap;
 import com.witcherbb.bettersound.client.resources.sounds.PianoSoundInstance;
+import com.witcherbb.bettersound.music.nbs.NBSLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
@@ -14,12 +15,11 @@ import java.util.UUID;
 
 @OnlyIn(Dist.CLIENT)
 public class ModSoundManager {
-    private final PianoSoundMap playingPianoNotes = PianoSoundMap.create();
-    protected final Minecraft minecraft;
+    public static final ModSoundManager INSTANCE = new ModSoundManager();
 
-    public ModSoundManager(Minecraft minecraft) {
-        this.minecraft = minecraft;
-    }
+    private final PianoSoundMap playingPianoNotes = PianoSoundMap.create();
+
+    private final NBSLoader nbsLoader = new NBSLoader(Minecraft.getInstance().gameDirectory, "nbs_bettersound");
 
     public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, int tone, float volume, boolean isForUI, boolean isShort) {
         this.playPianoSound(soundEvent, playerUUID, Vec3.atCenterOf(pos), tone, volume, isForUI, isShort);
@@ -33,7 +33,7 @@ public class ModSoundManager {
         } else {
             soundInstance = PianoSoundInstance.forPosition(soundEvent, pos, playerUUID, tone, volume, isShort);
         }
-        minecraft.getSoundManager().play(soundInstance);
+        Minecraft.getInstance().getSoundManager().play(soundInstance);
         playingPianoNotes.put(blockPos, playerUUID, tone, soundInstance);
     }
 
@@ -58,6 +58,10 @@ public class ModSoundManager {
 
     public PianoSoundMap getPlayingPianoNotes() {
         return playingPianoNotes;
+    }
+
+    public NBSLoader getNbsLoader() {
+        return nbsLoader;
     }
 
     public void stopAll() {

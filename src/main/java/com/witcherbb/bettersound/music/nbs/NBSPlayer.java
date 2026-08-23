@@ -65,13 +65,10 @@ public class NBSPlayer {
 
     private void playNote(Note[] notes) {
         if (this.block instanceof PianoBlock pianoBlock) {
-            for (int i = 0; i < notes.length; i++) {
-                Note note = notes[i];
-                Level level = this.blockEntity.getLevel();
-                if (level != null) {
-                    pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), true);
-                    pianoBlock.playSound(null, note.getPitch(), note.getVolume(), level, this.blockEntity.getBlockPos());
-                }
+            Level level = this.blockEntity.getLevel();
+            if (level != null) {
+                pianoBlock.setDelay(this.blockEntity.getBlockState(), level, this.blockEntity.getBlockPos(), true);
+                pianoBlock.playSounds(null, notes, level, this.blockEntity.getBlockPos());
             }
         }
     }

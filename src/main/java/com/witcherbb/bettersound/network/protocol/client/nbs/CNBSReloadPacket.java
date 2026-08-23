@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
-import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
+import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,8 +20,7 @@ public record CNBSReloadPacket() {
     public static void handle(CNBSReloadPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
-            MinecraftExtender mcExtender = (MinecraftExtender) mc;
-            mcExtender.betterSound$getNBSLoader().load();
+            ModSoundManager.INSTANCE.getNbsLoader().load();
             if (mc.player != null) {
                 mc.player.sendSystemMessage(Component.translatable("bettersound.nbs.loadscs").withStyle(ChatFormatting.GREEN));
             }

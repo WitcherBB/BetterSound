@@ -11,6 +11,10 @@ public class LastToneMap extends HashMap<BlockPos, HashMap<UUID, List<Integer>>>
     private LastToneMap() {
     }
 
+    public static LastToneMap create() {
+        return new LastToneMap();
+    }
+
     public void put(BlockPos pos, UUID uuid, Integer tone) {
         HashMap<UUID, List<Integer>> lastToneMap = this.computeIfAbsent(pos, k -> new HashMap<>());
         List<Integer> toneList = lastToneMap.computeIfAbsent(uuid, k -> new ArrayList<>());
@@ -40,9 +44,5 @@ public class LastToneMap extends HashMap<BlockPos, HashMap<UUID, List<Integer>>>
             newTones.addAll(tones);
         }
         return Util.toIntArray(newTones);
-    }
-
-    public static LastToneMap create() {
-        return new LastToneMap();
     }
 }

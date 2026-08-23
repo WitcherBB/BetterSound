@@ -1,23 +1,23 @@
 package com.witcherbb.bettersound.event;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
 import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
+import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
 import com.witcherbb.bettersound.commands.ModCommands;
 import com.witcherbb.bettersound.world.structure.ModStructureAdder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.commands.CommandBuildContext;
@@ -68,7 +68,7 @@ public class ModEventHandler {
 
 			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
 
-			((MinecraftExtender) Minecraft.getInstance()).betterSound$getNBSLoader().load();
+			ModSoundManager.INSTANCE.getNbsLoader().load();
         }
 
 		@SubscribeEvent
@@ -101,7 +101,7 @@ public class ModEventHandler {
 
 		static {
 			// 验证类是否被加载
-			System.out.println("===== ModServerEvents 类已加载 =====");
+			LogUtils.getLogger().info("===== ModServerEvents 类已加载 =====");
 		}
 
 		@SubscribeEvent

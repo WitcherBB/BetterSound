@@ -1,9 +1,9 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
 import com.witcherbb.bettersound.blocks.PianoBlock;
+import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.exception.NBSNotFoundException;
 import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import net.minecraft.ChatFormatting;
@@ -29,11 +29,10 @@ public record CCommandPlayNBSPacket(String filename, BlockPos pos) {
     public static void handle(CCommandPlayNBSPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
-            MinecraftExtender extender = (MinecraftExtender) mc;
             if (mc.level == null) return;
             try {
                 BlockPos target = PianoBlock.getVoiceSectionPos(mc.level.getBlockState(packet.pos), packet.pos, PianoBlock.MIDDEL_PART);
-                PianoSong song = extender.betterSound$getNBSLoader().findSong(packet.filename);
+                PianoSong song = ModSoundManager.INSTANCE.getNbsLoader().findSong(packet.filename);
                 BlockEntity entity = mc.level.getBlockEntity(target);
                 if (entity instanceof AutoPlayer autoPlayer) {
                     autoPlayer.getNBSPlayer().play(song);

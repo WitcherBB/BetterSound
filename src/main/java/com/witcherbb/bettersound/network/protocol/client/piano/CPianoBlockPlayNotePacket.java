@@ -3,11 +3,11 @@ package com.witcherbb.bettersound.network.protocol.client.piano;
 import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftExtender;
 import com.witcherbb.bettersound.music.nbs.bean.Note;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
@@ -15,7 +15,7 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public record CPianoBlockPlayNotePacket(UUID playerUUID, Vec3 blockPos, Vec3 voicePos, int tone, byte volume, boolean stop, boolean isForUI) {
+public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos blockPos, Vec3 voicePos, int tone, byte volume, boolean stop, boolean isForUI) {
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeBoolean(this.playerUUID == null);
@@ -23,7 +23,7 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, Vec3 blockPos, Vec3 voi
             buf.writeUUID(this.playerUUID);
         }
 
-        buf.writeVector3f(this.blockPos.toVector3f());
+        buf.writeBlockPos(this.blockPos);
         buf.writeVector3f(this.voicePos.toVector3f());
         buf.writeInt(this.tone);
         buf.writeByte(this.volume);
@@ -33,21 +33,20 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, Vec3 blockPos, Vec3 voi
 
     public static CPianoBlockPlayNotePacket decode(FriendlyByteBuf buf) {
         boolean isNull = buf.readBoolean();
-        return new CPianoBlockPlayNotePacket(isNull ? null : buf.readUUID(), new Vec3(buf.readVector3f()), new Vec3(buf.readVector3f()), buf.readInt(), buf.readByte(), buf.readBoolean(), buf.readBoolean());
+        return new CPianoBlockPlayNotePacket(isNull ? null : buf.readUUID(), buf.readBlockPos(), new Vec3(buf.readVector3f()), buf.readInt(), buf.readByte(), buf.readBoolean(), buf.readBoolean());
     }
 
     public static void handle(CPianoBlockPlayNotePacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ModSoundManager soundManager = ((MinecraftExtender) Minecraft.getInstance()).betterSound$getmodSoundManager();
-            BlockPos blockPos = BlockPos.containing(packet.blockPos);
-            if (Minecraft.getInstance().level != null) {
-                BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(blockPos);
-                if (packet.stop) {
-                    soundManager.tryToStopPianoSound(packet.playerUUID, blockPos, packet.tone);
-                } else {
-                    if (entity instanceof AbstractPianoBlockEntity blockEntity)
-                        soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID, packet.voicePos, packet.tone, Note.toPianoSoundVolume(packet.volume), packet.isForUI, !blockEntity.isSoundDelay());
-                }
+            Level level = Minecraft.getInstance().level;
+            if (level == null) return;
+            ModSoundManager soundManager = ModSoundManager.INSTANCE;
+            BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.blockPos);
+            if (packet.stop) {
+                soundManager.tryToStopPianoSound(packet.playerUUID, packet.blockPos, packet.tone);
+            } else {
+                if (entity instanceof AbstractPianoBlockEntity blockEntity)
+                    soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID, packet.voicePos, packet.tone, Note.toPianoSoundVolume(packet.volume), packet.isForUI, !blockEntity.isSoundDelay());
             }
 
         });

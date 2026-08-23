@@ -21,9 +21,15 @@ build
 eclipse
 run
 
+# skills folder
+/.dsh/
+
 # Files from Forge MDK
 forge*changelog.txt
 /mcmodsrepo/com/wictherbb/sdutmod/
 /笔记.md
 /run-data/
 /src/main/java/com/witcherbb/help/
+/.screen-share/
+/.dsh-tmp/
+/.dsh-tmpstats.txt

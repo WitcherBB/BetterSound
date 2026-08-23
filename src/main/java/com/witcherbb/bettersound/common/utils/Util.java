@@ -2,6 +2,7 @@ package com.witcherbb.bettersound.common.utils;
 
 import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,22 +19,7 @@ public class Util {
     }
 
     public static int[] toIntArray(@NotNull List<Integer> nums) {
-        return toIntArray(nums.toArray(Integer[]::new));
-    }
-
-    public static int[] toIntArray(Integer[] nums) {
-        return Arrays.stream(nums).mapToInt(Integer::valueOf).toArray();
-    }
-
-    public static byte[] toArray(List<Byte> list) {
-        byte[] arr = new byte[10];
-        int count = 0;
-        for (Byte b : list.toArray(Byte[]::new)) {
-            if (arr.length == count) arr = Arrays.copyOf(arr, count * 2);
-            arr[count++] = b;
-        }
-        arr = Arrays.copyOfRange(arr, 0, count);
-        return arr;
+        return ArrayUtils.toPrimitive(nums.toArray(Integer[]::new));
     }
 
     public static List<Byte> toList(byte[] bytes) {

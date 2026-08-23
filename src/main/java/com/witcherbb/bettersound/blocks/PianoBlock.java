@@ -7,7 +7,9 @@ import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
+import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
@@ -230,9 +232,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockState state = pState;
             while ((state = this.getCombinedState(state.getValue(PART), state)) != null) {
                 BlockPos pos = pPos.relative(this.getCombinedDirection(pState.getValue(PART), pState.getValue(FACING)));
-                pLevel.setBlock(pos, state, ExampleBlock.UPDATE_ALL);
+                pLevel.setBlock(pos, state, Block.UPDATE_ALL);
                 pLevel.blockUpdated(pPos, Blocks.AIR);
-                state.updateNeighbourShapes(pLevel, pPos, ExampleBlock.UPDATE_ALL);
+                state.updateNeighbourShapes(pLevel, pPos, Block.UPDATE_ALL);
                 pPos = pos;
                 pState = state;
             }
@@ -303,7 +305,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
 
     public void setDelay(BlockState state, Level level, BlockPos pos, boolean delay) {
         if (!level.isClientSide && state.getValue(DELAY) != delay) {
-            level.setBlock(pos, state.setValue(DELAY, delay), Block.UPDATE_ALL);
+            level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL | UPDATE_KNOWN_SHAPE | UPDATE_SUPPRESS_DROPS);
 
             BlockPos blockPos = pos;
             List<Integer> tones = Lists.newArrayList();
@@ -328,9 +330,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), target, tone, volume, false, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), pPos, target, tone, volume, false, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), target, tone, volume, false, false));
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, pPos, target, tone, volume, false, false));
             pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, tone);
         }
     }
@@ -340,9 +342,27 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), Vec3.atCenterOf(pPos), target, tone, (byte) 0, true, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), pPos, target, tone, (byte) 0, true, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, Vec3.atCenterOf(pPos), target, tone, (byte) 0, true, false));
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, pPos, target, tone, (byte) 0, true, false));
+        }
+    }
+
+    public void playSounds(@Nullable ServerPlayer pPlayer, Note[] notes, Level pLevel, BlockPos pPos) {
+        if (!pLevel.isClientSide) {
+            BlockState sourceState = pLevel.getBlockState(pPos);
+            Vec3[] targets = new Vec3[notes.length];
+            for (int i = 0; i < notes.length; i++) {
+                targets[i] = getVoicePosition(sourceState, pPos, notes[i].getPitch());
+            }
+            if (pPlayer != null) {
+                ModNetwork.broadcastBut(new CPianoBlockPlayMultipleNotesPacket(pPlayer.getUUID(), pPos, targets, notes), pPlayer);
+            } else {
+                ModNetwork.broadcast(new CPianoBlockPlayMultipleNotesPacket(null, pPos, targets, notes));
+            }
+            for (Note note : notes) {
+                pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, note.getPitch());
+            }
         }
     }
 

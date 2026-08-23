@@ -4,11 +4,14 @@ import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.exception.FileIsNotNBSException;
 import com.witcherbb.bettersound.exception.NBSNotFoundException;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+@OnlyIn(Dist.CLIENT)
 public class NBSLoader {
     private final File dir;
     private final Map<String, PianoSong> songs = new HashMap<>();
