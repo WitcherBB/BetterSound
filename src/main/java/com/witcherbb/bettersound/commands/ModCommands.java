@@ -1,13 +1,15 @@
 package com.witcherbb.bettersound.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.witcherbb.bettersound.server.commands.PlayNBSCommand;
+import com.witcherbb.bettersound.client.commands.PlayNBSCommand;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ModCommands {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, Commands.CommandSelection environment, CommandBuildContext context) {
+    @OnlyIn(Dist.CLIENT)
+    public static void registerOnClient(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         PlayNBSCommand.register(dispatcher, context);
     }
 }

@@ -37,6 +37,7 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -98,7 +99,6 @@ public class ModEventHandler {
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 	public static class ModServerEvents {
-
 		static {
 			// 验证类是否被加载
 			LogUtils.getLogger().info("===== ModServerEvents 类已加载 =====");
@@ -118,18 +118,20 @@ public class ModEventHandler {
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 	public static class ForgeClientEvents {
+		@SubscribeEvent
+		public static void onClientCommandRegister(RegisterClientCommandsEvent event) {
+			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+			CommandBuildContext context = event.getBuildContext();
 
+			ModCommands.registerOnClient(dispatcher, context);
+		}
 	}
 
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class ForgeServerEvents {
 		@SubscribeEvent
 		public static void onCommandRegister(RegisterCommandsEvent event) {
-			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-			Commands.CommandSelection selection = event.getCommandSelection();
-			CommandBuildContext context = event.getBuildContext();
 
-			ModCommands.register(dispatcher, selection, context);
 		}
 
 		@SubscribeEvent
