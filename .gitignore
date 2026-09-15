@@ -25,6 +25,7 @@ eclipse
 /run/
 /run-data/
 /tools/
+/logs/
 
 # 内存看板编译产物
 /tools/mem-monitor/bin/
