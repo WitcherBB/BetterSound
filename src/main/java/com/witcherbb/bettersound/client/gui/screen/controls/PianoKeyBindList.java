@@ -7,7 +7,6 @@ import com.witcherbb.bettersound.BetterSound;
 import com.witcherbb.bettersound.ComponentModifier;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
-import com.witcherbb.bettersound.mixins.extenders.AbstractWidgetExtender;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -407,7 +406,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
     }
     /* **************************************************** */
     @OnlyIn(Dist.CLIENT)
-    public class KeyButton extends Button implements AbstractWidgetExtender {
+    public class KeyButton extends Button {
         protected static final ResourceLocation TEXTURE = new ResourceLocation(BetterSound.MODID, "textures/gui/piano_keyboard.png");
         protected static final int textureWidth = 300;
         protected static final int textureHeight = 300;
@@ -454,11 +453,6 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
                     break;
             }
             return super.clicked(pMouseX, pMouseY);
-        }
-
-        @Override
-        public boolean betterSound$ifOverridePreTip() {
-            return true;
         }
     }
 

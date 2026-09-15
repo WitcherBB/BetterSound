@@ -1,6 +1,13 @@
 pluginManagement {
     repositories {
+        // 国内镜像（优先）：Gradle 插件门户镜像
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         gradlePluginPortal()
+        // 国内镜像（优先）：Forge maven 镜像（BMCLAPI）
+        maven {
+            name = 'MinecraftForgeMirror'
+            url = 'https://bmclapi2.bangbang93.com/maven'
+        }
         maven {
             name = 'MinecraftForge'
             url = 'https://maven.minecraftforge.net/'

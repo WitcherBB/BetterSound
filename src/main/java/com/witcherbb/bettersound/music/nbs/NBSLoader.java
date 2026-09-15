@@ -32,11 +32,7 @@ public class NBSLoader {
                 PianoSong song = reader.readPiano();
                 songs.put(song.fileName, song);
             } catch (Exception e) {
-                if (e.getClass() == FileIsNotNBSException.class) {
-                    LogUtils.getLogger().warn(e.getMessage());
-                } else {
-                    throw new IllegalStateException(e);
-                }
+                LogUtils.getLogger().warn(e.getMessage());
             }
         }
     }

@@ -2,8 +2,8 @@ package com.witcherbb.bettersound.blocks;
 
 import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
+import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.items.TunerItem;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +55,7 @@ public class ToneBlock extends AbstractPianoBlock implements SpectatorInvalidBlo
                 if (flag1 != flag2) {
                     if (!flag1) {
                         blockEntity.setSoundDelay(false);
-                        int[] tones = ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().getLastTones(pPos);
+                        int[] tones = ModToneManager.getInstance().getLastTones(pPos);
                         ModNetwork.broadcast(new CPianoBlockStopPacket(pPos, tones));
                     } else {
                         blockEntity.setSoundDelay(true);

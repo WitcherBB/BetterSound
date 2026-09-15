@@ -50,5 +50,6 @@
   "wrong.bettersound.nbs.isnotplaying": "%s 已经暂停",
   "wrong.bettersound.nbs.isplaying": "播放器正在播放",
   "bettersound.nbs.success": "正在播放 %s",
-  "bettersound.nbs.loadscs": "NBS文件重新加载成功！"
+  "bettersound.nbs.loadscs": "NBS文件重新加载成功！",
+  "exception.bettersound.modtonemanager.onlyserver": "ModToneManager 只能在服务端运行期使用！疑似被客户端误调。"
 }

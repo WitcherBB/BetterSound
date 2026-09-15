@@ -1,7 +1,5 @@
 package com.witcherbb.bettersound.common.utils;
 
-import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,9 +1,6 @@
 package com.witcherbb.bettersound.client.resources.sounds;
 
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
-import com.witcherbb.bettersound.mixins.extenders.SoundInstanceExtender;
-import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -18,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.UUID;
 
 @OnlyIn(Dist.CLIENT)
-public class PianoSoundInstance extends AbstractTickableSoundInstance implements SoundInstanceExtender {
+public class PianoSoundInstance extends AbstractTickableSoundInstance implements SoundInstanceCallback {
     private int tickCount = 0;
     private int lastTick = 0;
     private boolean isShort;
@@ -163,7 +160,7 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     }
 
     @Override
-    public void betterSound$onStop() {
+    public void onStop() {
         //判断是否是手动停止很有必要！！！这样就不会在声音彻底停止以后再清除一次，否则可能会把清除之前播放的另一个音清除掉！！！
         if (!this.wasSetStopped) {
             ModSoundManager.INSTANCE.getPlayingPianoNotes().removeFirst(this.pos, this.playerUUID, this.tone);

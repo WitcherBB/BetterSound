@@ -20,6 +20,8 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
@@ -273,6 +275,11 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             else zIndex = 2;
 
             this.setTooltip(Tooltip.create(this.getMessage()));
+        }
+
+        @Override
+        protected ClientTooltipPositioner createTooltipPositioner() {
+            return DefaultTooltipPositioner.INSTANCE;
         }
 
         @Override

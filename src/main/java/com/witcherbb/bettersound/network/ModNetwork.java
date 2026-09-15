@@ -12,7 +12,6 @@ import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPa
 import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;

@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.mixins.mixins;
 
-import com.witcherbb.bettersound.mixins.extenders.SoundInstanceExtender;
+import com.witcherbb.bettersound.client.resources.sounds.SoundInstanceCallback;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
@@ -21,6 +21,8 @@ public abstract class SoundEngineMixin {
                     ordinal = 1),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void tickNonePaused0(CallbackInfo ci, Iterator iterator, Map.Entry entry, ChannelAccess.ChannelHandle channelaccess$channelhandle1, SoundInstance soundinstance) {
-        ((SoundInstanceExtender) soundinstance).betterSound$onStop();
+        if (soundinstance instanceof SoundInstanceCallback callback) {
+            callback.onStop();
+        }
     }
 }

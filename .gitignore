@@ -17,18 +17,24 @@ out
 build
 .gradle
 
+#vscode
+.vscode
+
 # other
 eclipse
-run
+/run/
+/run-data/
+/tools/
+
+# 内存看板编译产物
+/tools/mem-monitor/bin/
 
 # skills folder
 /.dsh/
 
 # Files from Forge MDK
 forge*changelog.txt
-/mcmodsrepo/com/wictherbb/sdutmod/
-/笔记.md
-/run-data/
+/mcmodsrepo/
 /src/main/java/com/witcherbb/help/
 /.screen-share/
 /.dsh-tmp/

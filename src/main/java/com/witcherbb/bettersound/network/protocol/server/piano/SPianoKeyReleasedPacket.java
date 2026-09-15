@@ -1,14 +1,13 @@
 package com.witcherbb.bettersound.network.protocol.server.piano;
 
 import com.witcherbb.bettersound.blocks.AbstractPianoBlock;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
+import com.witcherbb.bettersound.common.ModToneManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.function.Supplier;
 
@@ -32,7 +31,7 @@ public record SPianoKeyReleasedPacket(BlockPos pos, int tone, boolean whetherToS
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof AbstractPianoBlock pianoBlock) {
                 if (packet.whetherToStop) pianoBlock.stopSound(sender, packet.tone, level, pos);
-                ((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().removeLastTone(packet.pos, sender.getUUID(), packet.tone());
+                ModToneManager.getInstance().removeLastTone(packet.pos, sender.getUUID(), packet.tone());
             }
         });
         ctx.get().setPacketHandled(true);

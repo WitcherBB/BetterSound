@@ -50,5 +50,6 @@
   "wrong.bettersound.nbs.isnotplaying":"%s has been paused",
   "wrong.bettersound.nbs.isplaying":"The player is playing",
   "bettersound.nbs.success": "%s is playing",
-  "bettersound.nbs.loadscs": "NBS files have been reloaded successfully!"
+  "bettersound.nbs.loadscs": "NBS files have been reloaded successfully!",
+  "exception.bettersound.modtonemanager.onlyserver": "ModToneManager can only be used while a server is running! It may have been accidentally called from the client."
 }

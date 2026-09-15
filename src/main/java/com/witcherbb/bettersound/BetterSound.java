@@ -5,15 +5,12 @@ import com.witcherbb.bettersound.blocks.ModBlocks;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.items.ModItems;
-import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
@@ -32,7 +29,6 @@ public final class BetterSound
         instance = this;
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
         ModCreativeTabs.CREATIVE_MODE_TAB_DEFERRED_REGISTER.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
@@ -42,14 +38,6 @@ public final class BetterSound
         ModBlockEntityTypes.BLOCK_ENTITIES.register(modEventBus);
         ModParticleTypes.register(modEventBus);
 
-    }
-
-    private void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            // 确保这里有日志输出
-//            LogUtils.getLogger().info("===== 进入CommonSetup事件 =====");
-//            ModNetwork.register();
-        });
     }
 
     public static BetterSound getInstance() {

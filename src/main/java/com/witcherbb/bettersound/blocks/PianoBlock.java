@@ -5,8 +5,8 @@ import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
+import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.mixins.extenders.MinecraftServerExtender;
 import com.witcherbb.bettersound.music.nbs.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
@@ -37,7 +37,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -313,7 +312,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
                 BlockState state1 = level.getBlockState(blockPos);
                 if (!delay && (state1.getValue(PART) == PianoPart.KEYBOARD_L || state1.getValue(PART) == PianoPart.KEYBOARD_M || state1.getValue(PART) == PianoPart.KEYBOARD_R)) {
                     tones.addAll(
-                            Util.toIntegerList(((MinecraftServerExtender) ServerLifecycleHooks.getCurrentServer()).betterSound$getModDataManager().getLastTones(blockPos))
+                            Util.toIntegerList(ModToneManager.getInstance().getLastTones(blockPos))
                     );
                     ModNetwork.broadcast(new CPianoBlockStopPacket(blockPos, Util.toIntArray(tones)));
                 }

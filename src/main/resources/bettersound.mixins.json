@@ -10,20 +10,14 @@
     "EntityMixin",
     "JukeboxBlockEntityMixin",
     "JukeboxMixin",
-    "MinecraftServerMixin",
     "NoteBlockMixin",
     "PlayerSittingMixin",
-    "RecordItemMixin",
     "ServerPlayerMixin"
   ],
   "client": [
-    "AbstractWidgetMixin",
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",
-    "MinecraftMixin",
-    "OptionsMixin",
-    "SoundEngineMixin",
-    "SoundInstanceMixin"
+    "SoundEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1

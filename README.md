@@ -23,6 +23,7 @@
 - [指令速查](#指令速查)
 - [技术架构](#技术架构)
 - [开发者指南](#开发者指南)
+  - [调试时实时查看内存分配（VSCode）](#调试时实时查看内存分配vscode)
 - [版本记录](#版本记录)
 - [已知问题](#已知问题)
 - [开源协议](#开源协议)
@@ -213,6 +214,16 @@ src/main/resources/
 | `./gradlew build` | 构建并重混淆出模组 jar |
 | `./gradlew cleanCache` | 清理 `build/tmp/.cache/expanded`（修改 Mixin 后映射异常时可试） |
 | `./gradlew publish` | 发布 jar 到本地 Maven 仓库（`mcmodsrepo/`，由 `build.gradle` 的 publishing 块配置） |
+
+### 调试时实时查看内存分配（VSCode）
+
+VSCode 的 Java 调试器只提供断点/变量/调用栈，没有内存视图，因此本仓库自带一套基于 JDK 原生能力的实时内存看板：
+
+1. **F5 选择 `runClient+Mem`** 启动客户端（与原 `runClient` 完全一致，只多出诊断参数；用原 `runClient` 启动也能被自动识别）；
+2. **Ctrl+Shift+P → Tasks: Run Task → 实时内存看板**，每 2 秒刷新堆占用、各内存池、GC 次数与停顿、堆净增长、堆外直接缓冲区与趋势曲线；
+3. 需要定位具体对象时，再运行任务 **导出堆快照(.hprof)** 或 **类直方图(GC.class_histogram)**。
+
+实现细节、参数、常见问题见 [`tools/mem-monitor/README.md`](tools/mem-monitor/README.md)。
 
 ### 版本配置
 

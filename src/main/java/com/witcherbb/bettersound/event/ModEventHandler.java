@@ -9,6 +9,7 @@ import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.screen.inventory.*;
 import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
+import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
@@ -22,14 +23,15 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -42,13 +44,16 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.GameShuttingDownEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -119,6 +124,17 @@ public class ModEventHandler {
 	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 	public static class ForgeClientEvents {
 		@SubscribeEvent
+		public static void onGameShuttingDown(GameShuttingDownEvent event) {
+			ModSoundManager.INSTANCE.destroy();
+		}
+
+		@SubscribeEvent
+		public static void onLevelUnload(LevelEvent.Unload event) {
+			ModSoundManager.INSTANCE.destroy();
+			ModOptions.getOptions().save();
+		}
+
+		@SubscribeEvent
 		public static void onClientCommandRegister(RegisterClientCommandsEvent event) {
 			CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 			CommandBuildContext context = event.getBuildContext();
@@ -152,6 +168,7 @@ public class ModEventHandler {
 			Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
 			Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
 
+			ModToneManager.getInstance();
 			ModStructureAdder.bootstrap(templatePoolRegistry, processorListRegistry);
 		}
 
@@ -161,6 +178,11 @@ public class ModEventHandler {
 
 		@SubscribeEvent
 		public static void onServerEnding(ServerStoppingEvent event) {
+		}
+
+		@SubscribeEvent
+		public static void onServerStopped(ServerStoppedEvent event) {
+			ModToneManager.destroy();
 		}
 
 		@SubscribeEvent
@@ -186,6 +208,11 @@ public class ModEventHandler {
 			Level level = event.getLevel();
 			if (event.getEntity().isSpectator() && level.getBlockState(event.getHitVec().getBlockPos()).getBlock() instanceof SpectatorInvalidBlock) {
 				event.setCanceled(true);
+			}
+			
+			if (event.getItemStack().getItem() instanceof RecordItem && level.getBlockState(event.getPos()).getBlock() instanceof JukeboxBlock) {
+				event.setUseBlock(Result.DENY);
+				event.setUseItem(Result.DENY);
 			}
 		}
 	}

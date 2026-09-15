@@ -1,6 +1,5 @@
 package com.witcherbb.bettersound.blocks;
 
-import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;

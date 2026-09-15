@@ -12,13 +12,13 @@ import java.util.*;
 public class MainTest {
     @Test
     public void test() {
-        System.out.println(check(Comparable.class));
+        // System.out.println(check(Comparable.class));
     }
 
     @Test
     public void test1() {
-        Scanner scanner = new Scanner();
-        System.out.println(scanner.getClassByAnnotation(Data.class));
+        // Scanner scanner = new Scanner();
+        // System.out.println(scanner.getClassByAnnotation(Data.class));
     }
 
     public int getZero(float num, int start, float offset) {
