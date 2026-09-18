@@ -40,8 +40,11 @@ public class NBSReader implements Closeable {
         pianoSong.author = reader.readString();
         pianoSong.originalAuthor = reader.readString();
         pianoSong.description = reader.readString();
-        pianoSong.speed = (short) Math.floor((double) 20 / ((double) reader.readShort() / 100));
-        pianoSong.speed = pianoSong.speed <= 1 ? 1 : pianoSong.speed;
+        // tempo 字段单位是「每秒歌曲刻数 × 100」，这里原样保留、不做任何取整：
+        // 以前在这里折算成整数倍率 floor(20 / (tempo / 100))，会把 16 刻/秒（1.25 游戏刻/歌曲刻）
+        // 压成 1，整首歌直接快 25%。歌曲刻 → 游戏刻 的换算改由 NbsTiming 在播放时精确进行。
+        short tempo = reader.readShort();
+        pianoSong.tempo = tempo > 0 ? tempo : NbsTiming.DEFAULT_TEMPO;
         pianoSong.autoSaving = reader.readByte();
         pianoSong.autoSavingDuration = reader.readByte();
         pianoSong.timeSignature = reader.readByte();

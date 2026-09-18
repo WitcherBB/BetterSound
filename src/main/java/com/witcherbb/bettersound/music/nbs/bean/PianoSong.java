@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.music.nbs.bean;
 
+import com.witcherbb.bettersound.music.nbs.NbsTiming;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,7 +20,8 @@ public class PianoSong {
     public String author;
     public String originalAuthor;
     public String description;
-    public short speed;
+    /** NBS 原始 tempo：每秒歌曲刻数 × 100（1000 即每秒 10 刻），换算见 {@link NbsTiming} */
+    public short tempo;
     public byte autoSaving;
     public byte autoSavingDuration;
     public byte timeSignature;
@@ -43,15 +45,17 @@ public class PianoSong {
         this.fileName = fileName;
     }
 
+    /**
+     * 记录一个音符。
+     * <p>
+     * 键 {@code tick} 就是 NBS 文件里的歌曲刻下标，读取阶段不做任何时间缩放：
+     * 缩放（歌曲刻 → 游戏刻）由 {@link NbsTiming} 在播放时按 tempo 精确换算。
+     * 以前在这里乘 {@code speed}（floor 过的整数倍率），会让 tempo 不能整除以
+     * 游戏刻的曲子整体变快。
+     */
     public void addNote(int tick, byte tone, byte volume, short layer) {
-        int jumps = tick * this.speed;
-        if (this.noteMap.containsKey(jumps)) {
-            this.noteMap.get(jumps).add(new Note(tone, volume).withLayer((byte) layer));
-        } else {
-            List<Note> noteList = new ArrayList<>();
-            noteList.add(new Note(tone, volume).withLayer((byte) layer));
-            this.noteMap.put(jumps, noteList);
-        }
+        this.noteMap.computeIfAbsent(tick, k -> new ArrayList<>())
+                .add(new Note(tone, volume).withLayer((byte) layer));
     }
 
     public void parse() {
@@ -74,6 +78,7 @@ public class PianoSong {
         this.layerVolumes.add(volume);
     }
 
+    /** @param tick NBS 歌曲刻下标（不是游戏刻） */
     public List<Note> getNotes(int tick) {
         return this.noteMap.get(tick);
     }
@@ -105,7 +110,8 @@ public class PianoSong {
                 ", \n\tauthor='" + author + '\'' +
                 ", \n\toriginalAuthor='" + originalAuthor + '\'' +
                 ", \n\tdescription='" + description + '\'' +
-                ", \n\ttempo=" + speed +
+                ", \n\ttempo=" + tempo + " (" + NbsTiming.songTicksPerSecond(tempo) + " 歌曲刻/秒, "
+                        + NbsTiming.gameTicksPerSongTick(tempo) + " 游戏刻/歌曲刻)" +
                 ", \n\tautoSaving=" + autoSaving +
                 ", \n\tautoSavingDuration=" + autoSavingDuration +
                 ", \n\ttimeSignature=" + timeSignature +

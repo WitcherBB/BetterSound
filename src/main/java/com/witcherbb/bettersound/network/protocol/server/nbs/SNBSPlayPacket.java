@@ -15,7 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, short speed, byte timeSignature) {
+/**
+ * @param noteMap 音符表，键是 NBS 歌曲刻下标
+ * @param tempo   NBS 原始 tempo：每秒歌曲刻数 × 100
+ */
+public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, short tempo, byte timeSignature) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(name);
@@ -29,7 +33,7 @@ public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>>
                     }
                 }
         );
-        buf.writeShort(speed);
+        buf.writeShort(tempo);
         buf.writeByte(timeSignature);
     }
     public static SNBSPlayPacket decode(FriendlyByteBuf buf) {
@@ -53,7 +57,7 @@ public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>>
             Level level = sender.level();
             BlockEntity entity = level.getBlockEntity(packet.pos);
             if (entity instanceof AutoPlayer autoPlayer) {
-                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.speed, packet.timeSignature * 4));
+                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.tempo, packet.timeSignature * 4));
             }
         });
         ctx.get().setPacketHandled(true);

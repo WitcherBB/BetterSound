@@ -304,7 +304,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
 
     public void setDelay(BlockState state, Level level, BlockPos pos, boolean delay) {
         if (!level.isClientSide && state.getValue(DELAY) != delay) {
-            level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL | UPDATE_KNOWN_SHAPE | UPDATE_SUPPRESS_DROPS);
+            level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL);
 
             BlockPos blockPos = pos;
             List<Integer> tones = Lists.newArrayList();
@@ -416,8 +416,8 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         Direction facing = sourceState.getValue(FACING);
         double keyDelta = 2.5 / 88.0;
         return Vec3.atCenterOf(getVoiceSectionPos(sourceState, sourcePos, MIDDEL_PART)) // 获取钢琴中声部的位置
-                .relative(facing.getOpposite(), 0.5) // 钢琴背部发声
-                .relative(Direction.DOWN, 0.5)
+                .relative(facing.getOpposite(), 0.5 - 1e-4) // 钢琴背部发声（直接用0.5会导致计算坐标错误，减去一个小量更保守）
+                .relative(Direction.DOWN, 0.5 - 1e-4) // 和上面一行同步减去小量，保守一些
                 .relative(facing.getCounterClockWise(),  (tone - (isBlack(tone) ? 44.0 : 43.5)) * keyDelta); // 根据音调定位横向的发声位置
     }
 
