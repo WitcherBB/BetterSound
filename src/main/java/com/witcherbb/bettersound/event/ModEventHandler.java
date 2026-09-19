@@ -75,6 +75,7 @@ public class ModEventHandler {
 			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
 
 			ModSoundManager.INSTANCE.getNbsLoader().load();
+			ModSoundManager.INSTANCE.getMidiLoader().load();
         }
 
 		@SubscribeEvent
