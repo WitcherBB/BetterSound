@@ -95,7 +95,7 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
     @Override
     public void tick() {
         this.tickCount++;
-        if (!this.relative) {
+        if (this.relative) {
             // 每 tick 跟随相机重算虚拟音源位置：左右声道只与音调有关，与玩家移动、转向及世界坐标无关
             this.updateUIPosition();
         }

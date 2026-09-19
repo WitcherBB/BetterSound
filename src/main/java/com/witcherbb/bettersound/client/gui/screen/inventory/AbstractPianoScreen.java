@@ -10,7 +10,7 @@ import com.witcherbb.bettersound.client.gui.PianoUtil;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
-import com.witcherbb.bettersound.music.nbs.bean.Note;
+import com.witcherbb.bettersound.music.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;

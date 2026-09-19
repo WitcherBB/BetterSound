@@ -7,7 +7,7 @@ import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.blocks.utils.ShapeUtil;
 import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.music.nbs.bean.Note;
+import com.witcherbb.bettersound.music.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;

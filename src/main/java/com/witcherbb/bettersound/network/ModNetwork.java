@@ -8,6 +8,7 @@ import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNo
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.*;
 import com.witcherbb.bettersound.network.protocol.server.*;
+import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
@@ -101,6 +102,12 @@ public class ModNetwork {
                 .encoder(SAutoPlayerActionPacket::encode)
                 .decoder(SAutoPlayerActionPacket::decode)
                 .consumerMainThread(SAutoPlayerActionPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(SMidiPlayPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SMidiPlayPacket::encode)
+                .decoder(SMidiPlayPacket::decode)
+                .consumerMainThread(SMidiPlayPacket::handle)
                 .add();
     }
 

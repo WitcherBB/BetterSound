@@ -51,5 +51,10 @@
   "wrong.bettersound.nbs.isplaying":"The player is playing",
   "bettersound.nbs.success": "%s is playing",
   "bettersound.nbs.loadscs": "NBS files have been reloaded successfully!",
+
+  "exception.bettersound.fileisnotmidi": "%s is not MIDI file!",
+  "exception.bettersound.midinotfound": "%s was not found",
+  "bettersound.midi.success": "%s is playing",
+  "bettersound.midi.loadscs": "MIDI files have been reloaded successfully!",
   "exception.bettersound.modtonemanager.onlyserver": "ModToneManager can only be used while a server is running! It may have been accidentally called from the client."
 }

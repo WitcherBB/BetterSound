@@ -21,10 +21,22 @@ public class Config
 
     public static class Common {
 
+        /** MIDI 延音踏板最长保持多少个小节，超过则强制释放一次；0 表示关闭该保护 */
+        public final ForgeConfigSpec.IntValue midiMaxSustainBars;
+
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Common configuration settings")
                     .push("common");
             builder.define("version", "0.0.0.0-demo");
+            builder.pop();
+
+            builder.comment("MIDI playback settings")
+                    .push("midi");
+            midiMaxSustainBars = builder
+                    .comment("MIDI 延音踏板最长保持的小节数。",
+                            "超过该长度仍未抬起踏板时会强制释放一次，避免曲子里踏板一直踩住导致声音糊成一片。",
+                            "0 = 关闭该保护，完全跟随 MIDI 记录。")
+                    .defineInRange("maxSustainBars", 4, 0, 64);
             builder.pop();
         }
     }

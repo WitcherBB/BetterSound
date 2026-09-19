@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.music.nbs.bean;
+package com.witcherbb.bettersound.music.bean;
 
 import com.witcherbb.bettersound.common.utils.Util;
 import it.unimi.dsi.fastutil.bytes.Byte2ByteFunctions;
@@ -8,6 +8,11 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 一个待演奏的音符。NBS 与 MIDI 共用。
+ *
+ * @see PianoSongTrack
+ */
 public class Note {
     public static final int FIELD_NUM = 3;
 

@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.music.nbs;
 
 import com.witcherbb.bettersound.exception.FileIsNotNBSException;
+import com.witcherbb.bettersound.music.MusicTiming;
 import com.witcherbb.bettersound.music.nbs.bean.PianoSong;
 import com.witcherbb.bettersound.music.util.BinaryFileReader;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,9 +43,9 @@ public class NBSReader implements Closeable {
         pianoSong.description = reader.readString();
         // tempo 字段单位是「每秒歌曲刻数 × 100」，这里原样保留、不做任何取整：
         // 以前在这里折算成整数倍率 floor(20 / (tempo / 100))，会把 16 刻/秒（1.25 游戏刻/歌曲刻）
-        // 压成 1，整首歌直接快 25%。歌曲刻 → 游戏刻 的换算改由 NbsTiming 在播放时精确进行。
+        // 压成 1，整首歌直接快 25%。歌曲刻 → 游戏刻 的换算改由 MusicTiming 在播放时精确进行。
         short tempo = reader.readShort();
-        pianoSong.tempo = tempo > 0 ? tempo : NbsTiming.DEFAULT_TEMPO;
+        pianoSong.tempo = tempo > 0 ? tempo : MusicTiming.NBS_DEFAULT_TEMPO;
         pianoSong.autoSaving = reader.readByte();
         pianoSong.autoSavingDuration = reader.readByte();
         pianoSong.timeSignature = reader.readByte();

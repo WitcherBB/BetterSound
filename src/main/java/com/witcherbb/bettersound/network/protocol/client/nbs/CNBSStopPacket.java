@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
+import com.witcherbb.bettersound.music.AutoMusicPlayer;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -29,10 +30,12 @@ public record CNBSStopPacket(BlockPos pos) {
             if (level != null) {
                 BlockEntity blockEntity = level.getBlockEntity(packet.pos);
                 if (blockEntity instanceof AutoPlayer autoPlayer) {
-                    if (!autoPlayer.getNBSPlayer().hasSong() && mc.player != null) {
+                    // 播放状态只有一份（在共用引擎里），所以 NBS 与 MIDI 用的是同一套同步包
+                    AutoMusicPlayer musicPlayer = autoPlayer.getMusicPlayer();
+                    if (!musicPlayer.hasSong() && mc.player != null) {
                         mc.player.sendSystemMessage(Component.translatable("wrong.bettersound.nbs.hasnosong").withStyle(ChatFormatting.RED));
                     } else {
-                        autoPlayer.getNBSPlayer().stop();
+                        musicPlayer.stop();
                     }
                 }
             }

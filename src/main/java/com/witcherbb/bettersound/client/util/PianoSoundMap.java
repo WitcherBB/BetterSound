@@ -5,6 +5,7 @@ import com.witcherbb.bettersound.common.utils.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,23 +71,38 @@ public class PianoSoundMap {
         return instances;
     }
 
+    /**
+     * 摘走这台钢琴上所有“已经不需要再响”的实例，只把 {@code tones} 点名的那些留下。
+     *
+     * <p>{@code tones} 是玩家此刻还按着的音（{@code ModToneManager.getLastTones}），
+     * 它们要继续响，也必须继续留在簿记里——等玩家真正抬手时再通过
+     * {@code tryToStopPianoSound} -> {@code getFirst} 停掉。
+     * 所以这里只能逐个音调摘，绝不可以把整个位置一起清空。</p>
+     *
+     * @return 移除的实例
+     */
     public List<PianoSoundInstance> removeAllButLast(BlockPos pos, int[] tones) {
         if (ArrayUtils.isEmpty(tones)) return this.removeAll(pos);
 
-        List<Integer> toneList = Util.toIntegerList(tones);
-        HashMap<UUID, TreeMap<Integer, List<PianoSoundInstance>>> removedUuidMap = this.soundMap.remove(pos);
-        if (removedUuidMap == null || removedUuidMap.isEmpty()) return new ArrayList<>();
+        HashMap<UUID, TreeMap<Integer, List<PianoSoundInstance>>> uuidMap = this.soundMap.get(pos);
+        if (uuidMap == null || uuidMap.isEmpty()) return new ArrayList<>();
 
-        List<PianoSoundInstance> instances = new ArrayList<>();
-        for (TreeMap<Integer, List<PianoSoundInstance>> instanceMap : removedUuidMap.values()) {
-            if (instanceMap.isEmpty()) continue;
-            for (Map.Entry<Integer, List<PianoSoundInstance>> instanceEntry : instanceMap.entrySet()) {
-                if (toneList.contains(instanceEntry.getKey())) continue;
-                instances.addAll(instanceEntry.getValue());
+        List<Integer> toneList = Util.toIntegerList(tones);
+        List<PianoSoundInstance> removedInstances = new ArrayList<>();
+        Iterator<Map.Entry<UUID, TreeMap<Integer, List<PianoSoundInstance>>>> players = uuidMap.entrySet().iterator();
+        while (players.hasNext()) {
+            TreeMap<Integer, List<PianoSoundInstance>> instanceMap = players.next().getValue();
+            Iterator<Map.Entry<Integer, List<PianoSoundInstance>>> notes = instanceMap.entrySet().iterator();
+            while (notes.hasNext()) {
+                Map.Entry<Integer, List<PianoSoundInstance>> note = notes.next();
+                if (toneList.contains(note.getKey())) continue;
+                removedInstances.addAll(note.getValue());
+                notes.remove();
             }
+            if (instanceMap.isEmpty()) players.remove();
         }
-        removedUuidMap.clear();
-        return instances;
+        if (uuidMap.isEmpty()) this.soundMap.remove(pos);
+        return removedInstances;
     }
 
     public void clear() {

@@ -170,11 +170,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core
     implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
-
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.music.nbs.bean;
 
-import com.witcherbb.bettersound.music.nbs.NbsTiming;
+import com.witcherbb.bettersound.music.MusicTiming;
+import com.witcherbb.bettersound.music.bean.Note;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,7 +21,7 @@ public class PianoSong {
     public String author;
     public String originalAuthor;
     public String description;
-    /** NBS 原始 tempo：每秒歌曲刻数 × 100（1000 即每秒 10 刻），换算见 {@link NbsTiming} */
+    /** NBS 原始 tempo：每秒歌曲刻数 × 100（1000 即每秒 10 刻），换算见 {@link MusicTiming} */
     public short tempo;
     public byte autoSaving;
     public byte autoSavingDuration;
@@ -49,7 +50,7 @@ public class PianoSong {
      * 记录一个音符。
      * <p>
      * 键 {@code tick} 就是 NBS 文件里的歌曲刻下标，读取阶段不做任何时间缩放：
-     * 缩放（歌曲刻 → 游戏刻）由 {@link NbsTiming} 在播放时按 tempo 精确换算。
+     * 缩放（歌曲刻 → 游戏刻）由 {@link MusicTiming} 在播放时按 tempo 精确换算。
      * 以前在这里乘 {@code speed}（floor 过的整数倍率），会让 tempo 不能整除以
      * 游戏刻的曲子整体变快。
      */
@@ -110,8 +111,8 @@ public class PianoSong {
                 ", \n\tauthor='" + author + '\'' +
                 ", \n\toriginalAuthor='" + originalAuthor + '\'' +
                 ", \n\tdescription='" + description + '\'' +
-                ", \n\ttempo=" + tempo + " (" + NbsTiming.songTicksPerSecond(tempo) + " 歌曲刻/秒, "
-                        + NbsTiming.gameTicksPerSongTick(tempo) + " 游戏刻/歌曲刻)" +
+                ", \n\ttempo=" + tempo + " (" + MusicTiming.songTicksPerSecond(tempo) + " 歌曲刻/秒, "
+                        + MusicTiming.gameTicksPerSongTick(tempo) + " 游戏刻/歌曲刻)" +
                 ", \n\tautoSaving=" + autoSaving +
                 ", \n\tautoSavingDuration=" + autoSavingDuration +
                 ", \n\ttimeSignature=" + timeSignature +

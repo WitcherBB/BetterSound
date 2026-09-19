@@ -3,7 +3,7 @@ package com.witcherbb.bettersound.network.protocol.client.piano;
 import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
-import com.witcherbb.bettersound.music.nbs.bean.Note;
+import com.witcherbb.bettersound.music.bean.Note;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

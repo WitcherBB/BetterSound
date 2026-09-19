@@ -1,8 +1,8 @@
 package com.witcherbb.bettersound.network.protocol.server.nbs;
 
+import com.witcherbb.bettersound.music.bean.Note;
+import com.witcherbb.bettersound.music.bean.PianoSongTrack;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
-import com.witcherbb.bettersound.music.nbs.bean.Note;
-import com.witcherbb.bettersound.music.nbs.bean.PianoSongTrack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
