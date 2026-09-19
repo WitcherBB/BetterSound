@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.client.renderer.blockentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.witcherbb.bettersound.ClientConfig;
 import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.ToneBlock;
 import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
@@ -21,6 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ToneRenderer implements BlockEntityRenderer<ToneBlockEntity> {
     @Override
     public void render(ToneBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+        if (!ClientConfig.CLIENT.showTone.get()) return;
         Level level = pBlockEntity.getLevel();
         Player player = Minecraft.getInstance().player;
         if (level != null) {
@@ -32,9 +34,9 @@ public class ToneRenderer implements BlockEntityRenderer<ToneBlockEntity> {
 
                 Font font = Minecraft.getInstance().font;
                 String name = pBlockEntity.getToneName();
-                float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
+                float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0F);
                 int j = (int) (f1 * 255.0F) << 24;
-                font.drawInBatch(name, (float) -font.width(name) / 2, 0.0F, 0x00ef30, false, pPoseStack.last().pose(), pBuffer, Font.DisplayMode.NORMAL, j, 15728880);
+                font.drawInBatch(name, (float) -font.width(name) / 2, 0.0F, 0x00ef30, false, pPoseStack.last().pose(), pBuffer, Font.DisplayMode.NORMAL, j, 0xf000f0);
                 pPoseStack.popPose();
             }
         } else {

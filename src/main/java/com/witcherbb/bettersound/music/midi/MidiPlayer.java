@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.music.midi;
 
-import com.witcherbb.bettersound.Config;
+import com.witcherbb.bettersound.CommonConfig;
 import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.AutoMusicPlayer;
 import com.witcherbb.bettersound.music.bean.PianoSongTrack;
@@ -54,6 +54,6 @@ public class MidiPlayer {
      */
     private static int maxSustainTicks(PianoSongTrack track) {
         if (track.pedalChanges().isEmpty()) return 0;
-        return Config.COMMON.midiMaxSustainBars.get() * track.subsectionLength();
+        return CommonConfig.COMMON.midiMaxSustainBars.get() * track.subsectionLength();
     }
 }

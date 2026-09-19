@@ -7,7 +7,10 @@ import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
+
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -29,7 +32,10 @@ public final class BetterSound
         instance = this;
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.commonSpec);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientSpec);
+        });
         ModCreativeTabs.CREATIVE_MODE_TAB_DEFERRED_REGISTER.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
