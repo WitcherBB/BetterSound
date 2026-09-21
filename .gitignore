@@ -1,42 +1,42 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
+# 忽略所有
+*
 
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
+!*/
+!.gitignore
+!.gitattributes
 
-# gradle
-build
-.gradle
+# 源文件
+!build-logic/
+!build-logic/**
+!buildSrc/
+!buildSrc/**
+!common/
+!common/**
+!forge/
+!forge/**
+!fabric/
+!fabric/**
 
-#vscode
-.vscode
+# 根目录工程文件
+!gradle/
+!gradle/**
+!bugs.md
+!build.gradle
+!changelog.txt
+!CREDITS.txt
+!gradle.properties
+!gradlew
+!gradlew.bat
+!icon.png
+!LICENSE
+!README.md
+!settings.gradle
 
-# other
-eclipse
-/run/
-/run-data/
-/tools/
-/logs/
-
-# 内存看板编译产物
-/tools/mem-monitor/bin/
-
-# skills folder
-/.dsh/
-
-# Files from Forge MDK
-forge*changelog.txt
-/mcmodsrepo/
-/src/main/java/com/witcherbb/help/
-/.screen-share/
-/.dsh-tmp/
-/.dsh-tmpstats.txt
+# 忽略
+.gradle/
+bin/
+build/
+logs/
+run/
+run-data/
+generated/
