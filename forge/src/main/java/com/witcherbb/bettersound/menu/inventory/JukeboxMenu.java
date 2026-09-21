@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.menu.inventory;
 
-import com.witcherbb.bettersound.menu.ModMenuTypes;
+import com.witcherbb.bettersound.menu.ForgeMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Inventory;
@@ -11,8 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +27,7 @@ public class JukeboxMenu extends AbstractContainerMenu {
 	}
 
 	public JukeboxMenu(int pContainerId, Inventory inventory, BlockEntity entity, ContainerData data) {
-		super(ModMenuTypes.JUKEBOX_MENU.get(), pContainerId);
+		super(ForgeMenuTypes.JUKEBOX_MENU.get(), pContainerId);
 		checkContainerSize(inventory, 1);
 		blockEntity = (JukeboxBlockEntity) entity;
 		this.level = inventory.player.level();

@@ -1,7 +1,9 @@
 package com.witcherbb.bettersound.client.gui.screen.inventory;
 
+import java.util.function.Supplier;
+
 import com.mojang.blaze3d.platform.InputConstants;
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.client.gui.screen.controls.PianoKeyBindsScreen;
 import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
@@ -13,17 +15,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Lazy;
 
 import java.util.Map;
 import java.util.Set;
 
 //TODO 添加搜索音轨文件界面，直接通过UI界面导入nbs或者midi文件
-@OnlyIn(Dist.CLIENT)
+
 public class PianoBlockScreen extends AbstractPianoScreen {
-    protected static final Component KEY_CONTROLL = Component.translatable("block.bettersound.piano.use_keymap").withStyle(Style.EMPTY.withFont(new ResourceLocation(BetterSound.MODID, "fzjz")));
+    protected static final Component KEY_CONTROLL = Component.translatable("block.bettersound.piano.use_keymap").withStyle(Style.EMPTY.withFont(new ResourceLocation(Constants.MOD_ID, "fzjz")));
     private final boolean[] pressedStates = new boolean[88];
     private boolean pedalPressed;
     private Button keybindsButton;
@@ -51,8 +50,8 @@ public class PianoBlockScreen extends AbstractPianoScreen {
                 if (!this.pedalPressed) this.pressPedal(true);
                 return true;
             }
-            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
-            for (Map.Entry<Lazy<KeyMapping>, Integer> entry : entrySet) {
+            Set<Map.Entry<Supplier<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
+            for (Map.Entry<Supplier<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
                 if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
                     if (!this.pressedStates[keyValue]) {
@@ -74,8 +73,8 @@ public class PianoBlockScreen extends AbstractPianoScreen {
                 if (this.pedalPressed) this.pressPedal(false);
                 return true;
             }
-            Set<Map.Entry<Lazy<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
-            for (Map.Entry<Lazy<KeyMapping>, Integer> entry : entrySet) {
+            Set<Map.Entry<Supplier<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
+            for (Map.Entry<Supplier<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
                 if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
                     if (this.pressedStates[keyValue]) {

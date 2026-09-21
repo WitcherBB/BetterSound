@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.client.gui.screen.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SJukeboxNamePacket;
@@ -18,13 +18,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
 public class JukeboxScreen extends AbstractContainerScreen<JukeboxMenu> {
-	private static final ResourceLocation TEXTURE = new ResourceLocation(BetterSound.MODID, "textures/gui/jukebox.png");
+	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/jukebox.png");
 	private final JukeboxBlockEntity blockEntity;
 	private final Level level;
 	private EditBox editBox;
@@ -186,8 +183,6 @@ public class JukeboxScreen extends AbstractContainerScreen<JukeboxMenu> {
 		public Util.Status getStatus() {
 			return status;
 		}
-
-
 
 	}
 }

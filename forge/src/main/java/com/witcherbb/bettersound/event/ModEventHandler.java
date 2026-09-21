@@ -2,7 +2,7 @@ package com.witcherbb.bettersound.event;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.client.ModOptions;
@@ -13,9 +13,11 @@ import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
+import com.witcherbb.bettersound.network.ForgeNetwork;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
+import com.witcherbb.bettersound.menu.ForgeMenuTypes;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
 import com.witcherbb.bettersound.commands.ModCommands;
 import com.witcherbb.bettersound.world.structure.ModStructureAdder;
@@ -59,13 +61,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ModEventHandler {
-	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 	public static class ModClientEvents {
 		@SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
 			ModOptions.getOptions().load();
 
-            MenuScreens.register(ModMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
+            MenuScreens.register(ForgeMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
             MenuScreens.register(ModMenuTypes.EXAMPLE_MENU.get(), ExampleScreen::new);
 			MenuScreens.register(ModMenuTypes.JUKEBOX_CONTROLLER_MENU.get(), JukeboxControllerScreen::new);
 			MenuScreens.register(ModMenuTypes.NOTE_BLOCK_MENU.get(), NoteBlockScreen::new);
@@ -103,7 +105,7 @@ public class ModEventHandler {
 
 	}
 
-	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+	@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 	public static class ModServerEvents {
 		static {
 			// 验证类是否被加载
@@ -113,7 +115,7 @@ public class ModEventHandler {
 		@SubscribeEvent
 		public static void onCommonSetup(FMLCommonSetupEvent event) {
 //			ModNetwork.register();
-			event.enqueueWork(ModNetwork::register);
+			event.enqueueWork(ForgeNetwork::register);
 		}
 
 		@SubscribeEvent
@@ -122,7 +124,7 @@ public class ModEventHandler {
 		}
 	}
 
-	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+	@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 	public static class ForgeClientEvents {
 		@SubscribeEvent
 		public static void onGameShuttingDown(GameShuttingDownEvent event) {
@@ -144,7 +146,7 @@ public class ModEventHandler {
 		}
 	}
 
-	@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+	@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class ForgeServerEvents {
 		@SubscribeEvent
 		public static void onCommandRegister(RegisterCommandsEvent event) {

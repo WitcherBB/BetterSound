@@ -1,6 +1,8 @@
 package com.witcherbb.bettersound.network.protocol.server;
 
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.network.PacketContext;
+
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
@@ -14,9 +16,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public record SJukeboxNamePacket(String name, String dimension) {
 
@@ -31,15 +30,15 @@ public record SJukeboxNamePacket(String name, String dimension) {
 		return new SJukeboxNamePacket(name, dimension);
 	}
 
-	public static void handle(SJukeboxNamePacket packet, Supplier<NetworkEvent.Context> ctx) {
-		ctx.get().enqueueWork(() -> {
-			ServerPlayer sender = ctx.get().getSender();
+	public static void handle(SJukeboxNamePacket packet, PacketContext ctx) {
+		ctx.enqueueWork(() -> {
+			ServerPlayer sender = ctx.sender();
 			if (sender == null) return;
 			//Do Stuff
 			AbstractContainerMenu abstractContainerMenu = sender.containerMenu;
 			if (abstractContainerMenu instanceof JukeboxMenu jukeboxMenu) {
 				if (!jukeboxMenu.stillValid(sender)) {
-					BetterSound.LOGGER.debug("Player {} interacted with invalid menu {}", sender, sender.containerMenu);
+					Constants.LOGGER.debug("Player {} interacted with invalid menu {}", sender, sender.containerMenu);
 					return;
 				}
 				JukeboxEntityDataProvider provider = JukeboxControllerBlockEntity.getProvider();
@@ -66,6 +65,5 @@ public record SJukeboxNamePacket(String name, String dimension) {
 
 			}
 		});
-		ctx.get().setPacketHandled(true);
 	}
 }

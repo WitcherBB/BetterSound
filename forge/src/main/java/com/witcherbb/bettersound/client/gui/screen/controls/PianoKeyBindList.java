@@ -1,9 +1,11 @@
 package com.witcherbb.bettersound.client.gui.screen.controls;
 
+import java.util.function.Supplier;
+
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.ComponentModifier;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
@@ -19,9 +21,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@OnlyIn(Dist.CLIENT)
 public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindList.Entry> {
     static final Minecraft mc = Minecraft.getInstance();
     static final ModOptions modOptions = ModOptions.getOptions();
@@ -63,7 +61,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         this.pedalTopOffset = 300;
         this.keyboardWidth = whiteCountInRow * whiteWidth;
 
-        Map<Lazy<KeyMapping>, Integer> pianokeys = modOptions.getPianokeys();
+        Map<Supplier<KeyMapping>, Integer> pianokeys = modOptions.getPianokeys();
         pianokeys.forEach(((keyMappingLazy, id) -> {
             PianoKeyEntry entry = new PianoKeyEntry(keyMappingLazy.get(), id);
             if (entry.isBlack) this.addKey(entry);
@@ -295,7 +293,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
     }
 
     /* *************************************************** */
-    @OnlyIn(Dist.CLIENT)
+    
     public class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         protected static final Minecraft mc = Minecraft.getInstance();
         protected final KeyMapping key;
@@ -338,7 +336,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
-                for (Lazy<KeyMapping> keyMappingLazy : modOptions.keymappings) {
+                for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
                     if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || this.key.hasKeyModifierConflict(keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
@@ -353,11 +351,10 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         }
     }
     /* **************************************************** */
-    @OnlyIn(Dist.CLIENT)
+    
     public class PianoKeyEntry extends Entry {
         private final int id;
         private final boolean isBlack;
-
 
         PianoKeyEntry(KeyMapping pKey, int pId) {
             super(pKey, Button.builder(PianoUtil.getKeyName(pId), pButton -> {
@@ -383,7 +380,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
-                for (Lazy<KeyMapping> keyMappingLazy : modOptions.keymappings) {
+                for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
                     if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || this.key.hasKeyModifierConflict(keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
@@ -405,9 +402,9 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         }
     }
     /* **************************************************** */
-    @OnlyIn(Dist.CLIENT)
+    
     public class KeyButton extends Button {
-        protected static final ResourceLocation TEXTURE = new ResourceLocation(BetterSound.MODID, "textures/gui/piano_keyboard.png");
+        protected static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/piano_keyboard.png");
         protected static final int textureWidth = 300;
         protected static final int textureHeight = 300;
         private final boolean isBlack;

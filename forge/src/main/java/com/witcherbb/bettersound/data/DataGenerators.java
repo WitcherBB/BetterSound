@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.data;
 
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.data.tags.ModBlockTagGenerator;
 import com.witcherbb.bettersound.data.tags.ModItemTagGenerator;
 import net.minecraft.core.HolderLookup;
@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(modid = BetterSound.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
     @SubscribeEvent
     public static void gatherData(final GatherDataEvent event) {

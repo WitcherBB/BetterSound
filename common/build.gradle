@@ -16,6 +16,10 @@ legacyForge {
 
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    // IMixinConfigPlugin 的方法签名用到 ASM 的 ClassNode；Mixin 的 POM 把 ASM 当"平台提供"，
+    // 而 common 模块的 classpath 里没有 Forge 那套库（forge 模块有，所以以前没暴露）。
+    // 版本与 Forge 1.20.1 (47.3.5) 用的 ASM 对齐；compileOnly，不进运行时。
+    compileOnly group: 'org.ow2.asm', name: 'asm-tree', version: '9.7'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 

@@ -1,6 +1,6 @@
 package com.witcherbb.bettersound.world.structure;
 
-import com.witcherbb.bettersound.BetterSound;
+import com.witcherbb.bettersound.Constants;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -11,7 +11,7 @@ public class MusicHouse {
 
     public static void bootstrap(Registry<StructureTemplatePool> templatePoolRegistry, Registry<StructureProcessorList> processorListRegistry) {
         ModStructureAdder.addBuildings(templatePoolRegistry, processorListRegistry,
-                new ResourceLocation(BetterSound.MODID, "music_house"),
+                new ResourceLocation(Constants.MOD_ID, "music_house"),
                 new NbtPieceBuilder()
                         .add("bettersound:music_house/house", 150)
                         .add(parrotColor("blue"), 1)

@@ -1,0 +1,54 @@
+package com.witcherbb.bettersound.network.protocol.client.piano;
+
+import com.witcherbb.bettersound.network.PacketContext;
+
+import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
+import com.witcherbb.bettersound.client.sound.ModSoundManager;
+import com.witcherbb.bettersound.common.events.ModSoundEvents;
+import com.witcherbb.bettersound.music.bean.Note;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
+
+public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos blockPos, Vec3 voicePos, int tone, byte volume, boolean stop, boolean isForUI) {
+
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeBoolean(this.playerUUID == null);
+        if (this.playerUUID != null) {
+            buf.writeUUID(this.playerUUID);
+        }
+
+        buf.writeBlockPos(this.blockPos);
+        buf.writeVector3f(this.voicePos.toVector3f());
+        buf.writeInt(this.tone);
+        buf.writeByte(this.volume);
+        buf.writeBoolean(this.stop);
+        buf.writeBoolean(this.isForUI);
+    }
+
+    public static CPianoBlockPlayNotePacket decode(FriendlyByteBuf buf) {
+        boolean isNull = buf.readBoolean();
+        return new CPianoBlockPlayNotePacket(isNull ? null : buf.readUUID(), buf.readBlockPos(), new Vec3(buf.readVector3f()), buf.readInt(), buf.readByte(), buf.readBoolean(), buf.readBoolean());
+    }
+
+    public static void handle(CPianoBlockPlayNotePacket packet, PacketContext ctx) {
+        ctx.enqueueWork(() -> {
+            Level level = Minecraft.getInstance().level;
+            if (level == null) return;
+            ModSoundManager soundManager = ModSoundManager.INSTANCE;
+            BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(packet.blockPos);
+            if (packet.stop) {
+                soundManager.tryToStopPianoSound(packet.playerUUID, packet.blockPos, packet.tone);
+            } else {
+                if (entity instanceof AbstractPianoBlockEntity blockEntity)
+                    soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID, packet.voicePos, packet.tone, Note.toPianoSoundVolume(packet.volume), packet.isForUI, !blockEntity.isSoundDelay());
+            }
+
+        });
+    }
+}

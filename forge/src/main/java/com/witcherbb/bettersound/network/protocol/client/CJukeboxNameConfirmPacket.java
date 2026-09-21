@@ -1,12 +1,11 @@
 package com.witcherbb.bettersound.network.protocol.client;
 
+import com.witcherbb.bettersound.network.PacketContext;
+
 import com.witcherbb.bettersound.client.gui.screen.inventory.JukeboxScreen;
 import com.witcherbb.bettersound.common.utils.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public record CJukeboxNameConfirmPacket(Util.Status status) {
 
@@ -18,12 +17,11 @@ public record CJukeboxNameConfirmPacket(Util.Status status) {
         return new CJukeboxNameConfirmPacket(buf.readEnum(Util.Status.class));
     }
 
-    public static void handle(CJukeboxNameConfirmPacket packet, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+    public static void handle(CJukeboxNameConfirmPacket packet, PacketContext ctx) {
+        ctx.enqueueWork(() -> {
             if (Minecraft.getInstance().screen instanceof JukeboxScreen jukeboxScreen) {
                 jukeboxScreen.getImageTip().updateStatus(packet.status);
             }
         });
-        ctx.get().setPacketHandled(true);
     }
 }
