@@ -1,11 +1,10 @@
 package com.witcherbb.bettersound.client.gui.screen.inventory;
 
-import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 
 public class ToneBlockScreen extends AbstractPianoScreen {
-    public ToneBlockScreen(AbstractPianoMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
+    public ToneBlockScreen(BlockPos pos) {
+        super(pos);
     }
 }

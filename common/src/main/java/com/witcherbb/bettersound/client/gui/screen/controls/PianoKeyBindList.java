@@ -9,6 +9,10 @@ import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.ComponentModifier;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
+import com.witcherbb.bettersound.client.gui.screen.BasicButton;
+import com.witcherbb.bettersound.client.gui.screen.controls.PianoKeyBindList.KeyButton;
+import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -337,7 +341,8 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
                 for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
-                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || this.key.hasKeyModifierConflict(keyMappingLazy.get())) {
+                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) ||
+                        ClientPlatform.hooks().hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
                     }
@@ -357,9 +362,9 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         private final boolean isBlack;
 
         PianoKeyEntry(KeyMapping pKey, int pId) {
-            super(pKey, Button.builder(PianoUtil.getKeyName(pId), pButton -> {
+            super(pKey, BasicButton.basicBuilder(PianoUtil.getKeyName(pId), pButton -> {
                 PianoKeyBindList.this.keyBindsScreen.selected = pKey;
-                pKey.setKeyModifierAndCode(null, InputConstants.UNKNOWN);
+                pKey.setKey(InputConstants.UNKNOWN);
                 PianoKeyBindList.this.reloadEntries();
             }).bounds(0, 0, PianoUtil.isBlackey(pId) ? blackWidth : whiteWidth, PianoUtil.isBlackey(pId) ? blackHeight : whiteHeight).build(builder ->
                     new KeyButton(builder, pId)));
@@ -381,7 +386,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
                 for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
-                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || this.key.hasKeyModifierConflict(keyMappingLazy.get())) {
+                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || ClientPlatform.hooks().hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
                     }
@@ -403,14 +408,14 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
     }
     /* **************************************************** */
     
-    public class KeyButton extends Button {
+    public class KeyButton extends BasicButton {
         protected static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/piano_keyboard.png");
         protected static final int textureWidth = 300;
         protected static final int textureHeight = 300;
         private final boolean isBlack;
         private final int id;
 
-        protected KeyButton(Builder builder, int id) {
+        protected KeyButton(BasicButton.Builder builder, int id) {
             super(builder);
             this.id = id;
             this.isBlack = PianoUtil.isBlackey(id);
@@ -464,7 +469,7 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         public void onPress() {
             KeyMapping pedalKey = modOptions.getKeyPianoSustainPedal().get();
             PianoKeyBindList.this.keyBindsScreen.selected = pedalKey;
-            pedalKey.setKeyModifierAndCode(null, InputConstants.UNKNOWN);
+            pedalKey.setKey(InputConstants.UNKNOWN);
             PianoKeyBindList.this.reloadEntries();
         }
 

@@ -9,6 +9,7 @@ import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.music.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
@@ -285,7 +286,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof PianoBlockEntity) {
                 if (flag) {
-                    com.witcherbb.bettersound.common.platform.Platform.hooks().openMenu((ServerPlayer) pPlayer, (MenuProvider) blockEntity, pPos);
+                    ModNetwork.sendToPlayer(new COpenPianoScreenPacket(pPos), (ServerPlayer) pPlayer);
                     return InteractionResult.CONSUME;
                 } else if (part == PianoPart.PEDAL) {
                     boolean delay = pState.getValue(DELAY);

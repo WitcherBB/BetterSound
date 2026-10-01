@@ -20,6 +20,7 @@ public final class ModBlockEntityTypes {
     public static RegistryRef<BlockEntityType<PianoBlockEntity>> PIANO_BLOCK_ENTITY_TYPE;
     public static RegistryRef<BlockEntityType<ToneBlockEntity>> TONE_BLOCK_ENTITY_TYPE;
     public static RegistryRef<BlockEntityType<PianoStoolBlockEntity>> PIANO_STOOL_BLOCK_ENTITY_TYPE;
+    public static RegistryRef<BlockEntityType<BetterJukeboxBlockEntity>> BETTER_JUKEBOX_BLOCK_ENTITY_TYPE;
 
     public static void register(ModRegistrar registrar) {
         // vanilla 的 BlockEntityType.Builder.of 参数类型不是 public，构造这一步走 loader 钩子
@@ -35,6 +36,8 @@ public final class ModBlockEntityTypes {
                 Platform.hooks().createBlockEntityType(ToneBlockEntity::new, ModBlocks.TONE_BLOCK.get()));
         PIANO_STOOL_BLOCK_ENTITY_TYPE = register(registrar, "piano_stool_block_entity", () ->
                 Platform.hooks().createBlockEntityType(PianoStoolBlockEntity::new, ModBlocks.PIANO_STOOL_BLOCK.get()));
+        BETTER_JUKEBOX_BLOCK_ENTITY_TYPE = register(registrar, "better_jukebox_block_entity", () ->
+                Platform.hooks().createBlockEntityType(BetterJukeboxBlockEntity::new , ModBlocks.BETTER_JUKEBOX_BLOCK.get()));
     }
 
     public static <T extends BlockEntity> RegistryRef<BlockEntityType<T>> register(ModRegistrar registrar, String name, Supplier<BlockEntityType<T>> supplier) {

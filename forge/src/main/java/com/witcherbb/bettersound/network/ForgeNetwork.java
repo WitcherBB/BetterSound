@@ -11,6 +11,7 @@ import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
@@ -70,6 +71,8 @@ public final class ForgeNetwork {
                 CNBSPlayOnPacket::encode, CNBSPlayOnPacket::decode, CNBSPlayOnPacket::handle);
         BRIDGE.register(CNBSReloadPacket.class, PacketDirection.TO_CLIENT,
                 CNBSReloadPacket::encode, CNBSReloadPacket::decode, CNBSReloadPacket::handle);
+        BRIDGE.register(COpenPianoScreenPacket.class, PacketDirection.TO_CLIENT,
+                COpenPianoScreenPacket::encode, COpenPianoScreenPacket::decode, COpenPianoScreenPacket::handle);
     }
 
     private ForgeNetwork() {

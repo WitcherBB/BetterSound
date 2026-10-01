@@ -8,9 +8,11 @@ import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.common.config.Configs;
 import com.witcherbb.bettersound.common.platform.Platform;
+import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
 import com.witcherbb.bettersound.config.ForgeConfigValues;
 import com.witcherbb.bettersound.network.ForgeNetwork;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.platform.ForgeClientHooks;
 import com.witcherbb.bettersound.platform.ForgeLoaderHooks;
 import com.witcherbb.bettersound.registry.ForgeRegistrar;
 import com.witcherbb.bettersound.menu.ForgeMenuTypes;
@@ -47,11 +49,14 @@ public final class BetterSound
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.commonSpec);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientSpec);
-        });
         // loader 差异注入（common 侧只认接口）
         Platform.install(new ForgeLoaderHooks());
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientSpec);
+            ClientPlatform.install(new ForgeClientHooks());
+        });
+        
         Configs.install(new ForgeConfigValues());
         ModNetwork.init(ForgeNetwork.BRIDGE);
 

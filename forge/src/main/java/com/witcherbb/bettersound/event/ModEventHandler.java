@@ -71,8 +71,6 @@ public class ModEventHandler {
             MenuScreens.register(ModMenuTypes.EXAMPLE_MENU.get(), ExampleScreen::new);
 			MenuScreens.register(ModMenuTypes.JUKEBOX_CONTROLLER_MENU.get(), JukeboxControllerScreen::new);
 			MenuScreens.register(ModMenuTypes.NOTE_BLOCK_MENU.get(), NoteBlockScreen::new);
-			MenuScreens.register(ModMenuTypes.PIANO_BLOCK_MENU.get(), PianoBlockScreen::new);
-			MenuScreens.register(ModMenuTypes.TONE_BLOCK_MENU.get(), ToneBlockScreen::new);
 
 			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
 

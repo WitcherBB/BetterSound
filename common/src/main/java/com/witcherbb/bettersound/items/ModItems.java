@@ -30,6 +30,7 @@ public final class ModItems {
     public static RegistryRef<Item> SEE_YOU_AGAIN_MUSIC_DISC;
     public static RegistryRef<Item> LDCXQ_MUSIC_DISC;
 
+    public static RegistryRef<Item> ITEM_BETTER_JUKEBOX;
     public static RegistryRef<Item> ITEM_JUKEBOX_CONTROLLER;
     public static RegistryRef<Item> ITEM_EXAMPLE_BLOCK_ITEM;
     public static RegistryRef<Item> ITEM_PIANO_BLOCK;
@@ -56,6 +57,7 @@ public final class ModItems {
         LDCXQ_MUSIC_DISC = registerMusicDisc(registrar, "ldcxq", ModSoundEvents.MOD_MUSIC_LDCXQ, 114);
         /* ********************************************************************************************************************* */
 
+        ITEM_BETTER_JUKEBOX = registerBlockItem(registrar, "better_jukebox", ModBlocks.BETTER_JUKEBOX_BLOCK);
         ITEM_JUKEBOX_CONTROLLER = registerBlockItem(registrar, "jukebox_controller", ModBlocks.JUKEBOX_CONTROLLER);
         ITEM_EXAMPLE_BLOCK_ITEM = registerBlockItem(registrar, "example_block", ModBlocks.EXAMPLE_BLOCK);
         ITEM_PIANO_BLOCK = registerBlockItem(registrar, "piano_block", ModBlocks.PIANO_BLOCK);

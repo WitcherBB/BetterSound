@@ -4,18 +4,18 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.witcherbb.bettersound.Constants;
+import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.client.gui.screen.controls.PianoKeyBindsScreen;
-import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
+import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SBlockEntityDataChangePacket;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -28,8 +28,8 @@ public class PianoBlockScreen extends AbstractPianoScreen {
     private Button keybindsButton;
     private Checkbox keyCtrledCheckbox;
 
-    public PianoBlockScreen(AbstractPianoMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
+    public PianoBlockScreen(BlockPos pos) {
+        super(pos);
     }
 
     @Override
@@ -46,14 +46,14 @@ public class PianoBlockScreen extends AbstractPianoScreen {
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (this.keyCtrledCheckbox.selected()) {
-            if (modOptions.getKeyPianoSustainPedal().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            if (ClientPlatform.hooks().isActiveAndMatchesKey(modOptions.getKeyPianoSustainPedal().get(), InputConstants.getKey(pKeyCode, pScanCode))) {
                 if (!this.pedalPressed) this.pressPedal(true);
                 return true;
             }
             Set<Map.Entry<Supplier<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
             for (Map.Entry<Supplier<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
-                if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+                if (ClientPlatform.hooks().isActiveAndMatchesKey(entry.getKey().get(), InputConstants.getKey(pKeyCode, pScanCode))) {
                     if (!this.pressedStates[keyValue]) {
                         this.keys.get(keyValue).press();
                         this.pressedStates[keyValue] = true;
@@ -69,14 +69,14 @@ public class PianoBlockScreen extends AbstractPianoScreen {
     @Override
     public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
         if (this.keyCtrledCheckbox.selected()) {
-            if (modOptions.getKeyPianoSustainPedal().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            if (ClientPlatform.hooks().isActiveAndMatchesKey(modOptions.getKeyPianoSustainPedal().get(), InputConstants.getKey(pKeyCode, pScanCode))) {
                 if (this.pedalPressed) this.pressPedal(false);
                 return true;
             }
             Set<Map.Entry<Supplier<KeyMapping>, Integer>> entrySet = modOptions.getPianokeys().entrySet();
             for (Map.Entry<Supplier<KeyMapping>, Integer> entry : entrySet) {
                 int keyValue = entry.getValue();
-                if (entry.getKey().get().isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+                if (ClientPlatform.hooks().isActiveAndMatchesKey(entry.getKey().get(), InputConstants.getKey(pKeyCode, pScanCode))) {
                     if (this.pressedStates[keyValue]) {
                         this.keys.get(entry.getValue()).release();
                         pressedStates[keyValue] = false;
@@ -91,6 +91,8 @@ public class PianoBlockScreen extends AbstractPianoScreen {
 
     private void pressPedal(boolean isPressed) {
         this.pedalPressed = isPressed;
-        ModNetwork.sendToServer(new SBlockEntityDataChangePacket(blockEntity.getBlockPos(), isPressed));
+        if (this.minecraft.level.getBlockEntity(this.position) instanceof PianoBlockEntity blockEntity){
+            ModNetwork.sendToServer(new SBlockEntityDataChangePacket(blockEntity.getBlockPos(), isPressed));
+        }
     }
 }

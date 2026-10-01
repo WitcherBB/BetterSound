@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
 
-public abstract class AbstractPianoBlockEntity extends BlockEntity implements MenuProvider, TickableBlockEntity {
+public abstract class AbstractPianoBlockEntity extends BlockEntity implements TickableBlockEntity {
     private static final String[] keyNames = new String[]{
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
     };
@@ -73,11 +73,6 @@ public abstract class AbstractPianoBlockEntity extends BlockEntity implements Me
     public void tick() {
         if (this.level == null || this.level.isClientSide) return;
         this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
-    }
-
-    @Override
-    public @NotNull Component getDisplayName() {
-        return Component.translatable("block.bettersound.piano_block.title");
     }
 
     public boolean isSoundDelay() {

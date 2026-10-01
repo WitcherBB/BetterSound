@@ -5,6 +5,7 @@ import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.items.TunerItem;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
 import net.minecraft.core.BlockPos;
@@ -70,7 +71,7 @@ public class ToneBlock extends AbstractPianoBlock implements SpectatorInvalidBlo
         if (!pLevel.isClientSide) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof ToneBlockEntity && pPlayer.getItemInHand(pHand).getItem() instanceof TunerItem) {
-                com.witcherbb.bettersound.common.platform.Platform.hooks().openMenu((ServerPlayer) pPlayer, (MenuProvider) blockEntity, pPos);
+                ModNetwork.sendToPlayer(new COpenPianoScreenPacket(pPos), (ServerPlayer) pPlayer);
                 return InteractionResult.CONSUME;
             }
             pLevel.setBlock(pPos, pState.cycle(TONE), Block.UPDATE_ALL);

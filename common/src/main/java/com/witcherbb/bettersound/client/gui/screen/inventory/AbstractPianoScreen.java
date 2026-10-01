@@ -4,12 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.AbstractPianoBlockEntity;
+import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.state.properties.PianoPart;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
-import com.witcherbb.bettersound.menu.inventory.AbstractPianoMenu;
 import com.witcherbb.bettersound.music.bean.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
@@ -19,7 +19,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.GameRenderer;
@@ -28,14 +28,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class AbstractPianoScreen extends AbstractContainerScreen<AbstractPianoMenu> {
+public abstract class AbstractPianoScreen extends Screen {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/piano_keyboard.png");
     private static final int textureWidth = 300;
     private static final int textureHeight = 300;
@@ -45,16 +44,21 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
     protected int firstWhiteKey; // C4
     protected boolean clicked;
-
-    protected final Level level;
-    protected final AbstractPianoBlockEntity blockEntity;
+    
+    // protected AbstractPianoBlockEntity blockEntity;
+    protected BlockPos position;
     protected final ModOptions modOptions = ModOptions.getOptions();
 
-    public AbstractPianoScreen(AbstractPianoMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
-        this.level = pMenu.getLevel();
-        this.blockEntity = pMenu.getPianoBlockEntity();
-        this.firstWhiteKey = this.blockEntity.getFirstWhiteKey();
+    protected int imageWidth;
+    protected int imageHeight;
+    protected int leftPos;
+    protected int topPos;
+    protected int titleLabelX;
+    protected int titleLabelY;
+
+    public AbstractPianoScreen(BlockPos pos) {
+        super(Component.translatable("block.bettersound.piano_block.title"));
+        this.position = pos;
         if (PianoUtil.isBlackey(this.firstWhiteKey)) {
             this.firstWhiteKey -= 1;
         }
@@ -68,10 +72,22 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
     protected void init() {
         this.imageWidth = 300;
         this.imageHeight = 145;
-        super.init();
+        this.leftPos = (this.width - this.imageWidth) / 2;
+        this.topPos = (this.height - this.imageHeight) / 2;
+        this.titleLabelX = this.leftPos + 8;
+        this.titleLabelY = this.topPos + 6;
 
         this.initButton();
         this.clicked = false;
+
+        if (this.minecraft.level.getBlockEntity(this.position) instanceof AbstractPianoBlockEntity pianoBlockEntity) {
+            this.firstWhiteKey = pianoBlockEntity.getFirstWhiteKey();
+        }
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 
     @Override
@@ -82,11 +98,12 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
     @Override
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         renderBackground(pGuiGraphics);
+        pGuiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xe9e9e9, false);
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
-    protected void renderBg(@NotNull GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+    public void renderBackground(GuiGraphics pGuiGraphics) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
@@ -95,10 +112,20 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
         pGuiGraphics.blit(TEXTURE, this.leftPos + 14, this.topPos + 31, 1, 0, 145, 272, 4, textureWidth, textureHeight);
     }
 
-    @Override
-    protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        pGuiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xe9e9e9, false);
-    }
+    // @Override
+    // protected void renderBg(@NotNull GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+    //     RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    //     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    //     RenderSystem.setShaderTexture(0, TEXTURE);
+
+    //     pGuiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, 0, 300, 145, textureWidth, textureHeight);
+    //     pGuiGraphics.blit(TEXTURE, this.leftPos + 14, this.topPos + 31, 1, 0, 145, 272, 4, textureWidth, textureHeight);
+    // }
+
+    // @Override
+    // protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+    //     pGuiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xe9e9e9, false);
+    // }
 
     private void initButton() {
         keys.clear();
@@ -108,11 +135,6 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
             else this.keys.add(new PianoKeyButton(KeyCategory.WHITE, i));
         }
         this.loadButtons();
-    }
-
-    @Override
-    protected void containerTick() {
-        super.containerTick();
     }
 
     private void loadButtons() {
@@ -227,18 +249,19 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
     @Override
     public void onClose() {
-        this.blockEntity.updateFirstWhiteKey(this);
-        BlockPos pos = this.blockEntity.getBlockPos();
-        BlockState state = this.level.getBlockState(pos);
-
-        if (state.getBlock() instanceof PianoBlock pianoBlock) {
+        // this.blockEntity.updateFirstWhiteKey(this);
+        // BlockPos pos = this.blockEntity.getBlockPos();
+        BlockEntity blockEntity = this.minecraft.level.getBlockEntity(this.position);
+        if (blockEntity instanceof PianoBlockEntity pianoBlockEntity) {
+            BlockState state = pianoBlockEntity.getBlockState();
+            PianoBlock pianoBlock = (PianoBlock) state.getBlock();
             Direction combinedDir = pianoBlock.getCombinedDirection(state.getValue(PianoBlock.PART), state.getValue(PianoBlock.FACING));
-            BlockPos blockPos = pos.relative(combinedDir);
+            BlockPos blockPos = this.position.relative(combinedDir);
 
-            while (level.getBlockEntity(blockPos) instanceof AbstractPianoBlockEntity pianoBlockEntity && (pianoBlockEntity.getFirstWhiteKey() != this.firstWhiteKey)) {
-                BlockState state1 = level.getBlockState(blockPos);
+            while (this.minecraft.level.getBlockEntity(blockPos) instanceof AbstractPianoBlockEntity neighborPianoBlockEntity && (neighborPianoBlockEntity.getFirstWhiteKey() != this.firstWhiteKey)) {
+                BlockState state1 = this.minecraft.level.getBlockState(blockPos);
                 if (state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_L || state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_M || state1.getValue(PianoBlock.PART) == PianoPart.KEYBOARD_R) {
-                    pianoBlockEntity.updateFirstWhiteKey(this);
+                    neighborPianoBlockEntity.updateFirstWhiteKey(this);
                 }
                 combinedDir = pianoBlock.getCombinedDirection(state1.getValue(PianoBlock.PART), state1.getValue(PianoBlock.FACING));
                 blockPos = blockPos.relative(combinedDir);
@@ -376,21 +399,23 @@ public abstract class AbstractPianoScreen extends AbstractContainerScreen<Abstra
 
         public void press() {
             this.pressed = true;
-            BlockPos pos = fatherInstance.blockEntity.getBlockPos();
+            // BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (minecraft != null) {
-                ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), pos, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
+                ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), position, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
             }
-            ModNetwork.sendToServer(new SPianoKeyPressedPacket(pos, this.id, NORM_VOLUME));
+            ModNetwork.sendToServer(new SPianoKeyPressedPacket(position, this.id, NORM_VOLUME));
         }
 
         public void release() {
             this.pressed = false;
-            BlockPos pos = fatherInstance.blockEntity.getBlockPos();
-            if (!fatherInstance.blockEntity.isSoundDelay())
-                if (minecraft != null) {
-                    ModSoundManager.INSTANCE.tryToStopPianoSound(minecraft.player.getUUID(), pos, this.id);
+            if (minecraft.level.getBlockEntity(position) instanceof AbstractPianoBlockEntity blockEntity) {
+                if (!blockEntity.isSoundDelay()) {
+                    if (minecraft != null) {
+                        ModSoundManager.INSTANCE.tryToStopPianoSound(minecraft.player.getUUID(), position, this.id);
+                    }
                 }
-            ModNetwork.sendToServer(new SPianoKeyReleasedPacket(pos, this.id, !fatherInstance.blockEntity.isSoundDelay()));
+                ModNetwork.sendToServer(new SPianoKeyReleasedPacket(position, this.id, !blockEntity.isSoundDelay()));
+            }
         }
 
         @Override
