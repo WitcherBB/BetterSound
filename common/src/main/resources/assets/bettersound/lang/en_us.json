@@ -25,6 +25,7 @@
   "item.bettersound.keyboard": "Keyboard",
   "item.bettersound.piano_voice_core": "Piano Voice Core",
 
+  "block.bettersound.better_jukebox": "Better Jukebox",
   "block.bettersound.jukebox_controller": "Jukebox Controller",
   "block.bettersound.example_block": "Example Block",
   "block.bettersound.jukebox.name_input": "Connection String:",

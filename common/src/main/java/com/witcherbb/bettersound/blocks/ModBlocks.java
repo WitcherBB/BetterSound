@@ -4,6 +4,7 @@ import com.witcherbb.bettersound.common.registry.ModRegistrar;
 import com.witcherbb.bettersound.common.registry.RegistryRef;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -17,6 +18,7 @@ public final class ModBlocks {
     public static RegistryRef<Block> TONE_BLOCK;
     public static RegistryRef<Block> SUSTAIN_PEDAL;
     public static RegistryRef<Block> PIANO_STOOL_BLOCK;
+    public static RegistryRef<Block> BETTER_JUKEBOX_BLOCK;
 
     /** 由各 loader 的入口在注册阶段调用一次（顺序有讲究：后面的方块会复制 PIANO_BLOCK 的属性）。 */
     public static void register(ModRegistrar registrar) {
@@ -30,6 +32,8 @@ public final class ModBlocks {
                 new SustainPedalBlock(BlockBehaviour.Properties.copy(PIANO_BLOCK.get())));
         PIANO_STOOL_BLOCK = registrar.register(Registries.BLOCK, "piano_stool_block", () ->
                 new PianoStoolBlock(BlockBehaviour.Properties.copy(PIANO_BLOCK.get())));
+        BETTER_JUKEBOX_BLOCK = registrar.register(Registries.BLOCK, "better_jukebox", () ->
+                new BetterJukeboxBlock(BlockBehaviour.Properties.copy(Blocks.JUKEBOX)));
     }
 
     private ModBlocks() {

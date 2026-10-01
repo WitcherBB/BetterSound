@@ -25,6 +25,7 @@
   "item.bettersound.keyboard": "键盘",
   "item.bettersound.piano_voice_core": "钢琴音核",
 
+  "block.bettersound.better_jukebox": "更好的唱片机",
   "block.bettersound.jukebox_controller": "唱片机控制器",
   "block.bettersound.example_block": "例子",
   "block.bettersound.jukebox.name_input": "名称:",

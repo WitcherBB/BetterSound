@@ -24,6 +24,7 @@ public final class ModCreativeTabs {
                         .icon(() -> ModItems.ITEM_TUNER.get().getDefaultInstance())
                         .displayItems((parameters, output) -> {
                             //完整方块
+                            output.accept(ModItems.ITEM_BETTER_JUKEBOX.get());
                             output.accept(ModItems.ITEM_JUKEBOX_CONTROLLER.get());
                             output.accept(ModItems.ITEM_TONE_BLOCK.get());
                             //不完整方块(越往下越不完整)
