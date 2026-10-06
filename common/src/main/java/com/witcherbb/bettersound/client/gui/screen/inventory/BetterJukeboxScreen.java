@@ -2,13 +2,17 @@ package com.witcherbb.bettersound.client.gui.screen.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.witcherbb.bettersound.Constants;
+import com.witcherbb.bettersound.blocks.entity.BetterJukeboxBlockEntity;
 import com.witcherbb.bettersound.common.utils.Util;
+import com.witcherbb.bettersound.menu.inventory.BetterJukeboxMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.protocol.server.SJukeboxNamePacket;
-import com.witcherbb.bettersound.menu.inventory.JukeboxMenu;
+import com.witcherbb.bettersound.network.protocol.server.SBetterJukeboxNamePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -17,18 +21,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class JukeboxScreen extends AbstractContainerScreen<JukeboxMenu> {
+public class BetterJukeboxScreen extends AbstractContainerScreen<BetterJukeboxMenu> {
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/jukebox.png");
-	private final JukeboxBlockEntity blockEntity;
+	private final BetterJukeboxBlockEntity blockEntity;
 	private final Level level;
 	private EditBox editBox;
 	private ImageTip imageTip;
 	private JukeboxConfirmButton confirmButton;
 
-	public JukeboxScreen(JukeboxMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
+	public BetterJukeboxScreen(BetterJukeboxMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
 		super(pMenu, pPlayerInventory, pTitle);
 		this.blockEntity = pMenu.getBlockEntity();
 		this.level = this.blockEntity.getLevel();
@@ -108,7 +111,7 @@ public class JukeboxScreen extends AbstractContainerScreen<JukeboxMenu> {
 	public class JukeboxConfirmButton extends AbstractButton {
 
 		public JukeboxConfirmButton() {
-			super(JukeboxScreen.this.editBox.getX() + JukeboxScreen.this.editBox.getWidth() + 5, JukeboxScreen.this.editBox.getY(), 10, 10, CommonComponents.GUI_DONE);
+			super(BetterJukeboxScreen.this.editBox.getX() + BetterJukeboxScreen.this.editBox.getWidth() + 5, BetterJukeboxScreen.this.editBox.getY(), 10, 10, CommonComponents.GUI_DONE);
 		}
 
 		@Override
@@ -118,9 +121,9 @@ public class JukeboxScreen extends AbstractContainerScreen<JukeboxMenu> {
 
 		@Override
 		public void onPress() {
-			String name = JukeboxScreen.this.editBox.getValue();
+			String name = BetterJukeboxScreen.this.editBox.getValue();
             if (Minecraft.getInstance().level != null) {
-                ModNetwork.sendToServer(new SJukeboxNamePacket(name, Minecraft.getInstance().level.dimension().location().getPath()));
+                ModNetwork.sendToServer(new SBetterJukeboxNamePacket(name, Minecraft.getInstance().level.dimension().location().getPath()));
             }
         }
 

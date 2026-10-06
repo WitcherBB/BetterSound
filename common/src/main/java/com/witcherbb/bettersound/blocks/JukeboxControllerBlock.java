@@ -1,11 +1,12 @@
 package com.witcherbb.bettersound.blocks;
 
+import com.witcherbb.bettersound.blocks.entity.BetterJukeboxBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
+import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -19,7 +20,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class JukeboxControllerBlock extends BaseEntityBlock implements SpectatorInvalidBlock {
     public static final BooleanProperty OPENED = BooleanProperty.create("opened");
@@ -71,38 +70,24 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborBlockPos, boolean movedByPiston) {
-		boolean flag = hasNeighborSignalExceptJukebox(level, pos);
-		boolean flag1 = state.getValue(OPENED);
-		if (flag != flag1) {
-			JukeboxControllerBlockEntity blockEntity = (JukeboxControllerBlockEntity) level.getBlockEntity(pos);
-			if (blockEntity != null) {
-				if (flag && !checkAnyOpened(blockEntity.getName(), level)) {
-					level.setBlock(pos, state.setValue(OPENED, true), Block.UPDATE_ALL);
-					startPlaying(blockEntity.getName(), level);
+		if (!level.isClientSide) {
+			boolean flag = level.getBestNeighborSignal(pos) > 0;
+			boolean flag1 = state.getValue(OPENED);
+			if (flag != flag1) {
+				JukeboxControllerBlockEntity blockEntity = (JukeboxControllerBlockEntity) level.getBlockEntity(pos);
+				if (blockEntity != null) {
+					if (flag && !checkAnyOpened(blockEntity.getName(), level)) {
+						level.setBlock(pos, state.setValue(OPENED, true), Block.UPDATE_ALL);
+						startPlaying(blockEntity.getName(), level);
 
-				} else {
-					level.setBlock(pos, state.setValue(OPENED, false), Block.UPDATE_ALL);
-					stopPlaying(blockEntity.getName(), level);
+					} else {
+						level.setBlock(pos, state.setValue(OPENED, false), Block.UPDATE_ALL);
+						stopPlaying(blockEntity.getName(), level);
+					}
 				}
 			}
 		}
     }
-
-	private static boolean hasNeighborSignalExceptJukebox(Level level, BlockPos pos) {
-		if (!(level.getBlockState(pos.below()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.below(), Direction.DOWN) > 0) {
-			return true;
-		} else if (!(level.getBlockState(pos.above()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.above(), Direction.UP) > 0) {
-			return true;
-		} else if (!(level.getBlockState(pos.north()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.north(), Direction.NORTH) > 0) {
-			return true;
-		} else if (!(level.getBlockState(pos.south()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.south(), Direction.SOUTH) > 0) {
-			return true;
-		} else if (!(level.getBlockState(pos.west()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.west(), Direction.WEST) > 0) {
-			return true;
-		} else {
-			return !(level.getBlockState(pos.east()).getBlock() instanceof JukeboxBlock) && level.getSignal(pos.east(), Direction.EAST) > 0;
-		}
-	}
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
@@ -138,31 +123,28 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
 
     public static void startPlaying(String name, Level level) {
 		List<BlockPos> posList = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath());
-		int size = posList.size();
-		for (int i = 0; i < size; i++) {
-			Optional<JukeboxBlockEntity> blockEntityOptional = level.getBlockEntity(posList.get(i), BlockEntityType.JUKEBOX);
-			blockEntityOptional.ifPresent((blockEntity) -> blockEntity.setFirstItem(blockEntity.getFirstItem()));
-		}
+        for (BlockPos blockPos : posList) {
+            level.getBlockEntity(blockPos, ModBlockEntityTypes.BETTER_JUKEBOX_BLOCK_ENTITY_TYPE.get())
+                    .ifPresent(BetterJukeboxBlockEntity::startPlaying);
+        }
 	}
 
 	public static void stopPlaying(String name, Level level) {
         List<BlockPos> posList = JukeboxControllerBlockEntity.getProvider().getPosListByNameAndDimension(name, level.dimension().location().getPath());
-		int size = posList.size();
-		for (int i = 0; i < size; i++) {
-			Optional<JukeboxBlockEntity> blockEntityOptional = level.getBlockEntity(posList.get(i), BlockEntityType.JUKEBOX);
-			blockEntityOptional.ifPresent(be -> be.removeItem(100, be.getMaxStackSize()));
-		}
+        for (BlockPos blockPos : posList) {
+            level.getBlockEntity(blockPos, ModBlockEntityTypes.BETTER_JUKEBOX_BLOCK_ENTITY_TYPE.get())
+                    .ifPresent(BetterJukeboxBlockEntity::stopPlaying);
+        }
 	}
 
 	public static boolean checkAnyOpened(String name, Level level) {
 		JukeboxEntityDataProvider provider = JukeboxControllerBlockEntity.getProvider();
 		BlockPos[] posArray = provider.getControllerPosListByNameAndDimension(name, level.dimension().location().getPath()).toArray(BlockPos[]::new);
-		int size = posArray.length;
-		for (int i = 0; i < size; i++) {
-			if (level.getBlockState(posArray[i]).getValue(JukeboxControllerBlock.OPENED)) {
-				return true;
-			}
-		}
+        for (BlockPos blockPos : posArray) {
+            if (level.getBlockState(blockPos).getValue(JukeboxControllerBlock.OPENED)) {
+                return true;
+            }
+        }
 		return false;
 	}
 }

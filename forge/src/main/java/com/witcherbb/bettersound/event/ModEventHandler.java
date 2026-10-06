@@ -14,10 +14,8 @@ import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
 import com.witcherbb.bettersound.network.ForgeNetwork;
-import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
-import com.witcherbb.bettersound.menu.ForgeMenuTypes;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
 import com.witcherbb.bettersound.commands.ModCommands;
 import com.witcherbb.bettersound.world.structure.ModStructureAdder;
@@ -31,9 +29,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.JukeboxBlock;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -55,7 +51,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -67,10 +62,10 @@ public class ModEventHandler {
         public static void onClientSetup(FMLClientSetupEvent event) {
 			ModOptions.getOptions().load();
 
-            MenuScreens.register(ForgeMenuTypes.JUKEBOX_MENU.get(), JukeboxScreen::new);
             MenuScreens.register(ModMenuTypes.EXAMPLE_MENU.get(), ExampleScreen::new);
 			MenuScreens.register(ModMenuTypes.JUKEBOX_CONTROLLER_MENU.get(), JukeboxControllerScreen::new);
 			MenuScreens.register(ModMenuTypes.NOTE_BLOCK_MENU.get(), NoteBlockScreen::new);
+			MenuScreens.register(ModMenuTypes.BETTER_JUKEBOX_MENU.get(), BetterJukeboxScreen::new);
 
 			BlockEntityRenderers.register(ModBlockEntityTypes.TONE_BLOCK_ENTITY_TYPE.get(), ctx -> new ToneRenderer());
 
@@ -209,11 +204,6 @@ public class ModEventHandler {
 			Level level = event.getLevel();
 			if (event.getEntity().isSpectator() && level.getBlockState(event.getHitVec().getBlockPos()).getBlock() instanceof SpectatorInvalidBlock) {
 				event.setCanceled(true);
-			}
-			
-			if (event.getItemStack().getItem() instanceof RecordItem && level.getBlockState(event.getPos()).getBlock() instanceof JukeboxBlock) {
-				event.setUseBlock(Result.DENY);
-				event.setUseItem(Result.DENY);
 			}
 		}
 	}

@@ -1,16 +1,12 @@
 package com.witcherbb.bettersound.network;
 
-import com.witcherbb.bettersound.network.protocol.server.SJukeboxNamePacket;
-import com.witcherbb.bettersound.network.protocol.server.SExampleNameChangedPacket;
-import com.witcherbb.bettersound.network.protocol.server.SJukeboxControllerNamePacket;
-import com.witcherbb.bettersound.network.protocol.server.SNoteBlockPlayNotePacket;
+import com.witcherbb.bettersound.network.protocol.client.CBetterJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.network.protocol.server.*;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
-import com.witcherbb.bettersound.network.protocol.server.SBlockEntityDataChangePacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
-import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;
 import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
@@ -33,8 +29,6 @@ public final class ForgeNetwork {
 
     /** 把所有数据包登记到 {@link #BRIDGE} 上（在 mod 初始化阶段调用一次）。 */
     public static void register() {
-        BRIDGE.register(SJukeboxNamePacket.class, PacketDirection.TO_SERVER,
-                SJukeboxNamePacket::encode, SJukeboxNamePacket::decode, SJukeboxNamePacket::handle);
         BRIDGE.register(SExampleNameChangedPacket.class, PacketDirection.TO_SERVER,
                 SExampleNameChangedPacket::encode, SExampleNameChangedPacket::decode, SExampleNameChangedPacket::handle);
         BRIDGE.register(SJukeboxControllerNamePacket.class, PacketDirection.TO_SERVER,
@@ -53,8 +47,9 @@ public final class ForgeNetwork {
                 SAutoPlayerActionPacket::encode, SAutoPlayerActionPacket::decode, SAutoPlayerActionPacket::handle);
         BRIDGE.register(SMidiPlayPacket.class, PacketDirection.TO_SERVER,
                 SMidiPlayPacket::encode, SMidiPlayPacket::decode, SMidiPlayPacket::handle);
-        BRIDGE.register(CJukeboxNameConfirmPacket.class, PacketDirection.TO_CLIENT,
-                CJukeboxNameConfirmPacket::encode, CJukeboxNameConfirmPacket::decode, CJukeboxNameConfirmPacket::handle);
+        BRIDGE.register(SBetterJukeboxNamePacket.class, PacketDirection.TO_SERVER,
+                SBetterJukeboxNamePacket::encode, SBetterJukeboxNamePacket::decode, SBetterJukeboxNamePacket::handle);
+
         BRIDGE.register(CPianoBlockPlayNotePacket.class, PacketDirection.TO_CLIENT,
                 CPianoBlockPlayNotePacket::encode, CPianoBlockPlayNotePacket::decode, CPianoBlockPlayNotePacket::handle);
         BRIDGE.register(CPianoBlockStopPacket.class, PacketDirection.TO_CLIENT,
@@ -73,6 +68,8 @@ public final class ForgeNetwork {
                 CNBSReloadPacket::encode, CNBSReloadPacket::decode, CNBSReloadPacket::handle);
         BRIDGE.register(COpenPianoScreenPacket.class, PacketDirection.TO_CLIENT,
                 COpenPianoScreenPacket::encode, COpenPianoScreenPacket::decode, COpenPianoScreenPacket::handle);
+        BRIDGE.register(CBetterJukeboxNameConfirmPacket.class, PacketDirection.TO_CLIENT,
+                CBetterJukeboxNameConfirmPacket::encode, CBetterJukeboxNameConfirmPacket::decode, CBetterJukeboxNameConfirmPacket::handle);
     }
 
     private ForgeNetwork() {

@@ -1,7 +1,13 @@
 package com.witcherbb.bettersound.blocks;
 
-import java.util.function.Function;
-
+import com.mojang.serialization.MapCodec;
+import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
+import com.witcherbb.bettersound.common.platform.Platform;
+import com.witcherbb.bettersound.mixins.extenders.BlockExtender;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.ImmutableMap;
@@ -13,7 +19,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -33,7 +38,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BetterJukeboxBlock extends BaseEntityBlock {
+public class BetterJukeboxBlock extends BaseEntityBlock implements BlockExtender {
     public static final BooleanProperty HAS_RECORD = BooleanProperty.create("has_record");
 
 	private static final VoxelShape betterSound$OUTSIDE = Shapes.block();
@@ -44,7 +49,12 @@ public class BetterJukeboxBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(HAS_RECORD, false));
     }
 
-    @Override
+	@Override
+	public StateDefinition.Factory<Block, BlockState> getStateFactory() {
+		return BetterJukeboxBlockState::new;
+	}
+
+	@Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BetterJukeboxBlockEntity(pos, state);
     }
@@ -82,19 +92,43 @@ public class BetterJukeboxBlock extends BaseEntityBlock {
 		}
 	}
 
-    @Override
+	@Override
 	public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
 		BlockEntity entity = pLevel.getBlockEntity(pPos);
 		if (!pLevel.isClientSide()) {
 			if (entity instanceof BetterJukeboxBlockEntity jukeboxBlockEntity) {
 				if (!jukeboxBlockEntity.isRecordPlaying()) {
-                    // pPlayer.openMenu(jukeboxBlockEntity);
-					// NetworkHooks.openScreen(((ServerPlayer) pPlayer), (MenuProvider) jukeboxBlockEntity, pPos);
+					Platform.hooks().openMenu((ServerPlayer) pPlayer, jukeboxBlockEntity);
 				}
 			} else {
 				throw new IllegalStateException("Our Container provider is missing");
 			}
 		}
 		return InteractionResult.sidedSuccess(pLevel.isClientSide);
+	}
+
+	@Override
+	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return createTickerHelper(blockEntityType, ModBlockEntityTypes.BETTER_JUKEBOX_BLOCK_ENTITY_TYPE.get(), BetterJukeboxBlockEntity::tick);
+	}
+
+	static class BetterJukeboxBlockState extends BlockState {
+		public BetterJukeboxBlockState(Block block, ImmutableMap<Property<?>, Comparable<?>> values, MapCodec<BlockState> propertiesCodec) {
+			super(block, values, propertiesCodec);
+		}
+
+		@Override
+		public void onRemove(Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+			if (!this.is(newState.getBlock())) {
+				BlockEntity blockEntity = level.getBlockEntity(pos);
+				if (blockEntity instanceof BetterJukeboxBlockEntity jukeboxBlockEntity) {
+					jukeboxBlockEntity.onRemove();
+					level.updateNeighbourForOutputSignal(pos, this.getBlock());
+					CompoundTag nbt = level.getBlockEntity(pos).getUpdateTag();
+					JukeboxControllerBlockEntity.removePos(nbt.getString("Name"), level.dimension().location().getPath(), pos, level);
+				}
+			}
+			super.onRemove(level, pos, newState, movedByPiston);
+		}
 	}
 }

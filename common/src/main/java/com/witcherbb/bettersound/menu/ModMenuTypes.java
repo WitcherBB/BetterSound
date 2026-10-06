@@ -2,6 +2,7 @@ package com.witcherbb.bettersound.menu;
 
 import com.witcherbb.bettersound.common.registry.ModRegistrar;
 import com.witcherbb.bettersound.common.registry.RegistryRef;
+import com.witcherbb.bettersound.menu.inventory.BetterJukeboxMenu;
 import com.witcherbb.bettersound.menu.inventory.ExampleMenu;
 import com.witcherbb.bettersound.menu.inventory.JukeboxControllerMenu;
 import com.witcherbb.bettersound.menu.inventory.NoteBlockMenu;
@@ -18,11 +19,13 @@ public final class ModMenuTypes {
     public static RegistryRef<MenuType<ExampleMenu>> EXAMPLE_MENU;
     public static RegistryRef<MenuType<JukeboxControllerMenu>> JUKEBOX_CONTROLLER_MENU;
     public static RegistryRef<MenuType<NoteBlockMenu>> NOTE_BLOCK_MENU;
+    public static RegistryRef<MenuType<BetterJukeboxMenu>> BETTER_JUKEBOX_MENU;
 
     public static void register(ModRegistrar registrar) {
         EXAMPLE_MENU = registrar.registerMenu("example_menu", ExampleMenu::new);
         JUKEBOX_CONTROLLER_MENU = registrar.registerMenu("jukebox_controller_menu", JukeboxControllerMenu::new);
         NOTE_BLOCK_MENU = registrar.registerMenu("note_block_menu", NoteBlockMenu::new);
+        BETTER_JUKEBOX_MENU = registrar.registerMenu("better_jukebox_menu", BetterJukeboxMenu::new);
     }
 
     private ModMenuTypes() {
