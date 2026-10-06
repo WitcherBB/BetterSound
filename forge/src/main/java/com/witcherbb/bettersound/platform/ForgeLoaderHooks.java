@@ -2,7 +2,9 @@ package com.witcherbb.bettersound.platform;
 
 import com.witcherbb.bettersound.common.platform.BlockEntityFactory;
 import com.witcherbb.bettersound.common.platform.LoaderHooks;
+import com.witcherbb.bettersound.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -16,6 +18,8 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 /** Forge 侧的 loader 差异实现。 */
 public final class ForgeLoaderHooks implements LoaderHooks {
 
@@ -27,6 +31,16 @@ public final class ForgeLoaderHooks implements LoaderHooks {
     @Override
     public void openMenu(ServerPlayer player, MenuProvider provider, BlockPos pos) {
         NetworkHooks.openScreen(player, provider, pos);
+    }
+
+    @Override
+    public void openMenu(ServerPlayer player, MenuProvider provider, BiConsumer<ServerPlayer, FriendlyByteBuf> dataAdder) {
+        NetworkHooks.openScreen(player, provider, buf -> dataAdder.accept(player, buf));
+    }
+
+    @Override
+    public void openMenu(ServerPlayer player, ExtendedMenuProvider provider) {
+        NetworkHooks.openScreen(player, provider, buf -> provider.writeScreenOpeningData(player, buf));
     }
 
     @Override

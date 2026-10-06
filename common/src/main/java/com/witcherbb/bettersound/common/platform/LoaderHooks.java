@@ -1,8 +1,8 @@
 package com.witcherbb.bettersound.common.platform;
 
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
+import com.witcherbb.bettersound.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -12,6 +12,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 /**
  * 各 loader 之间「行为不同」的那部分：
@@ -31,6 +33,12 @@ public interface LoaderHooks {
 
     /** 服务端打开一个菜单界面（把界面与方块位置关联）。 */
     void openMenu(ServerPlayer player, MenuProvider provider, BlockPos pos);
+
+    /** 服务端打开一个菜单界面（客户端临时自定义同步数据包）。 */
+    void openMenu(ServerPlayer player, MenuProvider provider, BiConsumer<ServerPlayer, FriendlyByteBuf> dataAdder);
+
+    /** 服务端打开一个菜单界面（客户端自定义同步数据包）。 */
+    void openMenu(ServerPlayer player, ExtendedMenuProvider provider);
 
     /** 当前运行的服务器实例；没有（比如纯客户端）时返回 {@code null}。 */
     @Nullable
