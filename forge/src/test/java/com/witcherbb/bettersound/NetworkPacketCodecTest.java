@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound;
 
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.music.bean.Note;
+import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.network.protocol.client.CBetterJukeboxNameConfirmPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;

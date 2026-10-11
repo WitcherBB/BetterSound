@@ -2,7 +2,7 @@ package com.witcherbb.bettersound.music.midi;
 
 import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.AutoMusicPlayer;
-import com.witcherbb.bettersound.music.bean.PianoSongTrack;
+import com.witcherbb.bettersound.music.data.PianoSongTrack;
 import com.witcherbb.bettersound.music.midi.bean.MidiSong;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;

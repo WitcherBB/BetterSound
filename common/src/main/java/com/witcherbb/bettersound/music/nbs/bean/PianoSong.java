@@ -1,7 +1,7 @@
 package com.witcherbb.bettersound.music.nbs.bean;
 
 import com.witcherbb.bettersound.music.MusicTiming;
-import com.witcherbb.bettersound.music.bean.Note;
+import com.witcherbb.bettersound.music.data.Note;
 
 import java.util.ArrayList;
 import java.util.HashMap;

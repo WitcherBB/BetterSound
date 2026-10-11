@@ -5,7 +5,7 @@ import com.witcherbb.bettersound.network.PacketContext;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
-import com.witcherbb.bettersound.music.bean.Note;
+import com.witcherbb.bettersound.music.data.Note;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

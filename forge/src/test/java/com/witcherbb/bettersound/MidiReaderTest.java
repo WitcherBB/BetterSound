@@ -1,8 +1,8 @@
 package com.witcherbb.bettersound;
 
 import com.witcherbb.bettersound.exception.FileIsNotMidiException;
-import com.witcherbb.bettersound.music.bean.Note;
-import com.witcherbb.bettersound.music.bean.PianoSongTrack;
+import com.witcherbb.bettersound.music.data.Note;
+import com.witcherbb.bettersound.music.data.PianoSongTrack;
 import com.witcherbb.bettersound.music.midi.MidiReader;
 import com.witcherbb.bettersound.music.midi.MidiTiming;
 import com.witcherbb.bettersound.music.midi.bean.MidiSong;

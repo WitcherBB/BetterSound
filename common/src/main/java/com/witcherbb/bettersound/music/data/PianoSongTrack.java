@@ -1,4 +1,4 @@
-package com.witcherbb.bettersound.music.bean;
+package com.witcherbb.bettersound.music.data;
 
 import java.util.List;
 import java.util.Map;

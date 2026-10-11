@@ -1,12 +1,8 @@
-package com.witcherbb.bettersound.music.bean;
+package com.witcherbb.bettersound.music.data;
 
-import com.witcherbb.bettersound.common.utils.Util;
-import it.unimi.dsi.fastutil.bytes.Byte2ByteFunctions;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * 一个待演奏的音符。NBS 与 MIDI 共用。
