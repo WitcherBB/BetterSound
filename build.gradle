@@ -2,3 +2,6 @@ plugins {
     id 'fabric-loom' version '1.9.2' apply(false)
     id 'net.neoforged.moddev.legacyforge' version '2.0.77' apply(false)
 }
+
+// mod 依赖 sources jar 的 Yarn 残留检查（详见文件内注释与 tools/mod-sources/README.md）
+apply from: 'gradle/mod-sources-check.gradle'
