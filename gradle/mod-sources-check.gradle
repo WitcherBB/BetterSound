@@ -1,0 +1,83 @@
+// 额外构建逻辑（不属于 Multiloader 模板）：
+//
+// checkModSources —— 检查 Loom 缓存里 mod 依赖的 sources jar 是否还是「半 Yarn」状态。
+//
+// 背景：Loom 用 Mercury 重写 mod 的 sources jar 时，只改声明/引用/Javadoc，
+// 不改方法体里的局部变量类型和方法调用名，于是 fabric-api 的 ClientNetworking.java 里
+// 会同时出现 `Identifier typeId = buf.readIdentifier();` 和 `ResourceLocation` 参数——
+// IDEA 跳进去满屏报错、跳转失效。二进制（class）本身是好的，纯粹是源码附件的问题。
+//
+// 修好之后这里应该输出 "OK"。如果哪天又变红了，跑一次：
+//     pwsh -File tools\mod-sources\Regenerate-ModSources.ps1 -Mode Deploy
+// 任务报错时也会直接把这条命令打出来。
+
+// 这些是 Yarn 才有的名字；Mojang 映射下应该是 readResourceLocation / readComponent
+def YARN_ONLY_NAMES = ['readIdentifier(', 'readText(', 'writeIdentifier(', 'writeText(']
+
+def modSourcesCheckAction = { task ->
+    def rootDir = task.project.rootProject.projectDir
+    def remappedRoot = new File(rootDir, '.gradle/loom-cache/remapped_mods')
+
+    // 抽查两个能被"污染"的源码：screen-handler 的 ClientNetworking 用的是这两个方法名
+    def checkFiles = [
+            'fabric-screen-handler-api-v1/1.3.30+1802ada577/fabric-screen-handler-api-v1-1.3.30+1802ada577-sources.jar',
+            'fabric-networking-api-v1/1.3.11+1802ada577/fabric-networking-api-v1-1.3.11+1802ada577-sources.jar'
+    ]
+
+    def candidates = []
+    checkFiles.each { rel ->
+        def hit = remappedRoot.listFiles()?.findResults { dir ->
+            def f = new File(dir, "net/fabricmc/fabric-api/$rel")
+            f.exists() ? f : null
+        }?.first()
+        if (hit) { candidates << hit }
+    }
+
+    if (candidates.isEmpty()) {
+        task.logger.lifecycle('checkModSources: 找不到 Fabric API 的 sources 缓存，跳过（先在 IDEA/Gradle 同步一次）')
+        return
+    }
+
+    def bad = []
+    candidates.each { jarFile ->
+        def tmp = File.createTempDir('loom-src-check', '')
+        try {
+            task.project.copy { from task.project.zipTree(jarFile); into tmp }
+            tmp.eachFileRecurse { f ->
+                if (f.isFile() && f.name.endsWith('.java')) {
+                    def text = f.getText('UTF-8')
+                    def hits = YARN_ONLY_NAMES.findAll { text.contains(it) }
+                    if (hits) { bad << "${jarFile.name} -> ${f.name} ${hits}".toString() }
+                }
+            }
+        } finally {
+            tmp.deleteDir()
+        }
+    }
+
+    if (bad) {
+        throw new GradleException("""mod 依赖的 sources jar 里仍残留 Yarn 名字（IDEA 里这些文件会满屏报错）：
+${bad.collect { '  - ' + it }.join('\n')}
+
+修复命令：
+  pwsh -File tools\\mod-sources\\Regenerate-ModSources.ps1 -Mode Deploy
+""")
+    }
+    task.logger.lifecycle("checkModSources: OK —— ${candidates.size()} 个 sources jar 没有 Yarn 残留")
+}
+
+// 只注册一次：这个脚本是靠 apply from 加载的，如果写在 allprojects 里会每个项目注册一份。
+rootProject.tasks.register('checkModSources') { task ->
+    group = 'verification'
+    description = '检查 mod 依赖的 sources jar 是否残留 Yarn 名字（IDEA 跳转/报错问题）'
+    doLast { modSourcesCheckAction(task) }
+}
+
+// 编译前自动跑一遍：只有真出问题（或缓存被重建）时才会让构建失败并给出修复命令
+subprojects {
+    plugins.withId('java') {
+        tasks.matching { it.name == 'compileJava' }.configureEach {
+            dependsOn(rootProject.tasks.named('checkModSources'))
+        }
+    }
+}
