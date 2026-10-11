@@ -2,7 +2,7 @@ package com.witcherbb.bettersound;
 
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.music.bean.Note;
-import com.witcherbb.bettersound.network.protocol.client.CJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.network.protocol.client.CBetterJukeboxNameConfirmPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPlayOnPacket;
@@ -11,11 +11,7 @@ import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
-import com.witcherbb.bettersound.network.protocol.server.SBlockEntityDataChangePacket;
-import com.witcherbb.bettersound.network.protocol.server.SExampleNameChangedPacket;
-import com.witcherbb.bettersound.network.protocol.server.SJukeboxControllerNamePacket;
-import com.witcherbb.bettersound.network.protocol.server.SJukeboxNamePacket;
-import com.witcherbb.bettersound.network.protocol.server.SNoteBlockPlayNotePacket;
+import com.witcherbb.bettersound.network.protocol.server.*;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
@@ -140,8 +136,8 @@ public class NetworkPacketCodecTest {
 
     @Test
     public void jukeboxName() {
-        SJukeboxNamePacket packet = new SJukeboxNamePacket("music_house", "overworld");
-        assertEquals(packet, roundTrip(packet, SJukeboxNamePacket::encode, SJukeboxNamePacket::decode));
+        SBetterJukeboxNamePacket packet = new SBetterJukeboxNamePacket("music_house", "overworld");
+        assertEquals(packet, roundTrip(packet, SBetterJukeboxNamePacket::encode, SBetterJukeboxNamePacket::decode));
     }
 
     @Test
@@ -218,9 +214,9 @@ public class NetworkPacketCodecTest {
         // writeEnum/readEnum 走的是 ordinal，Status 里 FAIL 与 NULL 数值相同但序号不同，
         // 四个常量都必须能原样往返
         for (Util.Status status : Util.Status.values()) {
-            CJukeboxNameConfirmPacket packet = new CJukeboxNameConfirmPacket(status);
+            CBetterJukeboxNameConfirmPacket packet = new CBetterJukeboxNameConfirmPacket(status);
             assertEquals("状态 " + status, packet,
-                    roundTrip(packet, CJukeboxNameConfirmPacket::encode, CJukeboxNameConfirmPacket::decode));
+                    roundTrip(packet, CBetterJukeboxNameConfirmPacket::encode, CBetterJukeboxNameConfirmPacket::decode));
         }
     }
 
