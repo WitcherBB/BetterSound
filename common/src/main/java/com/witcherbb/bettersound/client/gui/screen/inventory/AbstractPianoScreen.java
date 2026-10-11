@@ -30,6 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -401,7 +402,9 @@ public abstract class AbstractPianoScreen extends Screen {
             this.pressed = true;
             // BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (minecraft != null) {
-                ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(), minecraft.player.getUUID(), position, this.id, Note.toPianoSoundVolume(NORM_VOLUME), true, false);
+                ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(),
+                        minecraft.player.getUUID(), position, Vec3.atCenterOf(position), this.id,
+                        Note.toPianoSoundVolume(NORM_VOLUME), true, false);
             }
             ModNetwork.sendToServer(new SPianoKeyPressedPacket(position, this.id, NORM_VOLUME));
         }

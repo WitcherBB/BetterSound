@@ -33,7 +33,8 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos blockPos, Vec3
 
     public static CPianoBlockPlayNotePacket decode(FriendlyByteBuf buf) {
         boolean isNull = buf.readBoolean();
-        return new CPianoBlockPlayNotePacket(isNull ? null : buf.readUUID(), buf.readBlockPos(), new Vec3(buf.readVector3f()), buf.readInt(), buf.readByte(), buf.readBoolean(), buf.readBoolean());
+        return new CPianoBlockPlayNotePacket(isNull ? null : buf.readUUID(), buf.readBlockPos(),
+                new Vec3(buf.readVector3f()), buf.readInt(), buf.readByte(), buf.readBoolean(), buf.readBoolean());
     }
 
     public static void handle(CPianoBlockPlayNotePacket packet, PacketContext ctx) {
@@ -46,7 +47,9 @@ public record CPianoBlockPlayNotePacket(UUID playerUUID, BlockPos blockPos, Vec3
                 soundManager.tryToStopPianoSound(packet.playerUUID, packet.blockPos, packet.tone);
             } else {
                 if (entity instanceof AbstractPianoBlockEntity blockEntity)
-                    soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID, packet.voicePos, packet.tone, Note.toPianoSoundVolume(packet.volume), packet.isForUI, !blockEntity.isSoundDelay());
+                    soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(packet.tone).get(), packet.playerUUID,
+                            packet.blockPos, packet.voicePos, packet.tone, Note.toPianoSoundVolume(packet.volume),
+                            packet.isForUI, !blockEntity.isSoundDelay());
             }
 
         });

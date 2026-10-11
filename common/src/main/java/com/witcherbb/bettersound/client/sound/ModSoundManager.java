@@ -21,20 +21,15 @@ public class ModSoundManager {
 
     private final MidiLoader midiLoader = new MidiLoader(Minecraft.getInstance().gameDirectory, "midi_bettersound");
 
-    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, int tone, float volume, boolean isForUI, boolean isShort) {
-        this.playPianoSound(soundEvent, playerUUID, Vec3.atCenterOf(pos), tone, volume, isForUI, isShort);
-    }
-
-    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, Vec3 pos, int tone, float volume, boolean isForUI, boolean isShort) {
+    public void playPianoSound(SoundEvent soundEvent, UUID playerUUID, BlockPos pos, Vec3 voicePos, int tone, float volume, boolean isForUI, boolean isShort) {
         PianoSoundInstance soundInstance;
-        BlockPos blockPos = BlockPos.containing(pos);
         if (isForUI) {
-            soundInstance = PianoSoundInstance.forUI(soundEvent, blockPos, Vec3.ZERO, playerUUID, tone, volume);
+            soundInstance = PianoSoundInstance.forUI(soundEvent, pos, Vec3.ZERO, playerUUID, tone, volume);
         } else {
-            soundInstance = PianoSoundInstance.forPosition(soundEvent, pos, playerUUID, tone, volume, isShort);
+            soundInstance = PianoSoundInstance.forPosition(soundEvent, pos, voicePos, playerUUID, tone, volume, isShort);
         }
         Minecraft.getInstance().getSoundManager().play(soundInstance);
-        playingPianoNotes.put(blockPos, playerUUID, tone, soundInstance);
+        playingPianoNotes.put(pos, playerUUID, tone, soundInstance);
     }
 
     private void stopPianoSound(UUID playerUUID, BlockPos pos, int tone) {

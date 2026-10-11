@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.blocks;
 
 import com.witcherbb.bettersound.Constants;
+import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
@@ -43,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<PianoPart>, SpectatorInvalidBlock {
     public static final IntegerProperty TONE = IntegerProperty.create("tones", 0, Constants.PIANO_KEY_NUM - 1);
@@ -305,18 +307,13 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
     public void setDelay(BlockState state, Level level, BlockPos pos, boolean delay) {
         if (!level.isClientSide && state.getValue(DELAY) != delay) {
             level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL);
-
-            BlockPos blockPos = pos;
-            while (level.getBlockEntity(blockPos) instanceof PianoBlockEntity pianoBlockEntity && (pianoBlockEntity.isSoundDelay() != delay)) {
-                BlockState state1 = level.getBlockState(blockPos);
-                if (!delay && (state1.getValue(PART) == PianoPart.KEYBOARD_L || state1.getValue(PART) == PianoPart.KEYBOARD_M || state1.getValue(PART) == PianoPart.KEYBOARD_R)) {
-                    stopLastTones(blockPos);
-                }
-                pianoBlockEntity.setSoundDelay(delay);
-                pianoBlockEntity.setChanged();
-                Direction combinedDir = this.getCombinedDirection(state1.getValue(PART), state1.getValue(FACING));
-                blockPos = blockPos.relative(combinedDir);
+            if (!delay) {
+                stopLastTones(getSectionPos(state, pos, MIDDEL_PART));
             }
+            forEachSection(blockEntity -> {
+                blockEntity.setSoundDelay(delay);
+                blockEntity.setChanged();
+            }, level, pos, state);
         }
     }
 
@@ -330,11 +327,12 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
+            BlockPos mainPos = getSectionPos(sourceState, pPos, MIDDEL_PART);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), pPos, target, tone, volume, false, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), mainPos, target, tone, volume, false, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, pPos, target, tone, volume, false, false));
-            pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, tone);
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, mainPos, target, tone, volume, false, false));
+            pLevel.blockEvent(mainPos, this, 0, tone);
         }
     }
 
@@ -342,10 +340,11 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
+            BlockPos mainPos = getSectionPos(sourceState, pPos, MIDDEL_PART);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), pPos, target, tone, (byte) 0, true, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), mainPos, target, tone, (byte) 0, true, false), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, pPos, target, tone, (byte) 0, true, false));
+                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, mainPos, target, tone, (byte) 0, true, false));
         }
     }
 
@@ -353,16 +352,17 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3[] targets = new Vec3[notes.length];
+            BlockPos mainPos = getSectionPos(sourceState, pPos, MIDDEL_PART);
             for (int i = 0; i < notes.length; i++) {
                 targets[i] = getVoicePosition(sourceState, pPos, notes[i].getPitch());
             }
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayMultipleNotesPacket(pPlayer.getUUID(), pPos, targets, notes), pPlayer);
+                ModNetwork.broadcastBut(new CPianoBlockPlayMultipleNotesPacket(pPlayer.getUUID(), mainPos, targets, notes), pPlayer);
             } else {
-                ModNetwork.broadcast(new CPianoBlockPlayMultipleNotesPacket(null, pPos, targets, notes));
+                ModNetwork.broadcast(new CPianoBlockPlayMultipleNotesPacket(null, mainPos, targets, notes));
             }
             for (Note note : notes) {
-                pLevel.blockEvent(getVoiceSectionPos(sourceState, pPos, MIDDEL_PART), this, 0, note.getPitch());
+                pLevel.blockEvent(mainPos, this, 0, note.getPitch());
             }
         }
     }
@@ -417,13 +417,13 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
     private static Vec3 getVoicePosition(BlockState sourceState, BlockPos sourcePos, int tone) {
         Direction facing = sourceState.getValue(FACING);
         double keyDelta = 2.5 / 88.0;
-        return Vec3.atCenterOf(getVoiceSectionPos(sourceState, sourcePos, MIDDEL_PART)) // 获取钢琴中声部的位置
+        return Vec3.atCenterOf(getSectionPos(sourceState, sourcePos, MIDDEL_PART)) // 获取钢琴中声部的位置
                 .relative(facing.getOpposite(), 0.5 - 1e-4) // 钢琴背部发声（直接用0.5会导致计算坐标错误，减去一个小量更保守）
                 .relative(Direction.DOWN, 0.5 - 1e-4) // 和上面一行同步减去小量，保守一些
                 .relative(facing.getCounterClockWise(),  (tone - (isBlack(tone) ? 44.0 : 43.5)) * keyDelta); // 根据音调定位横向的发声位置
     }
 
-    public static BlockPos getVoiceSectionPos(BlockState sourceState, BlockPos sourcePos, PianoPart target) {
+    public static BlockPos getSectionPos(BlockState sourceState, BlockPos sourcePos, PianoPart target) {
         Direction facing = sourceState.getValue(FACING);
         Direction clockWise = facing.getClockWise();
         Direction counterClockWise = facing.getCounterClockWise();
@@ -484,5 +484,18 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
                 case PEDAL_L -> sourcePos;
             };
         };
+    }
+
+    protected static void forEachSection(PianoBlockEntityConsumer consumer, Level level, BlockPos srcPos, BlockState srcState) {
+        for (PianoPart part : PianoPart.values()) {
+            BlockPos currentPos = getSectionPos(srcState, srcPos, part);
+            Optional<PianoBlockEntity> blockEntityOptional =
+                    level.getBlockEntity(currentPos, ModBlockEntityTypes.PIANO_BLOCK_ENTITY_TYPE.get());
+            blockEntityOptional.ifPresent(consumer::accept);
+        }
+    }
+
+    protected interface PianoBlockEntityConsumer {
+        void accept(PianoBlockEntity blockEntity);
     }
 }

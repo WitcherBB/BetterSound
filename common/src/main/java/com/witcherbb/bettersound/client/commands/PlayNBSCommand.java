@@ -55,10 +55,10 @@ public class PlayNBSCommand {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return -1;
         try {
-            BlockPos voicePos = PianoBlock.getVoiceSectionPos(mc.level.getBlockState(target), target, PianoBlock.MIDDEL_PART);
+            BlockPos mainPos = PianoBlock.getSectionPos(mc.level.getBlockState(target), target, PianoBlock.MIDDEL_PART);
             PianoSong song = ModSoundManager.INSTANCE.getNbsLoader().findSong(fileName);
-            BlockEntity entity = mc.level.getBlockEntity(voicePos);
-            if (entity instanceof AutoPlayer autoPlayer) {
+            BlockEntity blockEntity = mc.level.getBlockEntity(mainPos);
+            if (blockEntity instanceof AutoPlayer autoPlayer) {
                 autoPlayer.getNBSPlayer().play(song);
                 if (mc.player != null) {
                     mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.nbs.success", song.fileName)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));

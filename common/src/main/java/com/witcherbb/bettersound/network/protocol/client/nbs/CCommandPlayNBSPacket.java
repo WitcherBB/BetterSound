@@ -30,7 +30,7 @@ public record CCommandPlayNBSPacket(String filename, BlockPos pos) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null) return;
             try {
-                BlockPos target = PianoBlock.getVoiceSectionPos(mc.level.getBlockState(packet.pos), packet.pos, PianoBlock.MIDDEL_PART);
+                BlockPos target = PianoBlock.getSectionPos(mc.level.getBlockState(packet.pos), packet.pos, PianoBlock.MIDDEL_PART);
                 PianoSong song = ModSoundManager.INSTANCE.getNbsLoader().findSong(packet.filename);
                 BlockEntity entity = mc.level.getBlockEntity(target);
                 if (entity instanceof AutoPlayer autoPlayer) {

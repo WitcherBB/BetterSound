@@ -61,10 +61,10 @@ public class PlayMidiCommand {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return -1;
         try {
-            BlockPos voicePos = PianoBlock.getVoiceSectionPos(mc.level.getBlockState(target), target, PianoBlock.MIDDEL_PART);
+            BlockPos mainPos = PianoBlock.getSectionPos(mc.level.getBlockState(target), target, PianoBlock.MIDDEL_PART);
             MidiSong song = ModSoundManager.INSTANCE.getMidiLoader().findSong(fileName);
-            BlockEntity entity = mc.level.getBlockEntity(voicePos);
-            if (entity instanceof AutoPlayer autoPlayer && autoPlayer.getMidiPlayer() != null) {
+            BlockEntity blockEntity = mc.level.getBlockEntity(mainPos);
+            if (blockEntity instanceof AutoPlayer autoPlayer && autoPlayer.getMidiPlayer() != null) {
                 autoPlayer.getMidiPlayer().play(song);
                 if (mc.player != null) {
                     mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.midi.success", song.name)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));

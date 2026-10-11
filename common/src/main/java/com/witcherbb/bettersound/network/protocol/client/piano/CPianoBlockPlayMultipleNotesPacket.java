@@ -44,7 +44,7 @@ public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourc
         UUID playerUUID = isNull ? null : buf.readUUID();
         BlockPos sourcePos = buf.readBlockPos();
         byte[] noteData = buf.readByteArray();
-        // 每个 Note 定长 Note.FIELD_NUM(3) 字节（pitch/volume/layer），按固定步长切片解码。
+        // 每个 Note 定长 Note.FIELD_NUM 字节（pitch/volume/layer/duration），按固定步长切片解码。
         // 旧实现用 while(!isEmpty(noteData)) 且从未重写 noteData，导致解码死循环卡死网络线程。
         int noteCount = noteData.length / Note.FIELD_NUM;
         Note[] notes = new Note[noteCount];
@@ -69,7 +69,7 @@ public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourc
                         continue;
                     }
                     if (blockEntity instanceof PianoBlockEntity pianoBlockEntity){
-                        soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(note.getPitch()).get(), packet.playerUUID,
+                        soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(note.getPitch()).get(), packet.playerUUID, packet.sourcePos,
                                 packet.positions[i], note.getPitch(), Note.toPianoSoundVolume(note.getVolume()), false, !pianoBlockEntity.isSoundDelay());
                     }
                 }

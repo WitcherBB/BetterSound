@@ -54,22 +54,15 @@ public class PianoSoundInstance extends AbstractTickableSoundInstance implements
         return instance;
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, boolean isShort) {
-        return forPosition(soundEvent, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, playerUUID, tone, FULL_VOLUME, isShort);
+    public static PianoSoundInstance forPosition(SoundEvent soundEvent, BlockPos pos, Vec3 voicePos, UUID playerUUID, int tone, float volume, boolean isShort) {
+        return forPosition(soundEvent, pos, voicePos.x, voicePos.y, voicePos.z, playerUUID, tone, volume, isShort);
     }
 
-    public static PianoSoundInstance forBlock(SoundEvent soundEvent, BlockPos pos, UUID playerUUID, int tone, float volume, boolean isShort) {
-        return forPosition(soundEvent, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, playerUUID, tone, volume, isShort);
-    }
-
-    public static PianoSoundInstance forPosition(SoundEvent soundEvent, Vec3 vec3, UUID playerUUID, int tone, float volume, boolean isShort) {
-        return forPosition(soundEvent, vec3.x, vec3.y, vec3.z, playerUUID, tone, volume, isShort);
-    }
-
-    public static PianoSoundInstance forPosition(SoundEvent soundEvent, double x, double y, double z, UUID playerUUID, int tone, float volume, boolean isShort) {
+    public static PianoSoundInstance forPosition(SoundEvent soundEvent, BlockPos pos, double x, double y, double z, UUID playerUUID, int tone, float volume, boolean isShort) {
         PianoSoundInstance instance = new PianoSoundInstance(soundEvent, volume, 1.0F, x, y, z, false, isShort);
         instance.setPlayerUUID(playerUUID);
         instance.setTone(tone);
+        instance.setPos(pos);
         return instance;
     }
 

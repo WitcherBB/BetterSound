@@ -42,7 +42,7 @@ public record SAutoPlayerActionPacket(BlockPos pos, Action action) {
             BlockPos target = packet.pos;
             BlockState state = level.getBlockState(target);
             if (state.getBlock() instanceof PianoBlock) {
-                target = PianoBlock.getVoiceSectionPos(state, target, PianoBlock.MIDDEL_PART);
+                target = PianoBlock.getSectionPos(state, target, PianoBlock.MIDDEL_PART);
             }
             if (level.getBlockEntity(target) instanceof AutoPlayer autoPlayer) {
                 switch (packet.action) {

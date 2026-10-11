@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class PianoSoundMapTest {
 
     /** 按下一个音：登记的是真实的声音实例，和 ModSoundManager.playPianoSound 走的是同一条路。 */
     private static PianoSoundInstance press(PianoSoundMap map, BlockPos pos, UUID player, int tone) {
-        PianoSoundInstance instance = PianoSoundInstance.forBlock(noteSound, pos, player, tone, false);
+        PianoSoundInstance instance = PianoSoundInstance.forPosition(noteSound, pos, Vec3.atCenterOf(pos), player, tone, 1.0f, false);
         map.put(pos, player, tone, instance);
         return instance;
     }
