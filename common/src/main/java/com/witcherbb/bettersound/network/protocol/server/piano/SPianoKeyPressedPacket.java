@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.network.protocol.server.piano;
 
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.blocks.AbstractPianoBlock;
@@ -32,7 +33,9 @@ public record SPianoKeyPressedPacket(BlockPos pos, int tone, byte volume) {
             level.setBlock(pos, state, AbstractPianoBlock.UPDATE_ALL);
             if (state.getBlock() instanceof AbstractPianoBlock pianoBlock) {
                 pianoBlock.playSound(sender, packet.tone, packet.volume, level, pos);
-                ModToneManager.getInstance().putLastTone(packet.pos, sender.getUUID(), packet.tone());
+                BlockPos mainPos = state.getBlock() instanceof PianoBlock
+                        ? PianoBlock.getSectionPos(state, pos, PianoBlock.MIDDEL_PART) : pos;
+                ModToneManager.getInstance().putLastTone(mainPos, sender.getUUID(), packet.tone());
             }
         });
     }

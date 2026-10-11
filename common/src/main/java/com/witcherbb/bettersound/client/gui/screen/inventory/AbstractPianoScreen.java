@@ -400,10 +400,9 @@ public abstract class AbstractPianoScreen extends Screen {
 
         public void press() {
             this.pressed = true;
-            // BlockPos pos = fatherInstance.blockEntity.getBlockPos();
             if (minecraft != null) {
                 ModSoundManager.INSTANCE.playPianoSound(ModSoundEvents.pianoSounds.get(this.id).get(),
-                        minecraft.player.getUUID(), position, Vec3.atCenterOf(position), this.id,
+                        minecraft.player.getUUID(), position, Vec3.ZERO, this.id,
                         Note.toPianoSoundVolume(NORM_VOLUME), true, false);
             }
             ModNetwork.sendToServer(new SPianoKeyPressedPacket(position, this.id, NORM_VOLUME));
