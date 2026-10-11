@@ -22,6 +22,8 @@ public final class Constants {
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    public static final int PIANO_KEY_NUM = 88;
+
     private Constants() {
     }
 }

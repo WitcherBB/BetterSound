@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.blocks;
 
+import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<PianoPart>, SpectatorInvalidBlock {
-    public static final IntegerProperty TONE = IntegerProperty.create("tones", 0, 87);
+    public static final IntegerProperty TONE = IntegerProperty.create("tones", 0, Constants.PIANO_KEY_NUM - 1);
     public static final EnumProperty<PianoPart> PART = EnumProperty.create("part", PianoPart.class);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty DELAY = BooleanProperty.create("delay");
@@ -307,14 +308,10 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL);
 
             BlockPos blockPos = pos;
-            List<Integer> tones = Lists.newArrayList();
             while (level.getBlockEntity(blockPos) instanceof PianoBlockEntity pianoBlockEntity && (pianoBlockEntity.isSoundDelay() != delay)) {
                 BlockState state1 = level.getBlockState(blockPos);
                 if (!delay && (state1.getValue(PART) == PianoPart.KEYBOARD_L || state1.getValue(PART) == PianoPart.KEYBOARD_M || state1.getValue(PART) == PianoPart.KEYBOARD_R)) {
-                    tones.addAll(
-                            Util.toIntegerList(ModToneManager.getInstance().getLastTones(blockPos))
-                    );
-                    ModNetwork.broadcast(new CPianoBlockStopPacket(blockPos, Util.toIntArray(tones)));
+                    stopLastTones(blockPos);
                 }
                 pianoBlockEntity.setSoundDelay(delay);
                 pianoBlockEntity.setChanged();
@@ -322,6 +319,12 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
                 blockPos = blockPos.relative(combinedDir);
             }
         }
+    }
+
+    private void stopLastTones(BlockPos pos) {
+        List<Integer> tones = Lists.newArrayList();
+        tones.addAll(Util.toIntegerList(ModToneManager.getInstance().getLastTones(pos)));
+        ModNetwork.broadcast(new CPianoBlockStopPacket(pos, Util.toIntArray(tones)));
     }
 
     public void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos) {

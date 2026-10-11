@@ -38,18 +38,18 @@ public class ModSoundManager {
     }
 
     private void stopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
-        PianoSoundInstance soundInstance = playingPianoNotes.removeFirst(pos, playerUUID, tone);
+        PianoSoundInstance soundInstance = playingPianoNotes.remove(pos, playerUUID, tone);
         if (soundInstance != null)
             soundInstance.setStoped();
     }
 
     public void tryToStopPianoSound(UUID playerUUID, BlockPos pos, int tone) {
-        if (playingPianoNotes.getFirst(pos, playerUUID, tone) == null) return;
+        if (playingPianoNotes.get(pos, playerUUID, tone) == null) return;
         this.stopPianoSound(playerUUID, pos, tone);
     }
 
     public void tryToStopAllPianoSounds(BlockPos pos, int[] exceptedTones) {
-        List<PianoSoundInstance> instances = playingPianoNotes.removeAllButLast(pos, exceptedTones);
+        List<PianoSoundInstance> instances = playingPianoNotes.removeButLast(pos, exceptedTones);
         if (instances.isEmpty()) return;
         for (int i = 0; i < instances.size(); i++) {
             instances.get(i).setStoped();
