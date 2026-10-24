@@ -53,9 +53,14 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
     // 国内镜像加速依赖解析（按顺序优先）
     maven { url 'https://maven.aliyun.com/repository/public' }  // Maven Central 国内镜像
     maven { url 'https://bmclapi2.bangbang93.com/maven' }       // Forge maven 国内镜像
+    maven { url "https://maven.architectury.dev/" }
 
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 

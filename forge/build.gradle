@@ -81,6 +81,7 @@ dependencies {
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
     modRuntimeOnly "curse.maven:configured-457570:5096828"
     // runtimeOnly fg.deobf("curse.maven:configured-1407959:7352989")
+    modImplementation "dev.architectury:architectury-forge:${architectury_api_version}"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
@@ -92,8 +93,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    // https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core
-    implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
+    compileOnly group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
+    runtimeOnly group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
 }
 
 jar {
