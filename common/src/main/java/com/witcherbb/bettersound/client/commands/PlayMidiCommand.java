@@ -23,7 +23,9 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -61,10 +63,12 @@ public class PlayMidiCommand {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return -1;
         try {
-            BlockPos mainPos = PianoBlock.getSectionPos(mc.level.getBlockState(target), target, PianoBlock.MIDDEL_PART);
-            MidiSong song = ModSoundManager.INSTANCE.getMidiLoader().findSong(fileName);
-            BlockEntity blockEntity = mc.level.getBlockEntity(mainPos);
-            if (blockEntity instanceof AutoPlayer autoPlayer && autoPlayer.getMidiPlayer() != null) {
+            BlockState targetState = mc.level.getBlockState(target);
+            if (targetState.getBlock() instanceof PianoBlock) {
+                BlockPos mainPos = PianoBlock.getSectionPos(targetState, target, PianoBlock.MIDDEL_PART);
+                MidiSong song = ModSoundManager.INSTANCE.getMidiLoader().findSong(fileName);
+                AutoPlayer autoPlayer = (AutoPlayer) mc.level.getBlockEntity(mainPos);
+                Objects.requireNonNull(autoPlayer);
                 autoPlayer.getMidiPlayer().play(song);
                 if (mc.player != null) {
                     mc.player.sendSystemMessage(Component.empty().append(Component.translatable("bettersound.midi.success", song.name)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));
