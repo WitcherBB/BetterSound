@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Constants.MOD_ID)
-public final class BetterSound
+public final class BetterSoundForge
 {
     /** @deprecated 已迁移到 common 的 {@link Constants#MOD_ID}，保留别名只为兼容尚未迁移的代码。 */
     @Deprecated
@@ -38,9 +38,9 @@ public final class BetterSound
     @Deprecated
     public static final Logger LOGGER = Constants.LOGGER;
 
-    private static BetterSound instance;
+    private static BetterSoundForge instance;
 
-    public BetterSound()
+    public BetterSoundForge()
     {
         instance = this;
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -49,7 +49,9 @@ public final class BetterSound
         // loader 差异注入（common 侧只认接口）
         Platform.install(new ForgeLoaderHooks());
 
+        BetterSoundCommon.init();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            BetterSoundClient.init();
             ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.clientSpec);
             ClientPlatform.install(new ForgeClientHooks());
         });
@@ -77,7 +79,7 @@ public final class BetterSound
 
     }
 
-    public static BetterSound getInstance() {
+    public static BetterSoundForge getInstance() {
         return instance;
     }
 }
