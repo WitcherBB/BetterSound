@@ -24,6 +24,8 @@ public class CommonConfig
         /** MIDI 延音踏板最长保持多少个小节，超过则强制释放一次；0 表示关闭该保护 */
         public final ForgeConfigSpec.IntValue midiMaxSustainBars;
 
+        public final ForgeConfigSpec.DoubleValue releaseSubsections;
+
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("MIDI playback settings")
                     .push("midi");
@@ -34,7 +36,8 @@ public class CommonConfig
                     .defineInRange("maxSustainBars", 4, 0, 64);
             builder.pop();
 
-            // builder.comment()
+            releaseSubsections = builder.comment("默认多少个小节释放一次踏板")
+                    .defineInRange("释放间隔", 1.0, 0.0, 4.0);
         }
     }
 }

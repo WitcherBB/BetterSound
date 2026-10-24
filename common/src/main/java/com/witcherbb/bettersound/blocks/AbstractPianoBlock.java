@@ -45,7 +45,7 @@ public abstract class AbstractPianoBlock extends BaseEntityBlock implements Spec
     }
 
     /** Server side */
-    public abstract void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos);
+    public abstract void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos, boolean isShort);
 
     /** Server side */
     public abstract void stopSound(@Nullable ServerPlayer pPlayer, int tone, Level pLevel, BlockPos pPos);

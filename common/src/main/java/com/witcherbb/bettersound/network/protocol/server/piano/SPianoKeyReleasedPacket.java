@@ -3,6 +3,7 @@ package com.witcherbb.bettersound.network.protocol.server.piano;
 import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.blocks.AbstractPianoBlock;
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.common.ModToneManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -30,7 +31,12 @@ public record SPianoKeyReleasedPacket(BlockPos pos, int tone, boolean whetherToS
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof AbstractPianoBlock pianoBlock) {
                 if (packet.whetherToStop) pianoBlock.stopSound(sender, packet.tone, level, pos);
-                ModToneManager.getInstance().removeLastTone(packet.pos, sender.getUUID(), packet.tone());
+                // 簿记键必须和 SPianoKeyPressedPacket 里 putLastTone 用的一致（钢琴统一到键盘中格），
+                // 否则这一条删不掉：账只增不减，整片切时会把这些陈旧条目当成"还按着的音"保留下来，
+                // 结果就是那些音再也停不掉。
+                BlockPos mainPos = state.getBlock() instanceof PianoBlock
+                        ? PianoBlock.getSectionPos(state, pos, PianoBlock.MIDDEL_PART) : pos;
+                ModToneManager.getInstance().removeLastTone(mainPos, sender.getUUID(), packet.tone());
             }
         });
     }

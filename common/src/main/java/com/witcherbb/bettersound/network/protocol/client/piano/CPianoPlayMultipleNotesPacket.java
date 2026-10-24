@@ -16,7 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.UUID;
 
-public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourcePos, Vec3[] positions, Note[] notes) {
+public record CPianoPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourcePos, Vec3[] positions, Note[] notes) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(this.positions.length);
         for (Vec3 pos : this.positions) {
@@ -34,7 +34,7 @@ public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourc
         buf.writeByteArray(byteBuf.toByteArray());
     }
 
-    public static CPianoBlockPlayMultipleNotesPacket decode(FriendlyByteBuf buf) {
+    public static CPianoPlayMultipleNotesPacket decode(FriendlyByteBuf buf) {
         int posLength = buf.readVarInt();
         Vec3[] positions = new Vec3[posLength];
         for (int i = 0; i < posLength; i++) {
@@ -51,10 +51,10 @@ public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourc
         for (int i = 0; i < noteCount; i++) {
             notes[i] = Note.decode(Arrays.copyOfRange(noteData, i * Note.FIELD_NUM, (i + 1) * Note.FIELD_NUM));
         }
-        return new CPianoBlockPlayMultipleNotesPacket(playerUUID, sourcePos, positions, notes);
+        return new CPianoPlayMultipleNotesPacket(playerUUID, sourcePos, positions, notes);
     }
 
-    public static void handle(CPianoBlockPlayMultipleNotesPacket packet, PacketContext ctx) {
+    public static void handle(CPianoPlayMultipleNotesPacket packet, PacketContext ctx) {
         ctx.enqueueWork(() -> {
             if (Minecraft.getInstance().level != null) {
                 ModSoundManager soundManager = ModSoundManager.INSTANCE;
@@ -68,9 +68,9 @@ public record CPianoBlockPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourc
                     if (note.getPitch() < 0 || note.getPitch() >= ModSoundEvents.pianoSounds.size()) {
                         continue;
                     }
-                    if (blockEntity instanceof PianoBlockEntity pianoBlockEntity){
+                    if (blockEntity instanceof PianoBlockEntity){
                         soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(note.getPitch()).get(), packet.playerUUID, packet.sourcePos,
-                                packet.positions[i], note.getPitch(), Note.toPianoSoundVolume(note.getVolume()), false, !pianoBlockEntity.isSoundDelay());
+                                packet.positions[i], note.getPitch(), Note.toPianoSoundVolume(note.getVolume()), false, false);
                     }
                 }
             }

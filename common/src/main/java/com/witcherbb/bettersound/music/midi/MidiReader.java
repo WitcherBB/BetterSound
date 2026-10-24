@@ -15,10 +15,14 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * MIDI 文件读取器（客户端）。
@@ -73,6 +77,10 @@ public class MidiReader implements Closeable {
         String bestTrackName = null;
         int bestTrackNoteCount = 0;
 
+        // 等着 Note Off 的 Note On：键是「通道 + 音高」，值是这些音符在 song.notes 里的下标队列。
+        // 同一个 (通道, 音高) 可能重叠着响好几个，所以用队列按先后顺序配对。
+        Map<Integer, Deque<Integer>> pendingNotes = new HashMap<>();
+
         for (Track track : sequence.getTracks()) {
             String trackName = null;
             int trackNoteCount = 0;
@@ -84,17 +92,23 @@ public class MidiReader implements Closeable {
 
                 if (message instanceof ShortMessage shortMessage) {
                     int command = shortMessage.getCommand();
-                    if (command == ShortMessage.NOTE_ON && shortMessage.getData2() > 0) {
-                        // 力度为 0 的 Note On 等价于 Note Off，已被上面的条件排除
-                        if (this.collectNote(song, tick, shortMessage.getData1(), shortMessage.getData2(), shortMessage.getChannel())) {
+                    int data1 = shortMessage.getData1();
+                    int data2 = shortMessage.getData2();
+                    int channel = shortMessage.getChannel();
+                    if (command == ShortMessage.NOTE_ON && data2 > 0) {
+                        int index = this.collectNote(song, tick, data1, data2, channel);
+                        if (index >= 0) {
                             trackNoteCount++;
+                            pendingNotes.computeIfAbsent(noteKey(channel, data1), key -> new ArrayDeque<>()).add(index);
                         }
-                    } else if (command == ShortMessage.CONTROL_CHANGE && shortMessage.getData1() == SUSTAIN_PEDAL_CONTROLLER) {
-                        song.pedals.add(new MidiSong.RawPedal(tick,
-                                shortMessage.getData2() >= SUSTAIN_PEDAL_DOWN_THRESHOLD, shortMessage.getChannel()));
+                    } else if (command == ShortMessage.NOTE_OFF || (command == ShortMessage.NOTE_ON && data2 == 0)) {
+                        // 力度为 0 的 Note On 与 Note Off 表达的是同一件事，这里一并处理：
+                        // 它给出这个音符的结束时刻，两相减就是琴键按住的时长
+                        this.closeNote(song, pendingNotes, tick, channel, data1);
+                    } else if (command == ShortMessage.CONTROL_CHANGE && data1 == SUSTAIN_PEDAL_CONTROLLER) {
+                        song.pedals.add(new MidiSong.RawPedal(tick, data2 >= SUSTAIN_PEDAL_DOWN_THRESHOLD, channel));
                     }
-                    // Note Off、Pitch Bend、其它控制器、Aftertouch 一律忽略：
-                    // 本 mod 的模型里没有「松键」概念，音符一律自然衰减，释放点只由延音踏板决定
+                    // Pitch Bend、其它控制器、Aftertouch 仍然忽略
                 } else if (message instanceof MetaMessage metaMessage) {
                     byte[] data = metaMessage.getData();
                     switch (metaMessage.getType()) {
@@ -139,23 +153,47 @@ public class MidiReader implements Closeable {
     }
 
     /**
-     * 收集一个音符：越界音高与打击乐通道在这里就被丢弃，只有能真正弹出来的音符才会进入 {@link MidiSong}。
+     * 收集一个 Note On：越界音高与打击乐通道在这里就被丢弃，只有能真正弹出来的音符才会进入 {@link MidiSong}。
+     * <p>音高是否收录只取决于「通道 + 音高」，所以同一个键上的 Note On / Note Off 要么全部收录、要么全部丢弃，
+     * 配对时不会错位。
      *
-     * @return 是否收录
+     * @return 该音符在 {@code song.notes} 里的下标；被丢弃时返回 -1
      */
-    private boolean collectNote(MidiSong song, long tick, int midiNote, int velocity, int channel) {
+    private int collectNote(MidiSong song, long tick, int midiNote, int velocity, int channel) {
         song.totalNotes++;
         if (channel == MidiTiming.DRUM_CHANNEL) {
             song.drumNotes++;
-            return false;
+            return -1;
         }
         if (!MidiTiming.isInPianoRange(midiNote)) {
             song.outOfRangeNotes++;
-            return false;
+            return -1;
         }
         song.notes.add(new MidiSong.RawNote(tick, midiNote, velocity, channel));
         song.contributingChannels.add(channel);
-        return true;
+        return song.notes.size() - 1;
+    }
+
+    /** 把「通道 + 音高」合成一个键：只有同通道同音高才需要互相配对 */
+    private static int noteKey(int channel, int midiNote) {
+        return (channel << 8) | (midiNote & 0xFF);
+    }
+
+    /**
+     * 处理一个 Note Off：把它配对回同通道同音高、最早那个还没闭合的 Note On，
+     * 算出的时长（琴键按住多久）写回那条音符记录。
+     * <p>
+     * 找不到对应 Note On 的 Note Off（文件不规范）直接忽略；反过来一直没等到 Note Off 的音符，
+     * 时长会保持 {@link MidiSong#DURATION_UNKNOWN}。
+     */
+    private void closeNote(MidiSong song, Map<Integer, Deque<Integer>> pendingNotes, long tick, int channel, int midiNote) {
+        Deque<Integer> waiting = pendingNotes.get(noteKey(channel, midiNote));
+        if (waiting == null || waiting.isEmpty()) return;
+
+        int index = waiting.pollFirst();
+        MidiSong.RawNote note = song.notes.get(index);
+        if (tick < note.tick()) return; // 畸形文件：结束早于开始，宁可留成未知
+        song.notes.set(index, note.withDuration(tick - note.tick()));
     }
 
     /**

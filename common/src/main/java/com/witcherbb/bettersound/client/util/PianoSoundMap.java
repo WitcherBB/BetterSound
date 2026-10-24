@@ -1,5 +1,7 @@
 package com.witcherbb.bettersound.client.util;
 
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.client.resources.sounds.PianoSoundInstance;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -14,7 +16,7 @@ import java.util.*;
 
 public class PianoSoundMap {
     private static final PianoSoundInstance[] defaultPianoSoundInstances = createEmptyPianoSoundInstances();
-    private static final Map<UUID, PianoSoundInstance[]> defaultUuidMap = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, PianoSoundInstance[]> defaultUuidMap = ImmutableMap.of();
 
     private final Map<Long, Map<UUID, PianoSoundInstance[]>> soundMap = new Long2ObjectOpenHashMap<>();
 
@@ -53,11 +55,11 @@ public class PianoSoundMap {
         for (PianoSoundInstance[] instances : removedUuidMap.values()) {
             // 交出真正在响的实例
             removedInstances.addAll(Arrays.stream(instances).filter(Objects::nonNull).toList());
-            for (PianoSoundInstance instance : instances) {
-                if (instance != null) {
-                    removedInstances.add(instance);
-                }
-            }
+//            for (PianoSoundInstance instance : instances) {
+//                if (instance != null) {
+//                    removedInstances.add(instance);
+//                }
+//            }
         }
         return removedInstances;
     }
@@ -88,7 +90,7 @@ public class PianoSoundMap {
             }
             if (isAllEmpty(instances)) players.remove();
         }
-        if (uuidMap.isEmpty()) this.soundMap.remove(pos.asLong());
+        if (!removedInstances.isEmpty() && uuidMap.isEmpty()) this.soundMap.remove(pos.asLong());
         return removedInstances;
     }
 

@@ -8,17 +8,17 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
-public record CPianoBlockStopPacket(BlockPos pos, int[] tones) {
+public record CPianoStopNotesExceptPacket(BlockPos pos, int[] tones) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.pos);
         buf.writeVarIntArray(this.tones);
     }
 
-    public static CPianoBlockStopPacket decode(FriendlyByteBuf buf) {
-        return new CPianoBlockStopPacket(buf.readBlockPos(), buf.readVarIntArray());
+    public static CPianoStopNotesExceptPacket decode(FriendlyByteBuf buf) {
+        return new CPianoStopNotesExceptPacket(buf.readBlockPos(), buf.readVarIntArray());
     }
 
-    public static void handle(CPianoBlockStopPacket packet, PacketContext ctx) {
+    public static void handle(CPianoStopNotesExceptPacket packet, PacketContext ctx) {
         ctx.enqueueWork(() -> {
             Minecraft minecraft = Minecraft.getInstance();
             ClientLevel level = minecraft.level;

@@ -6,4 +6,9 @@ public class ToneBlockScreen extends AbstractPianoScreen {
     public ToneBlockScreen(BlockPos pos) {
         super(pos);
     }
+
+    @Override
+    protected BlockPos getMainPos(BlockPos currentPos) {
+        return currentPos;
+    }
 }

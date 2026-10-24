@@ -18,6 +18,9 @@ public final class Configs {
 
         /** 音阶方块顶部是否显示音阶（仅客户端会读）。 */
         boolean showTone();
+
+        /** 默认多少个小节释放一次踏板。 */
+        double releaseSubsections();
     }
 
     private static Values values;
@@ -39,6 +42,10 @@ public final class Configs {
 
     public static boolean showTone() {
         return values().showTone();
+    }
+
+    public static double releaseSubsections() {
+        return values().releaseSubsections();
     }
 
     private Configs() {

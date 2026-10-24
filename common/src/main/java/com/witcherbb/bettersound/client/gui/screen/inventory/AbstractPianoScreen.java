@@ -196,6 +196,8 @@ public abstract class AbstractPianoScreen extends Screen {
         this.currentKeys.forEach(this::removeWidget);
     }
 
+    protected abstract BlockPos getMainPos(BlockPos currentPos);
+
     /**
      *
      * @param delta 移动的白键数，正为左移，负为右移.
@@ -413,7 +415,8 @@ public abstract class AbstractPianoScreen extends Screen {
             if (minecraft.level.getBlockEntity(position) instanceof AbstractPianoBlockEntity blockEntity) {
                 if (!blockEntity.isSoundDelay()) {
                     if (minecraft != null) {
-                        ModSoundManager.INSTANCE.tryToStopPianoSound(minecraft.player.getUUID(), position, this.id);
+                        // 查询键要和 press() 里的 getMainPos(position) 一致，否则从 L/R 点开的钢琴抬键停不掉
+                        ModSoundManager.INSTANCE.tryToStopPianoSound(minecraft.player.getUUID(), getMainPos(position), this.id);
                     }
                 }
                 ModNetwork.sendToServer(new SPianoKeyReleasedPacket(position, this.id, !blockEntity.isSoundDelay()));

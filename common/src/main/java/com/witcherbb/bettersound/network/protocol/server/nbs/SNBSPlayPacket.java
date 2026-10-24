@@ -57,7 +57,7 @@ public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>>
             Level level = sender.level();
             BlockEntity entity = level.getBlockEntity(packet.pos);
             if (entity instanceof AutoPlayer autoPlayer) {
-                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.tempo, packet.timeSignature * 4));
+                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.tempo, packet.timeSignature));
             }
         });
     }

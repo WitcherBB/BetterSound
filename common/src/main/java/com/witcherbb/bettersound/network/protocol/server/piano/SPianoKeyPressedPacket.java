@@ -32,7 +32,7 @@ public record SPianoKeyPressedPacket(BlockPos pos, int tone, byte volume) {
             state = state.setValue(AbstractPianoBlock.TONE, packet.tone);
             level.setBlock(pos, state, AbstractPianoBlock.UPDATE_ALL);
             if (state.getBlock() instanceof AbstractPianoBlock pianoBlock) {
-                pianoBlock.playSound(sender, packet.tone, packet.volume, level, pos);
+                pianoBlock.playSound(sender, packet.tone, packet.volume, level, pos, false);
                 BlockPos mainPos = state.getBlock() instanceof PianoBlock
                         ? PianoBlock.getSectionPos(state, pos, PianoBlock.MIDDEL_PART) : pos;
                 ModToneManager.getInstance().putLastTone(mainPos, sender.getUUID(), packet.tone());

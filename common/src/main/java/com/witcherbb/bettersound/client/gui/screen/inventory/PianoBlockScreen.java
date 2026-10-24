@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.witcherbb.bettersound.Constants;
+import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.client.gui.screen.controls.PianoKeyBindsScreen;
 import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
@@ -16,6 +17,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +44,12 @@ public class PianoBlockScreen extends AbstractPianoScreen {
         int textWidth = this.font.width(KEY_CONTROLL);
         this.keyCtrledCheckbox = this.addRenderableWidget(new Checkbox(this.leftPos + this.imageWidth - textWidth - 24 - 50, this.topPos + 115, 20, 20,
                 KEY_CONTROLL, false));
+    }
+
+    @Override
+    protected BlockPos getMainPos(BlockPos currentPos) {
+        BlockState blockState = this.minecraft.level.getBlockState(currentPos);
+        return PianoBlock.getSectionPos(blockState, currentPos, PianoBlock.MIDDEL_PART);
     }
 
     @Override

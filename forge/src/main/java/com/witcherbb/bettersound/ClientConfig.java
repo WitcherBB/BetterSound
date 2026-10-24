@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientConfig {
     private static final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Client::new);
     static final ForgeConfigSpec clientSpec;
-    public static Client CLIENT;
+    public static final Client CLIENT;
 
     static {
         clientSpec = specPair.getRight();

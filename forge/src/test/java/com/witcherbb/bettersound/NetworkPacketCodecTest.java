@@ -8,9 +8,10 @@ import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPlayOnPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSReloadPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlayMultipleNotesPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlaySingleNotePacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopNotesExceptPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopSingleNotePacket;
 import com.witcherbb.bettersound.network.protocol.server.*;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
@@ -72,6 +73,7 @@ public class NetworkPacketCodecTest {
         assertEquals("pitch", expected.getPitch(), actual.getPitch());
         assertEquals("volume", expected.getVolume(), actual.getVolume());
         assertEquals("layer", expected.getLayer(), actual.getLayer());
+        assertEquals("duration", expected.getDuration(), actual.getDuration());
     }
 
     /** Note 没有 equals，音符表只能逐个字段比对。 */
@@ -177,12 +179,9 @@ public class NetworkPacketCodecTest {
     }
 
     @Test
-    public void midiPlayKeepsNotesAndThePedalTimeline() {
+    public void midiPlayKeepsNotesAndTheReleaseFlag() {
         Map<Integer, List<Note>> noteMap = sampleNoteMap();
-        Map<Integer, Boolean> pedalChanges = new LinkedHashMap<>();
-        pedalChanges.put(0, Boolean.TRUE);
-        pedalChanges.put(20, Boolean.FALSE);
-        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "see_you_again", noteMap, 40, pedalChanges);
+        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "see_you_again", noteMap, 40, false);
 
         SMidiPlayPacket decoded = roundTrip(packet, SMidiPlayPacket::encode, SMidiPlayPacket::decode);
 
@@ -190,14 +189,14 @@ public class NetworkPacketCodecTest {
         assertEquals("see_you_again", decoded.name());
         assertEquals(40, decoded.subsectionLength());
         assertNoteMapEquals(noteMap, decoded.noteMap());
-        assertEquals(pedalChanges, decoded.pedalChanges());
+        assertFalse("文件里有踏板信息时释放点全在事件表里，不该再走小节线", decoded.releaseOnBarLine());
     }
 
     @Test
-    public void midiPlayWithoutPedalTimeline() {
-        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "no_pedal", sampleNoteMap(), 40, Map.of());
+    public void midiPlayWithoutPedalInfoFallsBackToBarLines() {
+        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "no_pedal", sampleNoteMap(), 40, true);
         SMidiPlayPacket decoded = roundTrip(packet, SMidiPlayPacket::encode, SMidiPlayPacket::decode);
-        assertTrue("没有踏板时间轴时要原样回来，不能变成 null", decoded.pedalChanges().isEmpty());
+        assertTrue("没有踏板信息时要交回小节线", decoded.releaseOnBarLine());
     }
 
     /** 这个包的字符串是“裸 UTF-8 字节 + 读到缓冲区末尾”，所以额外单独验证一次。 */
@@ -255,9 +254,9 @@ public class NetworkPacketCodecTest {
     @Test
     public void pianoBlockStopKeepsTheWholeToneArray() {
         int[] tones = {0, 39, 87};
-        CPianoBlockStopPacket packet = new CPianoBlockStopPacket(POS, tones);
+        CPianoStopNotesExceptPacket packet = new CPianoStopNotesExceptPacket(POS, tones);
 
-        CPianoBlockStopPacket decoded = roundTrip(packet, CPianoBlockStopPacket::encode, CPianoBlockStopPacket::decode);
+        CPianoStopNotesExceptPacket decoded = roundTrip(packet, CPianoStopNotesExceptPacket::encode, CPianoStopNotesExceptPacket::decode);
 
         assertEquals(POS, decoded.pos());
         assertArrayEquals(tones, decoded.tones());
@@ -265,43 +264,59 @@ public class NetworkPacketCodecTest {
 
     @Test
     public void pianoBlockStopWithNoTones() {
-        CPianoBlockStopPacket packet = new CPianoBlockStopPacket(POS, new int[0]);
-        CPianoBlockStopPacket decoded = roundTrip(packet, CPianoBlockStopPacket::encode, CPianoBlockStopPacket::decode);
+        CPianoStopNotesExceptPacket packet = new CPianoStopNotesExceptPacket(POS, new int[0]);
+        CPianoStopNotesExceptPacket decoded = roundTrip(packet, CPianoStopNotesExceptPacket::encode, CPianoStopNotesExceptPacket::decode);
         assertEquals(0, decoded.tones().length);
     }
 
     @Test
     public void pianoBlockPlayNoteRoundTripsIncludingTheNullPlayer() {
         UUID player = UUID.fromString("11111111-2222-3333-4444-555555555555");
-        CPianoBlockPlayNotePacket packet = new CPianoBlockPlayNotePacket(
+        CPianoPlaySingleNotePacket packet = new CPianoPlaySingleNotePacket(
                 player, POS, new Vec3(1.5D, -2.25D, 3.0D), 39, (byte) 80, false, true);
-        assertEquals(packet, roundTrip(packet, CPianoBlockPlayNotePacket::encode, CPianoBlockPlayNotePacket::decode));
+        assertEquals(packet, roundTrip(packet, CPianoPlaySingleNotePacket::encode, CPianoPlaySingleNotePacket::decode));
 
         // playerUUID 走的是“先写一个 isNull 标志”的可空编码
-        CPianoBlockPlayNotePacket anonymous = new CPianoBlockPlayNotePacket(
+        CPianoPlaySingleNotePacket anonymous = new CPianoPlaySingleNotePacket(
                 null, POS, Vec3.ZERO, 87, (byte) -1, true, false);
-        CPianoBlockPlayNotePacket decoded = roundTrip(anonymous, CPianoBlockPlayNotePacket::encode, CPianoBlockPlayNotePacket::decode);
+        CPianoPlaySingleNotePacket decoded = roundTrip(anonymous, CPianoPlaySingleNotePacket::encode, CPianoPlaySingleNotePacket::decode);
         assertNull(decoded.playerUUID());
         assertEquals(87, decoded.tone());
         assertEquals((byte) -1, decoded.volume());
-        assertTrue(decoded.stop());
+        assertTrue(decoded.isForUI());
+        assertFalse(decoded.isShort());
+    }
+
+    @Test
+    public void pianoStopSingleNoteRoundTripsIncludingTheNullPlayer() {
+        UUID player = UUID.fromString("11111111-bbbb-3333-dddd-555555555555");
+        CPianoStopSingleNotePacket packet = new CPianoStopSingleNotePacket(player, POS, 1);
+        assertEquals(packet, roundTrip(packet, CPianoStopSingleNotePacket::encode, CPianoStopSingleNotePacket::decode));
+
+        // playerUUID is null
+        CPianoStopSingleNotePacket anonymous = new CPianoStopSingleNotePacket(null, POS, 2);
+        CPianoStopSingleNotePacket decoded = roundTrip(anonymous, CPianoStopSingleNotePacket::encode, CPianoStopSingleNotePacket::decode);
+        assertNull(decoded.playerUUID());
+        assertEquals(2, decoded.tone());
     }
 
     @Test
     public void pianoBlockPlayMultipleNotesRoundTrips() {
         UUID player = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
         Vec3[] positions = {new Vec3(0.5D, 1.0D, 2.5D), new Vec3(-1.0D, 0.0D, 4.0D)};
-        Note[] notes = {new Note((byte) 39, (byte) 100), new Note((byte) 43, (byte) 50).withLayer((byte) 2)};
+        // 一个带时长、一个没有（哨兵值是负数，正好检验高字节的符号处理）
+        Note[] notes = {new Note((byte) 39, (byte) 100).withDuration((short) 40),
+                new Note((byte) 43, (byte) 50).withLayer((byte) 2)};
 
-        CPianoBlockPlayMultipleNotesPacket packet =
-                new CPianoBlockPlayMultipleNotesPacket(player, POS, positions, notes);
-        CPianoBlockPlayMultipleNotesPacket decoded =
-                roundTrip(packet, CPianoBlockPlayMultipleNotesPacket::encode, CPianoBlockPlayMultipleNotesPacket::decode);
+        CPianoPlayMultipleNotesPacket packet =
+                new CPianoPlayMultipleNotesPacket(player, POS, positions, notes);
+        CPianoPlayMultipleNotesPacket decoded =
+                roundTrip(packet, CPianoPlayMultipleNotesPacket::encode, CPianoPlayMultipleNotesPacket::decode);
 
         assertEquals(player, decoded.playerUUID());
         assertEquals(POS, decoded.sourcePos());
         assertArrayEquals(positions, decoded.positions());
-        assertEquals("每个音符固定 3 字节，解码按 Note.FIELD_NUM 切片", notes.length, decoded.notes().length);
+        assertEquals("每个音符定长，解码按 Note.FIELD_NUM 切片", notes.length, decoded.notes().length);
         for (int i = 0; i < notes.length; i++) {
             assertNoteEquals(notes[i], decoded.notes()[i]);
         }
@@ -309,10 +324,10 @@ public class NetworkPacketCodecTest {
 
     @Test
     public void pianoBlockPlayMultipleNotesWithoutAnyNote() {
-        CPianoBlockPlayMultipleNotesPacket packet =
-                new CPianoBlockPlayMultipleNotesPacket(null, POS, new Vec3[0], new Note[0]);
-        CPianoBlockPlayMultipleNotesPacket decoded =
-                roundTrip(packet, CPianoBlockPlayMultipleNotesPacket::encode, CPianoBlockPlayMultipleNotesPacket::decode);
+        CPianoPlayMultipleNotesPacket packet =
+                new CPianoPlayMultipleNotesPacket(null, POS, new Vec3[0], new Note[0]);
+        CPianoPlayMultipleNotesPacket decoded =
+                roundTrip(packet, CPianoPlayMultipleNotesPacket::encode, CPianoPlayMultipleNotesPacket::decode);
 
         assertNull(decoded.playerUUID());
         assertEquals(0, decoded.positions().length);
@@ -325,10 +340,10 @@ public class NetworkPacketCodecTest {
         Vec3[] positions = {new Vec3(1.0D, 1.0D, 1.0D), new Vec3(2.0D, 2.0D, 2.0D), new Vec3(3.0D, 3.0D, 3.0D)};
         Note[] notes = {new Note((byte) 1, (byte) 10), new Note((byte) 2, (byte) 20), new Note((byte) 3, (byte) 30)};
 
-        CPianoBlockPlayMultipleNotesPacket decoded = roundTrip(
-                new CPianoBlockPlayMultipleNotesPacket(UUID.randomUUID(), POS, positions, notes),
-                CPianoBlockPlayMultipleNotesPacket::encode,
-                CPianoBlockPlayMultipleNotesPacket::decode);
+        CPianoPlayMultipleNotesPacket decoded = roundTrip(
+                new CPianoPlayMultipleNotesPacket(UUID.randomUUID(), POS, positions, notes),
+                CPianoPlayMultipleNotesPacket::encode,
+                CPianoPlayMultipleNotesPacket::decode);
 
         assertEquals(positions.length, decoded.positions().length);
         assertEquals(notes.length, decoded.notes().length);
@@ -347,10 +362,10 @@ public class NetworkPacketCodecTest {
         Vec3[] positions = positionList.toArray(new Vec3[0]);
         Note[] notes = noteList.toArray(new Note[0]);
 
-        CPianoBlockPlayMultipleNotesPacket decoded = roundTrip(
-                new CPianoBlockPlayMultipleNotesPacket(UUID.randomUUID(), POS, positions, notes),
-                CPianoBlockPlayMultipleNotesPacket::encode,
-                CPianoBlockPlayMultipleNotesPacket::decode);
+        CPianoPlayMultipleNotesPacket decoded = roundTrip(
+                new CPianoPlayMultipleNotesPacket(UUID.randomUUID(), POS, positions, notes),
+                CPianoPlayMultipleNotesPacket::encode,
+                CPianoPlayMultipleNotesPacket::decode);
 
         assertEquals(88, decoded.notes().length);
         assertArrayEquals(positions, decoded.positions());

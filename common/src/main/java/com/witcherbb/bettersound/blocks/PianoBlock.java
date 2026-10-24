@@ -12,9 +12,10 @@ import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlayMultipleNotesPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlaySingleNotePacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopNotesExceptPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopSingleNotePacket;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -304,34 +305,70 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
+    /** 玩家自己踩/抬踏板：外观、新音长短、以及松开时的收音，三者一起变 */
     public void setDelay(BlockState state, Level level, BlockPos pos, boolean delay) {
-        if (!level.isClientSide && state.getValue(DELAY) != delay) {
-            level.setBlock(pos, state.setValue(DELAY, delay), UPDATE_ALL);
+        if (!level.isClientSide) {
+            // 即使新旧状态相同也收音
             if (!delay) {
+                // 抬起踏板：把玩家此刻还按着的音留下，其余收掉
                 stopLastTones(getSectionPos(state, pos, MIDDEL_PART));
             }
-            forEachSection(blockEntity -> {
-                blockEntity.setSoundDelay(delay);
-                blockEntity.setChanged();
-            }, level, pos, state);
+            if (state.getValue(DELAY) != delay) {
+                setPedalState(state, level, pos, delay);
+                setSoundDelay(level, pos, state, delay);
+            }
         }
+    }
+
+    /**
+     * 只把延音踏板的状态反映到 {@link #DELAY} 方块状态上（模型会跟着变）。
+     * <p>
+     * <b>不切音，也不动"新音是长是短"</b>（{@code AbstractPianoBlockEntity.isSoundDelay()}）。
+     * 自动演奏用它把曲子里记录的 CC64 画到模型上；至于某个音该不该收，由事件表里的逐音释放事件
+     * 自己决定——这里再顺一刀会把"键还按着"的音也砍掉。
+     * <p>
+     * 尤其不能碰 {@code isSoundDelay}：客户端那份状态是靠方块实体同步来的，<b>比服务端慢一拍</b>，
+     * 一旦在这里把它置成 false，下一拍的音符包会被客户端当成"短音"播（约 200ms 就淡没）。
+     */
+    public void setPedalState(BlockState state, Level level, BlockPos pos, boolean down) {
+        if (!level.isClientSide && state.getValue(DELAY) != down) {
+            level.setBlock(pos, state.setValue(DELAY, down), UPDATE_ALL);
+        }
+    }
+
+    /**
+     * 把这台琴上正在响的音整片收掉，但<b>不动方块状态、也不动新音长短</b>。
+     * <p>自动演奏的"整片释放"（安全阀、NBS 的小节线）走这里；踏板外观由 {@link #setPedalState} 单独负责。
+     */
+    public void cutSounding(BlockState state, Level level, BlockPos pos) {
+        if (!level.isClientSide) {
+            stopLastTones(getSectionPos(state, pos, MIDDEL_PART));
+        }
+    }
+
+    /** 设置"新弹的音要不要带延音"，六个部件一起（只给 {@link #setDelay} 用） */
+    private void setSoundDelay(Level level, BlockPos pos, BlockState state, boolean delay) {
+        forEachSection(blockEntity -> {
+            blockEntity.setSoundDelay(delay);
+            blockEntity.setChanged();
+        }, level, pos, state);
     }
 
     private void stopLastTones(BlockPos pos) {
         List<Integer> tones = Lists.newArrayList();
         tones.addAll(Util.toIntegerList(ModToneManager.getInstance().getLastTones(pos)));
-        ModNetwork.broadcast(new CPianoBlockStopPacket(pos, Util.toIntArray(tones)));
+        ModNetwork.broadcast(new CPianoStopNotesExceptPacket(pos, Util.toIntArray(tones)));
     }
 
-    public void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos) {
+    public void playSound(@Nullable ServerPlayer pPlayer, int tone, byte volume, Level pLevel, BlockPos pPos, boolean isShort) {
         if (!pLevel.isClientSide) {
             BlockState sourceState = pLevel.getBlockState(pPos);
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             BlockPos mainPos = getSectionPos(sourceState, pPos, MIDDEL_PART);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), mainPos, target, tone, volume, false, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoPlaySingleNotePacket(pPlayer.getUUID(), mainPos, target, tone, volume, false, isShort), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, mainPos, target, tone, volume, false, false));
+                ModNetwork.broadcast(new CPianoPlaySingleNotePacket(null, mainPos, target, tone, volume, false, isShort));
             pLevel.blockEvent(mainPos, this, 0, tone);
         }
     }
@@ -342,9 +379,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
             Vec3 target = getVoicePosition(sourceState, pPos, tone);
             BlockPos mainPos = getSectionPos(sourceState, pPos, MIDDEL_PART);
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayNotePacket(pPlayer.getUUID(), mainPos, target, tone, (byte) 0, true, false), pPlayer);
+                ModNetwork.broadcastBut(new CPianoStopSingleNotePacket(pPlayer.getUUID(), mainPos, tone), pPlayer);
             } else
-                ModNetwork.broadcast(new CPianoBlockPlayNotePacket(null, mainPos, target, tone, (byte) 0, true, false));
+                ModNetwork.broadcast(new CPianoStopSingleNotePacket(null, mainPos, tone));
         }
     }
 
@@ -357,9 +394,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
                 targets[i] = getVoicePosition(sourceState, pPos, notes[i].getPitch());
             }
             if (pPlayer != null) {
-                ModNetwork.broadcastBut(new CPianoBlockPlayMultipleNotesPacket(pPlayer.getUUID(), mainPos, targets, notes), pPlayer);
+                ModNetwork.broadcastBut(new CPianoPlayMultipleNotesPacket(pPlayer.getUUID(), mainPos, targets, notes), pPlayer);
             } else {
-                ModNetwork.broadcast(new CPianoBlockPlayMultipleNotesPacket(null, mainPos, targets, notes));
+                ModNetwork.broadcast(new CPianoPlayMultipleNotesPacket(null, mainPos, targets, notes));
             }
             for (Note note : notes) {
                 pLevel.blockEvent(mainPos, this, 0, note.getPitch());

@@ -17,4 +17,9 @@ public final class ForgeConfigValues implements Configs.Values {
         // 只在客户端渲染器里被调用；专用服务端不会触发
         return ClientConfig.CLIENT.showTone.get();
     }
+
+    @Override
+    public double releaseSubsections() {
+        return CommonConfig.COMMON.releaseSubsections.get();
+    }
 }

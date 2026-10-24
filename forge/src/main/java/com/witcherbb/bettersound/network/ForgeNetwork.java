@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.network;
 
 import com.witcherbb.bettersound.network.protocol.client.CBetterJukeboxNameConfirmPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopSingleNotePacket;
 import com.witcherbb.bettersound.network.protocol.server.*;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
@@ -8,9 +9,9 @@ import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import com.witcherbb.bettersound.network.protocol.server.nbs.SAutoPlayerActionPacket;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import com.witcherbb.bettersound.network.protocol.client.COpenPianoScreenPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayNotePacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockStopPacket;
-import com.witcherbb.bettersound.network.protocol.client.piano.CPianoBlockPlayMultipleNotesPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlaySingleNotePacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopNotesExceptPacket;
+import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlayMultipleNotesPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CCommandPlayNBSPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
@@ -50,12 +51,14 @@ public final class ForgeNetwork {
         BRIDGE.register(SBetterJukeboxNamePacket.class, PacketDirection.TO_SERVER,
                 SBetterJukeboxNamePacket::encode, SBetterJukeboxNamePacket::decode, SBetterJukeboxNamePacket::handle);
 
-        BRIDGE.register(CPianoBlockPlayNotePacket.class, PacketDirection.TO_CLIENT,
-                CPianoBlockPlayNotePacket::encode, CPianoBlockPlayNotePacket::decode, CPianoBlockPlayNotePacket::handle);
-        BRIDGE.register(CPianoBlockStopPacket.class, PacketDirection.TO_CLIENT,
-                CPianoBlockStopPacket::encode, CPianoBlockStopPacket::decode, CPianoBlockStopPacket::handle);
-        BRIDGE.register(CPianoBlockPlayMultipleNotesPacket.class, PacketDirection.TO_CLIENT,
-                CPianoBlockPlayMultipleNotesPacket::encode, CPianoBlockPlayMultipleNotesPacket::decode, CPianoBlockPlayMultipleNotesPacket::handle);
+        BRIDGE.register(CPianoPlaySingleNotePacket.class, PacketDirection.TO_CLIENT,
+                CPianoPlaySingleNotePacket::encode, CPianoPlaySingleNotePacket::decode, CPianoPlaySingleNotePacket::handle);
+        BRIDGE.register(CPianoStopSingleNotePacket.class, PacketDirection.TO_CLIENT,
+                CPianoStopSingleNotePacket::encode, CPianoStopSingleNotePacket::decode, CPianoStopSingleNotePacket::handle);
+        BRIDGE.register(CPianoStopNotesExceptPacket.class, PacketDirection.TO_CLIENT,
+                CPianoStopNotesExceptPacket::encode, CPianoStopNotesExceptPacket::decode, CPianoStopNotesExceptPacket::handle);
+        BRIDGE.register(CPianoPlayMultipleNotesPacket.class, PacketDirection.TO_CLIENT,
+                CPianoPlayMultipleNotesPacket::encode, CPianoPlayMultipleNotesPacket::decode, CPianoPlayMultipleNotesPacket::handle);
         BRIDGE.register(CCommandPlayNBSPacket.class, PacketDirection.TO_CLIENT,
                 CCommandPlayNBSPacket::encode, CCommandPlayNBSPacket::decode, CCommandPlayNBSPacket::handle);
         BRIDGE.register(CNBSStopPacket.class, PacketDirection.TO_CLIENT,
