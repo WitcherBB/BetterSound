@@ -1,20 +1,22 @@
 package com.witcherbb.bettersound.network.protocol.server.midi;
 
-import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.music.data.PianoSongTrack;
 import com.witcherbb.bettersound.music.midi.MidiTiming;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
+import com.witcherbb.bettersound.network.MusicScoreTransfer;
+import com.witcherbb.bettersound.network.ScoreWire;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 客户端把编译好的 MIDI 曲目交给服务端播放。
@@ -27,57 +29,52 @@ import java.util.Map;
  * <p>事件表里可能夹着"释放延音"的哨兵（{@link Note#KIND_RELEASE_ALL} 等）——它们是服务端才知道的东西，
  * 引擎派发时会先分流出去，转成既有的演奏/停止数据包，客户端不会看到。
  *
+ * <p><b>一首曲子会被切成多块发送</b>（单个自定义载荷只有 32767 字节，见
+ * {@link MusicScoreTransfer}）：每块都带 {@code chunkIndex}/{@code chunkCount}，
+ * 服务端收齐之后拼回整张事件表才开播。
+ *
  * @param name             曲目名
- * @param noteMap          事件表，键是游戏刻
+ * @param noteMap          本块携带的事件表，键是游戏刻
  * @param subsectionLength 一小节多少游戏刻
- * @param releaseOnBarLine 是否要引擎按小节线释放延音（文件里没有踏板信息时才为 true）
+ * @param releaseOnBarLine 是否要引擎按小节线释放延音
+ * @param chunkIndex       本块序号，从 0 开始
+ * @param chunkCount       一共几块
  */
 public record SMidiPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, int subsectionLength,
-                              boolean releaseOnBarLine) {
+                              boolean releaseOnBarLine, int chunkIndex, int chunkCount) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.pos);
         buf.writeUtf(this.name);
-        buf.writeMap(this.noteMap,
-                FriendlyByteBuf::writeInt,
-                (buf1, notes) -> {
-                    int size = notes.size();
-                    buf1.writeInt(size);
-                    for (int i = 0; i < size; i++) {
-                        buf1.writeByteArray(notes.get(i).encode());
-                    }
-                }
-        );
         buf.writeVarInt(this.subsectionLength);
         buf.writeBoolean(this.releaseOnBarLine);
+        buf.writeVarInt(this.chunkIndex);
+        buf.writeVarInt(this.chunkCount);
+        ScoreWire.writeNotes(buf, this.noteMap);
     }
 
     public static SMidiPlayPacket decode(FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
         String name = buf.readUtf();
-        Map<Integer, List<Note>> noteMap = buf.readMap(
-                FriendlyByteBuf::readInt,
-                buf1 -> {
-                    List<Note> notes = new ArrayList<>();
-                    int size = buf1.readInt();
-                    for (int i = 0; i < size; i++) {
-                        notes.add(Note.decode(buf1.readByteArray()));
-                    }
-                    return notes;
-                }
-        );
         int subsectionLength = buf.readVarInt();
         boolean releaseOnBarLine = buf.readBoolean();
-        return new SMidiPlayPacket(pos, name, noteMap, subsectionLength, releaseOnBarLine);
+        int chunkIndex = buf.readVarInt();
+        int chunkCount = buf.readVarInt();
+        return new SMidiPlayPacket(pos, name, ScoreWire.readNotes(buf), subsectionLength, releaseOnBarLine,
+                chunkIndex, chunkCount);
     }
 
-    public static void handle(SMidiPlayPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            ServerPlayer sender = ctx.sender();
+    public static void handle(SMidiPlayPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> {
+            Player sender = ctx.get().getPlayer();
             if (sender == null) return;
+            // 分块投递：收齐了才有完整的事件表，否则先攒着
+            Map<Integer, List<Note>> merged = MusicScoreTransfer.accept(sender.getUUID(),
+                    packet.chunkIndex, packet.chunkCount, packet.noteMap);
+            if (merged == null) return;
             Level level = sender.level();
             BlockEntity entity = level.getBlockEntity(packet.pos);
             if (!(entity instanceof AutoPlayer autoPlayer) || autoPlayer.getMidiPlayer() == null) return;
-            autoPlayer.getMidiPlayer().play(new PianoSongTrack(packet.name, packet.noteMap,
+            autoPlayer.getMidiPlayer().play(new PianoSongTrack(packet.name, merged,
                     (short) MidiTiming.TEMPO_AS_GAME_TICKS, packet.subsectionLength, packet.releaseOnBarLine));
         });
     }

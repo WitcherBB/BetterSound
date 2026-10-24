@@ -5,9 +5,14 @@ import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.AutoMusicPlayer;
 import com.witcherbb.bettersound.music.data.PianoSongTrack;
 import com.witcherbb.bettersound.music.midi.bean.MidiSong;
+import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
+import com.witcherbb.bettersound.network.MusicScoreTransfer;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * MIDI 曲目的自动播放入口。
@@ -35,9 +40,12 @@ public class MidiPlayer {
         // 先做互斥检查再做（相对耗时的）编译，避免白白编译一遍
         if (this.player.isPlaying()) throw new PlayerIsPlayingMusicException();
         PianoSongTrack track = song.compile(maxSustainTicks(song));
-        if (this.player.beginClientPlay(track.name())) {
+        if (!this.player.beginClientPlay(track.name())) return;
+        // 一首曲子常常远超单个载荷上限（32767 字节），按刻切成多块发；服务端收齐之后才开播
+        List<Map<Integer, List<Note>>> chunks = MusicScoreTransfer.split(track.noteMap());
+        for (int index = 0; index < chunks.size(); index++) {
             ModNetwork.sendToServer(new SMidiPlayPacket(this.blockEntity.getBlockPos(), track.name(),
-                    track.noteMap(), track.subsectionLength(), track.releaseOnBarLine()));
+                    chunks.get(index), track.subsectionLength(), track.releaseOnBarLine(), index, chunks.size()));
         }
     }
 

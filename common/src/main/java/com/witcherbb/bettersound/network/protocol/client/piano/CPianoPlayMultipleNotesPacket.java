@@ -1,22 +1,18 @@
 package com.witcherbb.bettersound.network.protocol.client.piano;
 
-import com.witcherbb.bettersound.network.PacketContext;
-
-import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
-import com.witcherbb.bettersound.client.sound.ModSoundManager;
-import com.witcherbb.bettersound.common.events.ModSoundEvents;
+import com.witcherbb.bettersound.client.network.ClientPacketHandlers;
 import com.witcherbb.bettersound.music.data.Note;
-import net.minecraft.client.Minecraft;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public record CPianoPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourcePos, Vec3[] positions, Note[] notes) {
+
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(this.positions.length);
         for (Vec3 pos : this.positions) {
@@ -54,26 +50,7 @@ public record CPianoPlayMultipleNotesPacket(UUID playerUUID, BlockPos sourcePos,
         return new CPianoPlayMultipleNotesPacket(playerUUID, sourcePos, positions, notes);
     }
 
-    public static void handle(CPianoPlayMultipleNotesPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            if (Minecraft.getInstance().level != null) {
-                ModSoundManager soundManager = ModSoundManager.INSTANCE;
-                BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(packet.sourcePos);
-                if (packet.positions.length != packet.notes.length) {
-                    return;
-                }
-                for (int i = 0; i < packet.notes.length; i++) {
-                    Note note = packet.notes[i];
-                    // 过滤无效音调（旧版解析器残留的 -1 哨兵等），防止 pianoSounds.get() 越界崩溃
-                    if (note.getPitch() < 0 || note.getPitch() >= ModSoundEvents.pianoSounds.size()) {
-                        continue;
-                    }
-                    if (blockEntity instanceof PianoBlockEntity){
-                        soundManager.playPianoSound(ModSoundEvents.pianoSounds.get(note.getPitch()).get(), packet.playerUUID, packet.sourcePos,
-                                packet.positions[i], note.getPitch(), Note.toPianoSoundVolume(note.getVolume()), false, false);
-                    }
-                }
-            }
-        });
+    public static void handle(CPianoPlayMultipleNotesPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> ClientPacketHandlers.pianoPlayMultipleNotes(packet));
     }
 }

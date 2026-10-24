@@ -21,7 +21,18 @@ dependencies {
     // 版本与 Forge 1.20.1 (47.3.5) 用的 ASM 对齐；compileOnly，不进运行时。
     compileOnly group: 'org.ow2.asm', name: 'asm-tree', version: '9.7'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation "dev.architectury:architectury:${architectury_api_version}"
+    // dev.architectury:architectury（common 制品）是 Fabric intermediary 命名：
+    // NetworkChannel.create 的参数是 net.minecraft.class_2960，而不是 mojmap 的 ResourceLocation，
+    // 在 mojmap 开发环境里没法直接用（这也是 architectury 官方要求用 architectury-loom 替它重映射的原因）。
+    // forge 制品是 mojmap 类名 + srg 成员，且类集合完整包含 common 制品（362 ⊇ 260，缺 0）；
+    // common 本身 apply 了 moddev.legacyforge，mod* 配置会把 srg -> named 重映射，
+    // 所以这里借 forge 制品拿 mojmap 编译期签名，运行时仍由各 loader 模块的
+    // architectury-forge / architectury-fabric 提供实现。
+    // 注意用 modCompileOnly 而不是 modImplementation：common 只需要这份「编译期签名」，
+    // 用 implementation 会顺着 runtimeElements 传播给依赖 common 的模块（fabric 的
+    // implementation project(':common') 会把 common 的实现依赖带进 fabric 开发运行时），
+    // 结果 fabric 运行时同时出现 architectury-forge 与 remap 过的 architectury-fabric 两套重复类。
+    modCompileOnly "dev.architectury:architectury-forge:${architectury_api_version}"
 }
 
 configurations {

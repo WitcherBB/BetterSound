@@ -1,63 +1,68 @@
 package com.witcherbb.bettersound.network.protocol.server.nbs;
 
-import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.music.data.PianoSongTrack;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
+import com.witcherbb.bettersound.network.MusicScoreTransfer;
+import com.witcherbb.bettersound.network.ScoreWire;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
- * @param noteMap 音符表，键是 NBS 歌曲刻下标
- * @param tempo   NBS 原始 tempo：每秒歌曲刻数 × 100
+ * 客户端把一首 NBS 交给服务端播放。
+ *
+ * <p><b>一首曲子会被切成多块发送</b>（单个自定义载荷只有 32767 字节，见
+ * {@link MusicScoreTransfer}）：每块都带 {@code chunkIndex}/{@code chunkCount}，
+ * 服务端收齐之后拼回整张音符表才开播。
+ *
+ * @param noteMap      本块携带的音符表，键是 NBS 歌曲刻下标
+ * @param tempo        NBS 原始 tempo：每秒歌曲刻数 × 100
+ * @param chunkIndex   本块序号，从 0 开始
+ * @param chunkCount   一共几块
  */
-public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, short tempo, byte timeSignature) {
+public record SNBSPlayPacket(BlockPos pos, String name, Map<Integer, List<Note>> noteMap, short tempo,
+                             byte timeSignature, int chunkIndex, int chunkCount) {
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(name);
-        buf.writeMap(this.noteMap,
-                FriendlyByteBuf::writeInt,
-                (buf1, notes) -> {
-                    int size = notes.size();
-                    buf1.writeInt(size);
-                    for (int i = 0; i < size; i++) {
-                        buf1.writeByteArray(notes.get(i).encode());
-                    }
-                }
-        );
         buf.writeShort(tempo);
         buf.writeByte(timeSignature);
-    }
-    public static SNBSPlayPacket decode(FriendlyByteBuf buf) {
-        return new SNBSPlayPacket(buf.readBlockPos(), buf.readUtf(), buf.readMap(
-                FriendlyByteBuf::readInt,
-                buf1 -> {
-                    List<Note> notes = new ArrayList<>();
-                    int size = buf1.readInt();
-                    for (int i = 0; i < size; i++) {
-                        notes.add(Note.decode(buf1.readByteArray()));
-                    }
-                    return notes;
-                }
-        ), buf.readShort(), buf.readByte());
+        buf.writeVarInt(this.chunkIndex);
+        buf.writeVarInt(this.chunkCount);
+        ScoreWire.writeNotes(buf, this.noteMap);
     }
 
-    public static void handle(SNBSPlayPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            ServerPlayer sender = ctx.sender();
+    public static SNBSPlayPacket decode(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        String name = buf.readUtf();
+        short tempo = buf.readShort();
+        byte timeSignature = buf.readByte();
+        int chunkIndex = buf.readVarInt();
+        int chunkCount = buf.readVarInt();
+        return new SNBSPlayPacket(pos, name, ScoreWire.readNotes(buf), tempo, timeSignature, chunkIndex, chunkCount);
+    }
+
+    public static void handle(SNBSPlayPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> {
+            Player sender = ctx.get().getPlayer();
             if (sender == null) return;
+            // 分块投递：收齐了才有完整的音符表，否则先攒着
+            Map<Integer, List<Note>> merged = MusicScoreTransfer.accept(sender.getUUID(),
+                    packet.chunkIndex, packet.chunkCount, packet.noteMap);
+            if (merged == null) return;
             Level level = sender.level();
             BlockEntity entity = level.getBlockEntity(packet.pos);
             if (entity instanceof AutoPlayer autoPlayer) {
-                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, packet.noteMap, packet.tempo, packet.timeSignature));
+                autoPlayer.getNBSPlayer().play(new PianoSongTrack(packet.name, merged, packet.tempo, packet.timeSignature));
             }
         });
     }

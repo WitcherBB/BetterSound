@@ -39,7 +39,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -355,7 +354,7 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
     }
 
     private void stopLastTones(BlockPos pos) {
-        List<Integer> tones = Lists.newArrayList();
+        List<Integer> tones = new ArrayList<>();
         tones.addAll(Util.toIntegerList(ModToneManager.getInstance().getLastTones(pos)));
         ModNetwork.broadcast(new CPianoStopNotesExceptPacket(pos, Util.toIntArray(tones)));
     }

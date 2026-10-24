@@ -9,6 +9,7 @@
   "mixins": [
     "BlockMixin",
     "EntityMixin",
+    "NoteBlockMixin",
     "PlayerSittingMixin",
     "ServerPlayerMixin"
   ],

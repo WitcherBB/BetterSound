@@ -74,6 +74,7 @@ public class NetworkPacketCodecTest {
         assertEquals("volume", expected.getVolume(), actual.getVolume());
         assertEquals("layer", expected.getLayer(), actual.getLayer());
         assertEquals("duration", expected.getDuration(), actual.getDuration());
+        assertEquals("kind", expected.getKind(), actual.getKind());
     }
 
     /** Note 没有 equals，音符表只能逐个字段比对。 */
@@ -167,7 +168,7 @@ public class NetworkPacketCodecTest {
     @Test
     public void nbsPlayKeepsEveryNoteAndTheTempo() {
         Map<Integer, List<Note>> noteMap = sampleNoteMap();
-        SNBSPlayPacket packet = new SNBSPlayPacket(POS, "school_song", noteMap, (short) 2000, (byte) 4);
+        SNBSPlayPacket packet = new SNBSPlayPacket(POS, "school_song", noteMap, (short) 2000, (byte) 4, 1, 3);
 
         SNBSPlayPacket decoded = roundTrip(packet, SNBSPlayPacket::encode, SNBSPlayPacket::decode);
 
@@ -176,12 +177,14 @@ public class NetworkPacketCodecTest {
         assertEquals((short) 2000, decoded.tempo());
         assertEquals((byte) 4, decoded.timeSignature());
         assertNoteMapEquals(noteMap, decoded.noteMap());
+        assertEquals("分块下标也要一起过去", 1, decoded.chunkIndex());
+        assertEquals("总块数也要一起过去，服务端靠它判断收齐了没有", 3, decoded.chunkCount());
     }
 
     @Test
     public void midiPlayKeepsNotesAndTheReleaseFlag() {
         Map<Integer, List<Note>> noteMap = sampleNoteMap();
-        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "see_you_again", noteMap, 40, false);
+        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "see_you_again", noteMap, 40, false, 0, 2);
 
         SMidiPlayPacket decoded = roundTrip(packet, SMidiPlayPacket::encode, SMidiPlayPacket::decode);
 
@@ -190,13 +193,38 @@ public class NetworkPacketCodecTest {
         assertEquals(40, decoded.subsectionLength());
         assertNoteMapEquals(noteMap, decoded.noteMap());
         assertFalse("文件里有踏板信息时释放点全在事件表里，不该再走小节线", decoded.releaseOnBarLine());
+        assertEquals(0, decoded.chunkIndex());
+        assertEquals(2, decoded.chunkCount());
     }
 
     @Test
     public void midiPlayWithoutPedalInfoFallsBackToBarLines() {
-        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "no_pedal", sampleNoteMap(), 40, true);
+        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "no_pedal", sampleNoteMap(), 40, true, 0, 1);
         SMidiPlayPacket decoded = roundTrip(packet, SMidiPlayPacket::encode, SMidiPlayPacket::decode);
         assertTrue("没有踏板信息时要交回小节线", decoded.releaseOnBarLine());
+    }
+
+    /**
+     * 哨兵事件（松某个键 / 整片收掉 / 踏板上下）靠 {@code kind} 这一位区分。
+     * 它一旦在网线上去掉或串位，服务端就会把释放当成演奏播出来——所以这里逐个验证。
+     */
+    @Test
+    public void midiPlayKeepsSentinelKinds() {
+        Map<Integer, List<Note>> noteMap = new LinkedHashMap<>();
+        noteMap.put(0, List.of(Note.pedalDown(), new Note((byte) 39, (byte) 100)));
+        noteMap.put(30, List.of(Note.release((byte) 39), Note.pedalUp()));
+        noteMap.put(90, List.of(Note.releaseAll()));
+
+        SMidiPlayPacket packet = new SMidiPlayPacket(POS, "pedal_song", noteMap, 40, false, 0, 1);
+        SMidiPlayPacket decoded = roundTrip(packet, SMidiPlayPacket::encode, SMidiPlayPacket::decode);
+
+        assertNoteMapEquals(noteMap, decoded.noteMap());
+        assertTrue(decoded.noteMap().get(0).get(0).isPedalDown());
+        assertTrue(decoded.noteMap().get(0).get(1).isPlay());
+        assertTrue("松键事件要能指出是哪个键", decoded.noteMap().get(30).get(0).isReleaseTone());
+        assertEquals(39, decoded.noteMap().get(30).get(0).getPitch());
+        assertTrue(decoded.noteMap().get(30).get(1).isPedalUp());
+        assertTrue(decoded.noteMap().get(90).get(0).isReleaseAll());
     }
 
     /** 这个包的字符串是“裸 UTF-8 字节 + 读到缓冲区末尾”，所以额外单独验证一次。 */

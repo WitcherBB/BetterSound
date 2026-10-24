@@ -2,6 +2,7 @@ package com.witcherbb.bettersound.mixins.mixins;
 
 import com.witcherbb.bettersound.blocks.entity.NoteBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
+import com.witcherbb.bettersound.common.platform.Platform;
 import com.witcherbb.bettersound.items.TunerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +35,7 @@ public abstract class NoteBlockMixin extends Block implements EntityBlock, Spect
 	private void use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, CallbackInfoReturnable<InteractionResult> cir) {
 		BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
 		if (!pLevel.isClientSide && blockEntity instanceof NoteBlockEntity && pPlayer.getItemInHand(pHand).getItem() instanceof TunerItem) {
-			NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) blockEntity, pPos);
+			Platform.hooks().openMenu((ServerPlayer) pPlayer, (MenuProvider) blockEntity, pPos);
 			cir.setReturnValue(InteractionResult.CONSUME);
 		}
 	}

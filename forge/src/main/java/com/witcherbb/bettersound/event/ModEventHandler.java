@@ -13,7 +13,7 @@ import com.witcherbb.bettersound.common.ModToneManager;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.items.TunerItem;
-import com.witcherbb.bettersound.network.ForgeNetwork;
+import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.particletype.ModParticleTypes;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
@@ -107,8 +107,9 @@ public class ModEventHandler {
 
 		@SubscribeEvent
 		public static void onCommonSetup(FMLCommonSetupEvent event) {
-//			ModNetwork.register();
-			event.enqueueWork(ForgeNetwork::register);
+			// 网络通道与数据包登记：Architectury 的 NetworkChannel 是跨平台的，
+			// 所以 common 的 ModNetwork 里写一份，两个 loader 各自在初始化阶段调一次即可。
+			event.enqueueWork(ModNetwork::register);
 		}
 
 		@SubscribeEvent

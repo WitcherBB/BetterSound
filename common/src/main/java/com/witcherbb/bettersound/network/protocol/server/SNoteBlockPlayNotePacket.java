@@ -1,14 +1,17 @@
 package com.witcherbb.bettersound.network.protocol.server;
 
-import com.witcherbb.bettersound.network.PacketContext;
 
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+
+import java.util.function.Supplier;
 
 public record SNoteBlockPlayNotePacket(int note, BlockPos pos) {
 
@@ -21,9 +24,9 @@ public record SNoteBlockPlayNotePacket(int note, BlockPos pos) {
         buf.writeBlockPos(this.pos);
     }
 
-    public static void handle(SNoteBlockPlayNotePacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            ServerPlayer sender = ctx.sender();
+    public static void handle(SNoteBlockPlayNotePacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> {
+            Player sender = ctx.get().getPlayer();
             if (sender == null) return;
 
             Level level = sender.level();

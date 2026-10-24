@@ -1,6 +1,5 @@
 package com.witcherbb.bettersound;
 
-import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.blocks.ModBlocks;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.common.events.ModSoundEvents;
@@ -10,8 +9,6 @@ import com.witcherbb.bettersound.common.config.Configs;
 import com.witcherbb.bettersound.common.platform.Platform;
 import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
 import com.witcherbb.bettersound.config.ForgeConfigValues;
-import com.witcherbb.bettersound.network.ForgeNetwork;
-import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.platform.ForgeClientHooks;
 import com.witcherbb.bettersound.platform.ForgeLoaderHooks;
 import com.witcherbb.bettersound.registry.ForgeRegistrar;
@@ -58,7 +55,9 @@ public final class BetterSound
         });
         
         Configs.install(new ForgeConfigValues());
-        ModNetwork.init(ForgeNetwork.BRIDGE);
+
+        // 网络：通道与数据包登记统一走 common 的 ModNetwork（Architectury NetworkChannel），
+        // forge 侧在 FMLCommonSetupEvent 里调用 ModNetwork::register（见 ModEventHandler.ModServerEvents）。
 
         // common 侧声明的注册，通过 ForgeRegistrar 落到 DeferredRegister 上。
         // 顺序有讲究：后面的登记表会引用前面那些 RegistryRef 字段，字段必须先完成赋值。

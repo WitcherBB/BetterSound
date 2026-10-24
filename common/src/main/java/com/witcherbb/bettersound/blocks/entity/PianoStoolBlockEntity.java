@@ -9,13 +9,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class PianoStoolBlockEntity extends BlockEntity implements Sittable<PianoStoolBlockEntity> {
-    List<Player> passengers = Lists.newArrayList();
+    List<Player> passengers = new java.util.ArrayList<>();
 
     public PianoStoolBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntityTypes.PIANO_STOOL_BLOCK_ENTITY_TYPE.get(), pPos, pBlockState);

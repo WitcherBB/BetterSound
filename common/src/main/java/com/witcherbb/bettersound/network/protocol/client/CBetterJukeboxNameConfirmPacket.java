@@ -1,10 +1,10 @@
 package com.witcherbb.bettersound.network.protocol.client;
 
-import com.witcherbb.bettersound.client.gui.screen.inventory.BetterJukeboxScreen;
+import com.witcherbb.bettersound.client.network.ClientPacketHandlers;
 import com.witcherbb.bettersound.common.utils.Util;
-import com.witcherbb.bettersound.network.PacketContext;
-import net.minecraft.client.Minecraft;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
+import java.util.function.Supplier;
 
 public record CBetterJukeboxNameConfirmPacket(Util.Status status) {
 
@@ -16,11 +16,7 @@ public record CBetterJukeboxNameConfirmPacket(Util.Status status) {
         return new CBetterJukeboxNameConfirmPacket(buf.readEnum(Util.Status.class));
     }
 
-    public static void handle(CBetterJukeboxNameConfirmPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            if (Minecraft.getInstance().screen instanceof BetterJukeboxScreen screen) {
-                screen.getImageTip().updateStatus(packet.status);
-            }
-        });
+    public static void handle(CBetterJukeboxNameConfirmPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> ClientPacketHandlers.betterJukeboxNameConfirm(packet));
     }
 }

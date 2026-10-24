@@ -7,15 +7,17 @@ import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.menu.inventory.BetterJukeboxMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
-import com.witcherbb.bettersound.network.PacketContext;
 import com.witcherbb.bettersound.network.protocol.client.CBetterJukeboxNameConfirmPacket;
 import com.witcherbb.bettersound.world.WorldUtil;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+
+import java.util.function.Supplier;
 
 public record SBetterJukeboxNamePacket(String name, String dimension) {
 
@@ -30,9 +32,9 @@ public record SBetterJukeboxNamePacket(String name, String dimension) {
 		return new SBetterJukeboxNamePacket(name, dimension);
 	}
 
-	public static void handle(SBetterJukeboxNamePacket packet, PacketContext ctx) {
-		ctx.enqueueWork(() -> {
-			ServerPlayer sender = ctx.sender();
+	public static void handle(SBetterJukeboxNamePacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+		ctx.get().queue(() -> {
+			ServerPlayer sender = (ServerPlayer) ctx.get().getPlayer();
 			if (sender == null) return;
 			//Do Stuff
 			AbstractContainerMenu abstractContainerMenu = sender.containerMenu;

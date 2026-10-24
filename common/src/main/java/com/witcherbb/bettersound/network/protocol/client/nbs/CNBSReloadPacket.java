@@ -1,14 +1,12 @@
 package com.witcherbb.bettersound.network.protocol.client.nbs;
 
-import com.witcherbb.bettersound.network.PacketContext;
-
-import com.witcherbb.bettersound.client.sound.ModSoundManager;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
+import com.witcherbb.bettersound.client.network.ClientPacketHandlers;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import java.util.function.Supplier;
 
 public record CNBSReloadPacket() {
+
     public void encode(FriendlyByteBuf buf) {
     }
 
@@ -16,13 +14,7 @@ public record CNBSReloadPacket() {
         return new CNBSReloadPacket();
     }
 
-    public static void handle(CNBSReloadPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            ModSoundManager.INSTANCE.getNbsLoader().load();
-            if (mc.player != null) {
-                mc.player.sendSystemMessage(Component.translatable("bettersound.nbs.loadscs").withStyle(ChatFormatting.GREEN));
-            }
-        });
+    public static void handle(CNBSReloadPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> ClientPacketHandlers.nbsReload(packet));
     }
 }

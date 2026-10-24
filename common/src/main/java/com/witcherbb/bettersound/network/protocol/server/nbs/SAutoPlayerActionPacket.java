@@ -1,16 +1,19 @@
 package com.witcherbb.bettersound.network.protocol.server.nbs;
 
-import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.function.Supplier;
 
 public record SAutoPlayerActionPacket(BlockPos pos, Action action) {
     public enum Action {
@@ -34,9 +37,9 @@ public record SAutoPlayerActionPacket(BlockPos pos, Action action) {
         return new SAutoPlayerActionPacket(buf.readBlockPos(), buf.readEnum(Action.class));
     }
 
-    public static void handle(SAutoPlayerActionPacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            ServerPlayer player = ctx.sender();
+    public static void handle(SAutoPlayerActionPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> {
+            Player player = ctx.get().getPlayer();
             if (player == null) return;
             Level level = player.level();
             BlockPos target = packet.pos;

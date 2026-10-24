@@ -1,16 +1,18 @@
 package com.witcherbb.bettersound.network.protocol.server;
 
-import com.witcherbb.bettersound.network.PacketContext;
 
 import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.blocks.entity.ExampleBlockEntity;
 import com.witcherbb.bettersound.menu.inventory.ExampleMenu;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Supplier;
 
 public record SExampleNameChangedPacket(String name) {
 
@@ -22,9 +24,9 @@ public record SExampleNameChangedPacket(String name) {
 		return new SExampleNameChangedPacket(buf.toString(StandardCharsets.UTF_8));
 	}
 
-	public static void handle(SExampleNameChangedPacket packet, PacketContext ctx) {
-		ctx.enqueueWork(() -> {
-			ServerPlayer sender = ctx.sender();
+	public static void handle(SExampleNameChangedPacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+		ctx.get().queue(() -> {
+			Player sender = ctx.get().getPlayer();
 			if (sender == null) return;
 			//Do Stuff
 			AbstractContainerMenu abstractContainerMenu = sender.containerMenu;

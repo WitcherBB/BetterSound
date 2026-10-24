@@ -1,13 +1,14 @@
 package com.witcherbb.bettersound.network.protocol.client.piano;
 
-import com.witcherbb.bettersound.client.sound.ModSoundManager;
-import com.witcherbb.bettersound.network.PacketContext;
+import com.witcherbb.bettersound.client.network.ClientPacketHandlers;
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public record CPianoStopSingleNotePacket(UUID playerUUID, BlockPos playingPos, int tone) {
+
     public void encode(FriendlyByteBuf buf) {
         buf.writeBoolean(this.playerUUID == null);
         if (this.playerUUID != null) {
@@ -22,9 +23,7 @@ public record CPianoStopSingleNotePacket(UUID playerUUID, BlockPos playingPos, i
         return new CPianoStopSingleNotePacket(isUUIDNull ? null : buf.readUUID(), buf.readBlockPos(), buf.readVarInt());
     }
 
-    public static void handle(CPianoStopSingleNotePacket packet, PacketContext ctx) {
-        ctx.enqueueWork(() -> {
-            ModSoundManager.INSTANCE.tryToStopPianoSound(packet.playerUUID, packet.playingPos, packet.tone);
-        });
+    public static void handle(CPianoStopSingleNotePacket packet, Supplier<NetworkManager.PacketContext> ctx) {
+        ctx.get().queue(() -> ClientPacketHandlers.pianoStopSingleNote(packet));
     }
 }
