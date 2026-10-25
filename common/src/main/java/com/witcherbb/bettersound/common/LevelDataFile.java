@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class LevelDataFile<T> {
@@ -71,7 +69,13 @@ public class LevelDataFile<T> {
 //			Writer writer = new FileWriter(newFile, false);
 //			writer.write("{}");
 //			writer.close();
-		levelDataFile.dataFile = newFile;
+		// 空nbt文件写入空tag
+		try {
+			NbtIo.write(new CompoundTag(), newFile);
+		} catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        levelDataFile.dataFile = newFile;
 	}
 
 	public void wirteToNbt(T t) {
