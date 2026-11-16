@@ -19,7 +19,6 @@
 !gradle/**
 !bugs.md
 !build.gradle
-!changelog.txt
 !gradle.properties
 !gradlew
 !gradlew.bat
