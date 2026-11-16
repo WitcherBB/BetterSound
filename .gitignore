@@ -35,6 +35,8 @@ run/
 run-data/
 generated/
 .idea/
+.eclipse/
+.vscode/
 
 # 开发自使用
 /common/src/main/java/com/witcherbb/bettersound/custom/Impl/
