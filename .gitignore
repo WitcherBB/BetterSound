@@ -39,5 +39,5 @@ generated/
 .vscode/
 
 # 开发自使用
-/common/src/main/java/com/witcherbb/bettersound/custom/Impl/
+/common/src/main/java/com/witcherbb/bettersound/custom/impl/
 /common/src/main/dev-resources/
