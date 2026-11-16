@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/Java-17-orange?logo=openjdk" alt="Java">
   <img src="https://img.shields.io/badge/最新版本-1.20.1--0.0.0.0--demo-brightgreen" alt="Latest Release">
   <img src="https://img.shields.io/badge/状态-Demo-yellow" alt="Status">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
 </p>
 
 ---
@@ -23,9 +24,6 @@
 - [指令速查](#指令速查)
 - [技术架构](#技术架构)
 - [开发者指南](#开发者指南)
-  - [调试时实时查看内存分配（VSCode）](#调试时实时查看内存分配vscode)
-- [版本记录](#版本记录)
-- [已知问题](#已知问题)
 - [开源协议](#开源协议)
 - [致谢](#致谢)
 
@@ -215,40 +213,19 @@ src/main/resources/
 | `./gradlew cleanCache` | 清理 `build/tmp/.cache/expanded`（修改 Mixin 后映射异常时可试） |
 | `./gradlew publish` | 发布 jar 到本地 Maven 仓库（`mcmodsrepo/`，由 `build.gradle` 的 publishing 块配置） |
 
-### 调试时实时查看内存分配（VSCode）
-
-VSCode 的 Java 调试器只提供断点/变量/调用栈，没有内存视图，因此本仓库自带一套基于 JDK 原生能力的实时内存看板：
-
-1. **F5 选择 `runClient+Mem`** 启动客户端（与原 `runClient` 完全一致，只多出诊断参数；用原 `runClient` 启动也能被自动识别）；
-2. **Ctrl+Shift+P → Tasks: Run Task → 实时内存看板**，每 2 秒刷新堆占用、各内存池、GC 次数与停顿、堆净增长、堆外直接缓冲区与趋势曲线；
-3. 需要定位具体对象时，再运行任务 **导出堆快照(.hprof)** 或 **类直方图(GC.class_histogram)**。
-
-实现细节、参数、常见问题见 [`tools/mem-monitor/README.md`](tools/mem-monitor/README.md)。
-
 ### 版本配置
 
 关键版本集中在 `gradle.properties`：Minecraft `1.20.1`、Forge `47.3.5`、Parchment `2023.09.03-1.20.1`、modid `bettersound`。
 
 ---
 
-## 版本记录
-
-| 版本 | 状态 | 说明 |
-|------|------|------|
-| `1.20.1-0.0.0.0-demo` | Demo | 首个演示版本：钢琴/延音/琴凳、NBS 指令播放、唱片机控制器、音乐小屋结构、9 张唱片 |
-
----
-
-## 已知问题
-
-- 从唱片机槽位取出唱片时，可能出现一个“假物品”（会自动消失，不影响正常使用）——见 `bugs.md`。
-- 模组仍处于 Demo 阶段，部分功能（如钢琴 UI 内导入乐谱）尚未完成。
-
----
-
 ## 开源协议
 
-> ⚠️ 待确认：构建配置（`gradle.properties` / `mods.toml`）声明的模组许可证为 **MIT**，但仓库根目录的 `LICENSE.txt` 是 Forge 的 **LGPL-2.1** 许可原文（ForgeGradle MDK 模板遗留）。正式发布前请确认实际采用的许可证，并替换 `LICENSE.txt` 与徽章。
+本模组的**源代码**以 [MIT 协议](LICENSE) 发布，Copyright (c) 2024-2026 WitcherBB。
+
+- ✅ 可自由使用、修改、再分发，也可用于整合包与服务器（免费或收费服务器均可，无需另行申请授权）
+- ✅ 可用于闭源衍生项目
+- ⚠️ 唯一要求：保留 `LICENSE` 中的版权声明
 
 ---
 

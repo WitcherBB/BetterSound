@@ -22,7 +22,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public String getRefMapperConfig() {
-        return "bettersound.refmap.json";
+        return null;
     }
 
     @Override

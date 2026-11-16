@@ -6,6 +6,8 @@ import com.witcherbb.bettersound.blocks.entity.ExampleBlockEntity;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SExampleNameChangedPacket;
 import com.witcherbb.bettersound.menu.inventory.ExampleMenu;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -18,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+@Environment(EnvType.CLIENT)
 public class ExampleScreen extends AbstractContainerScreen<ExampleMenu> {
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/example.png");
 	private EditBox editBox;

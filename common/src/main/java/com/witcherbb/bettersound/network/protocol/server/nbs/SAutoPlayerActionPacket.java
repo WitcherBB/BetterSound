@@ -8,7 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,9 +48,9 @@ public record SAutoPlayerActionPacket(BlockPos pos, Action action) {
             }
             if (level.getBlockEntity(target) instanceof AutoPlayer autoPlayer) {
                 switch (packet.action) {
-                    case PLAY_ON -> autoPlayer.playNBSOn();
-                    case STOP -> autoPlayer.stopNBS();
-                    case PAUSE -> autoPlayer.pauseNBS();
+                    case PLAY_ON -> autoPlayer.playOn();
+                    case STOP -> autoPlayer.stop();
+                    case PAUSE -> autoPlayer.pause();
                 }
             } else {
                 player.sendSystemMessage(Component.translatable("wrong.bettersound.nbs.isnotautoplayer").withStyle(ChatFormatting.RED));

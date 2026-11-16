@@ -3,6 +3,8 @@ package com.witcherbb.bettersound.client.gui.screen;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.gui.components.Button;
@@ -10,6 +12,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+@Environment(EnvType.CLIENT)
 public class BasicButton extends Button {
     protected BasicButton(int x, int y, int width, int height, Component message, OnPress onPress,
             CreateNarration createNarration) {

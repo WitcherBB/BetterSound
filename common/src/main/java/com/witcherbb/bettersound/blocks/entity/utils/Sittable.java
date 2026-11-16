@@ -23,10 +23,4 @@ public interface Sittable<BE extends BlockEntity> {
     void removePassenger(Player passenger);
 
     double getPassengersRidingOffset();
-
-    boolean isRemoved();
-
-    default BlockPos getBlockPos() {
-        return get().getBlockPos();
-    }
 }

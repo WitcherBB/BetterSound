@@ -69,6 +69,9 @@ public final class JukeboxEntityData extends BaseEntityData{
 	}
 
 	public void removeBlockPos(BlockPos pos) {
+		if (this.posList.isEmpty()) {
+			return;
+		}
 		this.posList.remove(pos);
 	}
 

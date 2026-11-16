@@ -1,6 +1,8 @@
 package com.witcherbb.bettersound.client.resources.sounds;
 
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -12,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
+@Environment(EnvType.CLIENT)
 public class PianoSoundInstance extends AbstractTickableSoundInstance implements SoundInstanceCallback {
     private int tickCount = 0;
     private int lastTick = 0;

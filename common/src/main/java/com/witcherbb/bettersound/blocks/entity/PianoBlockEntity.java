@@ -47,32 +47,17 @@ public class PianoBlockEntity extends AbstractPianoBlockEntity implements AutoPl
 
     // 播放状态只有一份，所以下面六个方法的实现是一样的：NBS 与 MIDI 的差别只在曲目来源与延音释放策略
     @Override
-    public void playNBSOn() {
+    public void playOn() {
         this.musicPlayer.playOn();
     }
 
     @Override
-    public void stopNBS() {
+    public void stop() {
         this.musicPlayer.stop();
     }
 
     @Override
-    public void pauseNBS() {
-        this.musicPlayer.pause();
-    }
-
-    @Override
-    public void playMidiOn() {
-        this.musicPlayer.playOn();
-    }
-
-    @Override
-    public void stopMidi() {
-        this.musicPlayer.stop();
-    }
-
-    @Override
-    public void pauseMidi() {
+    public void pause() {
         this.musicPlayer.pause();
     }
 }

@@ -7,6 +7,7 @@ import com.witcherbb.bettersound.music.midi.MidiTiming;
 import com.witcherbb.bettersound.music.nbs.AutoPlayer;
 import com.witcherbb.bettersound.network.MusicScoreTransfer;
 import com.witcherbb.bettersound.network.ScoreWire;
+import com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -22,7 +23,7 @@ import java.util.function.Supplier;
  * 客户端把编译好的 MIDI 曲目交给服务端播放。
  *
  * <p>MIDI 的时间轴在客户端就已经折算到游戏刻（见 {@link MidiTiming}），所以这里传的事件表
- * 与 NBS 的 {@link com.witcherbb.bettersound.network.protocol.server.nbs.SNBSPlayPacket}
+ * 与 NBS 的 {@link SNBSPlayPacket}
  * 结构一致，服务端拿到后直接喂给同一个播放引擎。tempo 固定为
  * {@link MidiTiming#TEMPO_AS_GAME_TICKS}，不需要占用网络字段。
  *

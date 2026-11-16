@@ -10,6 +10,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -43,8 +44,8 @@ public class SustainPedalBlock extends HorizontalDirectionalBlock {
         W_PEDAL_SHAPE = shapes[2];
     }
 
-    protected SustainPedalBlock(Properties pProperties) {
-        super(pProperties);
+    protected SustainPedalBlock() {
+        super(BlockBehaviour.Properties.copy(ModBlocks.PIANO_BLOCK.get()));
         this.registerDefaultState(getStateDefinition().any().setValue(POWERED, false).setValue(FACING, Direction.NORTH).setValue(STEPED, false));
     }
 

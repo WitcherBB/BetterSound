@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
@@ -29,8 +30,8 @@ public class ToneBlock extends AbstractPianoBlock implements SpectatorInvalidBlo
     public static IntegerProperty TONE = IntegerProperty.create("tones", 0, 87);
     public static BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    protected ToneBlock(Properties pProperties) {
-        super(pProperties);
+    protected ToneBlock() {
+        super(BlockBehaviour.Properties.copy(ModBlocks.PIANO_BLOCK.get()));
     }
 
     @Override

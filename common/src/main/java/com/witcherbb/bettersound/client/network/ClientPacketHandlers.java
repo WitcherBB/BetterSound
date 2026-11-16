@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.client.network;
 
 import com.witcherbb.bettersound.blocks.AbstractPianoBlock;
+import com.witcherbb.bettersound.blocks.ModBlocks;
 import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.entity.PianoBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
@@ -26,6 +27,8 @@ import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlayMultipl
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoPlaySingleNotePacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopNotesExceptPacket;
 import com.witcherbb.bettersound.network.protocol.client.piano.CPianoStopSingleNotePacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -36,18 +39,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * S2C（C 前缀）数据包的客户端处理逻辑。
- *
- * <p><b>为什么单独放一个类：</b>包类本身必须能在专用服务端上被链接/校验，而这里的代码会用到
- * {@code Minecraft}/{@code ClientLevel} 等 client-only 类型。一旦把它们留在包类的 {@code handle} 里，
- * 服务端只要给该包建方法句柄（比如 {@code ModNetwork.register} 里取 {@code XxxPacket::encode}），
- * JVM 就会链接整个类去校验方法体，从而加载 client-only 类，被 Forge 的 RuntimeDistCleaner 拦下：
- * {@code invalid dist DEDICATED_SERVER}。
- *
- * <p>所以包类只留纯数据 + encode/decode，客户端行为转发到这里；本类只会在客户端被加载执行，
- * 服务端既不会加载也不会链接它。
- */
+@Environment(EnvType.CLIENT)
 public final class ClientPacketHandlers {
 
     public static void betterJukeboxNameConfirm(CBetterJukeboxNameConfirmPacket packet) {
@@ -62,10 +54,10 @@ public final class ClientPacketHandlers {
             return;
         }
         BlockPos pos = packet.pos();
-        BlockEntity blockEntity = mc.level.getBlockEntity(pos);
-        if (blockEntity instanceof PianoBlockEntity) {
+        BlockState blockState = mc.level.getBlockState(pos);
+        if (blockState.is(ModBlocks.PIANO_BLOCK.get())) {
             mc.setScreen(new PianoBlockScreen(pos));
-        } else if (blockEntity instanceof ToneBlockEntity) {
+        } else if (blockState.is(ModBlocks.TONE_BLOCK.get())) {
             mc.setScreen(new ToneBlockScreen(pos));
         }
     }

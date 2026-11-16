@@ -2,8 +2,9 @@ package com.witcherbb.bettersound.mixins.mixins;
 
 import com.witcherbb.bettersound.blocks.entity.NoteBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
-import com.witcherbb.bettersound.common.platform.Platform;
 import com.witcherbb.bettersound.items.TunerItem;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -31,11 +32,12 @@ public abstract class NoteBlockMixin extends Block implements EntityBlock, Spect
 		super(pProperties);
 	}
 
-	@Inject(method = "use", at = @At(value = "HEAD"), cancellable = true)
+	@Inject(method = "use(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;",
+			at = @At(value = "HEAD"), cancellable = true)
 	private void use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, CallbackInfoReturnable<InteractionResult> cir) {
 		BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
 		if (!pLevel.isClientSide && blockEntity instanceof NoteBlockEntity && pPlayer.getItemInHand(pHand).getItem() instanceof TunerItem) {
-			Platform.hooks().openMenu((ServerPlayer) pPlayer, (MenuProvider) blockEntity, pPos);
+			MenuRegistry.openExtendedMenu((ServerPlayer) pPlayer, (ExtendedMenuProvider) blockEntity);
 			cir.setReturnValue(InteractionResult.CONSUME);
 		}
 	}

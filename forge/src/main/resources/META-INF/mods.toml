@@ -65,7 +65,7 @@ description="${description}"
 [[dependencies.bettersound]]
     modId="architectury"
     mandatory=true
-    versionRange="${architectury_api_version_range}"
+    versionRange="${architectury_version_range}"
     ordering="NONE"
     side="BOTH"
 

@@ -1,16 +1,14 @@
 package com.witcherbb.bettersound.blocks.entity;
 
 import com.witcherbb.bettersound.blocks.BetterJukeboxBlock;
-import com.witcherbb.bettersound.menu.ExtendedMenuProvider;
+import com.witcherbb.bettersound.blocks.entity.utils.ExtendedPositionMenuProvider;
 import com.witcherbb.bettersound.menu.inventory.BetterJukeboxMenu;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
@@ -35,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BetterJukeboxBlockEntity extends BlockEntity implements ContainerSingleItem, ExtendedMenuProvider {
+public class BetterJukeboxBlockEntity extends BlockEntity implements ContainerSingleItem, ExtendedPositionMenuProvider {
     @NotNull ItemStack recordItemStack = ItemStack.EMPTY;
 
     private int ticksSinceLastEvent;
@@ -206,10 +204,5 @@ public class BetterJukeboxBlockEntity extends BlockEntity implements ContainerSi
     @Override
     public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return new BetterJukeboxMenu(i, inventory, this);
-    }
-
-    @Override
-    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf) {
-        buf.writeBlockPos(this.worldPosition);
     }
 }

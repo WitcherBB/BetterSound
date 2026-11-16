@@ -6,6 +6,8 @@ import com.witcherbb.bettersound.blocks.entity.NoteBlockEntity;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SNoteBlockPlayNotePacket;
 import com.witcherbb.bettersound.menu.inventory.NoteBlockMenu;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class NoteBlockScreen extends AbstractContainerScreen<NoteBlockMenu> {
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/note_block_keyboard.png");
 	private static final List<Integer> BLACKS = List.of(0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24);

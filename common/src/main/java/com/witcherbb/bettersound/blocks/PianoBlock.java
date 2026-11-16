@@ -31,9 +31,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -166,8 +168,9 @@ public class PianoBlock extends AbstractPianoBlock implements CombinedBlock<Pian
         W_KEYBOARD_R_SHAPE = shapes[2];
     }
 
-    protected PianoBlock(Properties pProperties) {
-        super(pProperties);
+    protected PianoBlock() {
+        super(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(0.8F).ignitedByLava());
         this.registerDefaultState(this.stateDefinition.any().setValue(TONE, 0).setValue(PART, PianoPart.PEDAL).setValue(DELAY, false));
     }
 

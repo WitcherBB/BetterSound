@@ -4,12 +4,9 @@
 !*/
 !.gitignore
 !.gitattributes
+!.run/**
 
 # 源文件
-!build-logic/
-!build-logic/**
-!buildSrc/
-!buildSrc/**
 !common/
 !common/**
 !forge/
@@ -23,11 +20,9 @@
 !bugs.md
 !build.gradle
 !changelog.txt
-!CREDITS.txt
 !gradle.properties
 !gradlew
 !gradlew.bat
-!icon.png
 !LICENSE
 !README.md
 !settings.gradle
@@ -41,3 +36,7 @@ run/
 run-data/
 generated/
 .idea/
+
+# 开发自使用
+/common/src/main/java/com/witcherbb/bettersound/custom/Impl/
+/common/src/main/dev-resources/

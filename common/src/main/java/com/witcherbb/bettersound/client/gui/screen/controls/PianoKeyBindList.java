@@ -10,9 +10,10 @@ import com.witcherbb.bettersound.ComponentModifier;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
 import com.witcherbb.bettersound.client.gui.screen.BasicButton;
-import com.witcherbb.bettersound.client.gui.screen.controls.PianoKeyBindList.KeyButton;
-import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
+import com.witcherbb.bettersound.platform.client.ClientHooks;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Environment(EnvType.CLIENT)
 public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindList.Entry> {
     static final Minecraft mc = Minecraft.getInstance();
     static final ModOptions modOptions = ModOptions.getOptions();
@@ -46,14 +48,12 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
     protected final int rowLeftMin;
     protected final PianoKeyBindsScreen keyBindsScreen;
     protected final List<PianoKeyEntry> keyEntries = new ArrayList<>();
-    protected String font;
     protected int whiteCountInRow;
     protected int keyboardWidth;
 
     public PianoKeyBindList(PianoKeyBindsScreen keyBindsScreen, Minecraft minecraft) {
         super(minecraft, keyBindsScreen.width, keyBindsScreen.height, 0, keyBindsScreen.height, 70);
         this.keyBindsScreen = keyBindsScreen;
-        this.font = "bettersound:fzjz";
         this.setRenderBackground(false);
         this.setRenderTopAndBottom(false);
 
@@ -335,23 +335,22 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
         }
 
         public void reload() {
-            this.keyButton.setMessage(ComponentModifier.start(this.key.getTranslatedKeyMessage())
-                    .withFont(font).end());
+            this.keyButton.setMessage(this.key.getTranslatedKeyMessage());
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
                 for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
                     if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) ||
-                        ClientPlatform.hooks().hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
+                            ClientHooks.hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
+                        break;
                     }
                 }
             }
 
             if (PianoKeyBindList.this.keyBindsScreen.selected != null && PianoKeyBindList.this.keyBindsScreen.selected == this.key) {
-                this.keyButton.setMessage(ComponentModifier.start(Component.literal("> <"))
-                        .withFont(font).end());
+                this.keyButton.setMessage(Component.literal("> <"));
             }
         }
     }
@@ -380,22 +379,22 @@ public class PianoKeyBindList extends ContainerObjectSelectionList<PianoKeyBindL
 
         @Override
         public void reload() {
-            this.keyname = ComponentModifier.start(this.key.getTranslatedKeyMessage())
-                    .withFont(font).end();
+            this.keyname = this.key.getTranslatedKeyMessage();
 
             this.textColor = 0x00D50E;
             if (!this.key.isUnbound()) {
                 for (Supplier<KeyMapping> keyMappingLazy : modOptions.keymappings) {
-                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) || ClientPlatform.hooks().hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
+                    if (this.key != keyMappingLazy.get() && this.key.same(keyMappingLazy.get()) ||
+                            ClientHooks.hasKeyModifierConflict(this.key, keyMappingLazy.get())) {
                         this.hasCollision = true;
                         this.textColor = 0xFF5F5F;
+                        break;
                     }
                 }
             }
 
             if (PianoKeyBindList.this.keyBindsScreen.selected != null && PianoKeyBindList.this.keyBindsScreen.selected == this.key) {
-                this.keyname = ComponentModifier.start(Component.literal("> <"))
-                        .withFont(font).end();
+                this.keyname = Component.literal("> <");
             }
 
             if (PianoKeyBindList.this.keyBindsScreen.selected == null && this.key.isUnbound()

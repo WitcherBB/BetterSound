@@ -2,13 +2,15 @@ package com.witcherbb.bettersound.client.gui.screen.controls;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.witcherbb.bettersound.client.ModOptions;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+@Environment(EnvType.CLIENT)
 public class PianoKeyBindsScreen extends Screen {
     protected final ModOptions modOptions = ModOptions.getOptions();
     private PianoKeyBindList keyBindList;

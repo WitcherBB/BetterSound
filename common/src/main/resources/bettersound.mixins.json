@@ -4,14 +4,13 @@
   "minVersion": "0.8",
   "package": "com.witcherbb.bettersound.mixins.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "bettersound.refmap.json",
   "plugin": "com.witcherbb.bettersound.mixins.mixins.MixinPlugin",
   "mixins": [
-    "BlockMixin",
     "EntityMixin",
     "NoteBlockMixin",
     "PlayerSittingMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "StructureTemplatePoolAccessor"
   ],
   "client": [
     "LivingEntityRendererMixin",

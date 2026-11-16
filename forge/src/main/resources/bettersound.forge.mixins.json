@@ -1,9 +1,8 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.witcherbb.bettersound.mixins.mixins",
+  "package": "com.witcherbb.bettersound.forge.mixins.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "bettersound.refmap.json",
   "mixins": [
   ],
   "client": [],

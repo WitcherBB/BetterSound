@@ -1,6 +1,5 @@
 package com.witcherbb.bettersound.music.midi;
 
-import com.witcherbb.bettersound.common.config.Configs;
 import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.AutoMusicPlayer;
 import com.witcherbb.bettersound.music.data.PianoSongTrack;
@@ -9,6 +8,7 @@ import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.MusicScoreTransfer;
 import com.witcherbb.bettersound.network.protocol.server.midi.SMidiPlayPacket;
+import com.witcherbb.bettersound.platform.CommonConfig;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
@@ -59,6 +59,6 @@ public class MidiPlayer {
      * <p>放在客户端算，是因为释放点要在编译期就折进事件表；0 表示不限制。
      */
     private static int maxSustainTicks(MidiSong song) {
-        return Math.max(0, Configs.midiMaxSustainBars()) * Math.max(1, song.barGameTicks);
+        return Math.max(0, CommonConfig.midiMaxSustainBars()) * Math.max(1, song.barGameTicks);
     }
 }

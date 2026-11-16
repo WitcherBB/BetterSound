@@ -4,7 +4,6 @@ package com.witcherbb.bettersound.network.protocol.server;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
@@ -32,9 +31,8 @@ public record SNoteBlockPlayNotePacket(int note, BlockPos pos) {
             Level level = sender.level();
             BlockPos pos = packet.pos;
             BlockState state = level.getBlockState(pos);
-            int _new = com.witcherbb.bettersound.common.platform.Platform.hooks().onNoteChange(level, pos, state, state.getValue(NoteBlock.NOTE), packet.note);
-            if (_new == -1) return;
-            state = state.setValue(NoteBlock.NOTE, _new);
+            if (packet.note == -1) return;
+            state = state.setValue(NoteBlock.NOTE, packet.note);
             level.setBlock(pos, state, NoteBlock.UPDATE_ALL);
             if (state.getValue(NoteBlock.INSTRUMENT).worksAboveNoteBlock() || level.getBlockState(pos.above()).isAir()) {
                 level.blockEvent(pos, state.getBlock(), 0, 0);

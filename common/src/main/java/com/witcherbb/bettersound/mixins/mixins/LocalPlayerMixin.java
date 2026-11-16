@@ -51,7 +51,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         }
     }
 
-    @Inject(method = "canStartSprinting", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "canStartSprinting()Z", at = @At("RETURN"), cancellable = true)
     public void canStartSprinting0(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(
                 !this.isSprinting() && this.hasEnoughImpulseToStartSprinting() && this.hasEnoughFoodToStartSprinting() && !this.isUsingItem() && !this.hasEffect(MobEffects.BLINDNESS) && (!this.isPassenger() || this.vehicleCanSprint(this.getVehicle())) && !this.isFallFlying()

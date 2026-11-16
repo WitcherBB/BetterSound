@@ -2,14 +2,17 @@ package com.witcherbb.bettersound.client;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.Constants;
 import com.witcherbb.bettersound.client.gui.PianoUtil;
-import com.witcherbb.bettersound.common.platform.client.ClientPlatform;
+import com.witcherbb.bettersound.platform.client.ClientHooks;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.FileToIdConverter;
@@ -22,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public final class ModOptions {
     static final Logger LOGGER = LogUtils.getLogger();
     static final Gson GSON = new Gson();
@@ -35,13 +39,13 @@ public final class ModOptions {
     private static final Integer[] WHITE_KEYS;
 
     private final Map<Supplier<KeyMapping>, Integer> pianokeys = new LinkedHashMap<>();
-    private final Supplier<KeyMapping> keyPianoSustainPedal = () ->
-            ClientPlatform.hooks().createGuiKeyMapping(
+    private final Supplier<KeyMapping> keyPianoSustainPedal = Suppliers.memoize(() ->
+            ClientHooks.createGuiKeyMapping(
                     "key.bettersound.piano_pedal",
                     InputConstants.Type.KEYSYM,
                     GLFW.GLFW_KEY_SPACE,
                     "key.categories.bettersound.keyboard"
-            );
+            ));
 
     public final List<Supplier<KeyMapping>> keymappings = new ArrayList<>();
 
@@ -58,35 +62,35 @@ public final class ModOptions {
         int whiteCount = 0;
         int blackCount = 0;
         for (int i = 0; i < 27; i++) {
-            pianokeys.put(() ->
-                    ClientPlatform.hooks().createGuiKeyMapping(
+            pianokeys.put(Suppliers.memoize(() ->
+                    ClientHooks.createGuiKeyMapping(
                             "key.bettersound.keyboard.key",
                             InputConstants.Type.KEYSYM,
                             GLFW.GLFW_KEY_UNKNOWN,
                             "key.categories.bettersound.keyboard"
-                    ), i);
+                    )), i);
         }
         for (int i = 27; i < 66; i++) {
             try {
                 int key = PianoUtil.isBlackey(i) ? BLACK_KEYS[blackCount++] : WHITE_KEYS[whiteCount++];
-                pianokeys.put(() ->
-                        ClientPlatform.hooks().createGuiKeyMapping(
+                pianokeys.put(Suppliers.memoize(() ->
+                        ClientHooks.createGuiKeyMapping(
                                 "key.bettersound.keyboard.key",
                                 InputConstants.Type.KEYSYM,
                                 key,
                                 "key.categories.bettersound.keyboard"
-                        ), i);
+                        )), i);
             } catch (IndexOutOfBoundsException ignored) {
             }
         }
         for (int i = 66; i < 88; i++) {
-            pianokeys.put(() ->
-                    ClientPlatform.hooks().createGuiKeyMapping(
+            pianokeys.put(Suppliers.memoize(() ->
+                    ClientHooks.createGuiKeyMapping(
                             "key.bettersound.keyboard.key",
                             InputConstants.Type.KEYSYM,
                             GLFW.GLFW_KEY_UNKNOWN,
                             "key.categories.bettersound.keyboard"
-                    ), i);
+                    )), i);
         }
         keymappings.addAll(pianokeys.keySet());
         keymappings.add(keyPianoSustainPedal);
@@ -160,17 +164,17 @@ public final class ModOptions {
     private void processKeyMapping(OptionAccess accessor) {
         this.pianokeys.forEach((keyMappingLazy, tone) -> {
             KeyMapping mapping = keyMappingLazy.get();
-            String s = ClientPlatform.hooks().serializeKeyMapping(mapping);
+            String s = ClientHooks.serializeKeyMapping(mapping);
             String s1 = accessor.get("key_" + mapping.getName() + "." + tone, s);
             if (!s.equals(s1)) {
-                ClientPlatform.hooks().applySerializedKeyMapping(mapping, s1);
+                ClientHooks.applySerializedKeyMapping(mapping, s1);
             }
         });
         KeyMapping pedal = keyPianoSustainPedal.get();
-        String s = ClientPlatform.hooks().serializeKeyMapping(pedal);
+        String s = ClientHooks.serializeKeyMapping(pedal);
         String s1 = accessor.get("key_" + pedal.getName(), s);
         if (!s.equals(s1)) {
-            ClientPlatform.hooks().applySerializedKeyMapping(pedal, s1);
+            ClientHooks.applySerializedKeyMapping(pedal, s1);
         }
     }
 
@@ -178,10 +182,10 @@ public final class ModOptions {
     private void writeKeyMappings(java.util.function.BiConsumer<String, String> writer) {
         this.pianokeys.forEach((keyMappingLazy, tone) -> {
             KeyMapping mapping = keyMappingLazy.get();
-            writer.accept("key_" + mapping.getName() + "." + tone, ClientPlatform.hooks().serializeKeyMapping(mapping));
+            writer.accept("key_" + mapping.getName() + "." + tone, ClientHooks.serializeKeyMapping(mapping));
         });
         KeyMapping pedal = keyPianoSustainPedal.get();
-        writer.accept("key_" + pedal.getName(), ClientPlatform.hooks().serializeKeyMapping(pedal));
+        writer.accept("key_" + pedal.getName(), ClientHooks.serializeKeyMapping(pedal));
     }
 
     public void setKey(KeyMapping pKeyBinding, InputConstants.Key pInput) {

@@ -6,6 +6,7 @@ import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.SpectatorInvalidBlock;
 import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -60,7 +61,7 @@ public class JukeboxControllerBlock extends BaseEntityBlock implements Spectator
         BlockEntity entity = level.getBlockEntity(pos);
 		if (!level.isClientSide()){
 			if (entity instanceof JukeboxControllerBlockEntity jukeboxControllerBlockEntity) {
-				com.witcherbb.bettersound.common.platform.Platform.hooks().openMenu((ServerPlayer) player, jukeboxControllerBlockEntity, pos);
+				MenuRegistry.openExtendedMenu((ServerPlayer) player, jukeboxControllerBlockEntity);
 			} else {
 				throw new IllegalStateException("Our Container provider is missing");
 			}

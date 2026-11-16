@@ -1,28 +1,30 @@
 package com.witcherbb.bettersound.client.renderer.blockentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.witcherbb.bettersound.blocks.PianoBlock;
 import com.witcherbb.bettersound.blocks.ToneBlock;
 import com.witcherbb.bettersound.blocks.entity.ToneBlockEntity;
 import com.witcherbb.bettersound.client.util.Utils;
+import com.witcherbb.bettersound.items.ModItems;
+import com.witcherbb.bettersound.platform.client.ClientConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
+@Environment(EnvType.CLIENT)
 public class ToneRenderer implements BlockEntityRenderer<ToneBlockEntity> {
     @Override
     public void render(ToneBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
-        if (!com.witcherbb.bettersound.common.config.Configs.showTone()) return;
+        if (!ClientConfig.showTone()) return;
         Level level = pBlockEntity.getLevel();
         Player player = Minecraft.getInstance().player;
-        if (level != null) {
-            if (player != null && Utils.aimedBlock(player, pBlockEntity.getBlockPos(), ToneBlock.class)) {
+        if (level != null && player != null) {
+            boolean mainHandTakingTuner = player.getMainHandItem().is(ModItems.ITEM_TUNER.get());
+            if (Utils.aimedBlock(player, pBlockEntity.getBlockPos(), ToneBlock.class) && mainHandTakingTuner) {
                 pPoseStack.pushPose();
                 pPoseStack.translate(0.5, 1.5, 0.5);
                 pPoseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());

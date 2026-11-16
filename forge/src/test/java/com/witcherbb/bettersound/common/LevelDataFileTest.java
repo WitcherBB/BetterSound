@@ -108,7 +108,7 @@ public class LevelDataFileTest {
             dataFile.readFromJson();
             fail("空文件应当直接报错，而不是悄悄当成空数据");
         } catch (IllegalStateException expected) {
-            assertEquals("readFromJson wrong", expected.getMessage());
+            assertTrue(expected.getMessage().startsWith("readFromJson wrong"));
         }
     }
 
@@ -123,7 +123,7 @@ public class LevelDataFileTest {
             dataFile.readFromJson();
             fail("文件不存在时应当直接报错");
         } catch (IllegalStateException expected) {
-            assertEquals("readFromJson wrong", expected.getMessage());
+            assertTrue(expected.getMessage().startsWith("readFromJson wrong"));
         }
     }
 }

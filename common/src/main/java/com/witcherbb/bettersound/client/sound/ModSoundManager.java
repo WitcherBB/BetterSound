@@ -4,6 +4,8 @@ import com.witcherbb.bettersound.client.util.PianoSoundMap;
 import com.witcherbb.bettersound.client.resources.sounds.PianoSoundInstance;
 import com.witcherbb.bettersound.music.midi.MidiLoader;
 import com.witcherbb.bettersound.music.nbs.NBSLoader;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
@@ -12,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 import java.util.UUID;
 
+@Environment(EnvType.CLIENT)
 public class ModSoundManager {
     public static final ModSoundManager INSTANCE = new ModSoundManager();
 

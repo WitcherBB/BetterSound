@@ -1,39 +1,136 @@
 plugins {
-    id 'multiloader-loader'
-    id 'fabric-loom'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "dev.architectury:architectury-fabric:${architectury_api_version}"
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":common")
+
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
 }
 
 loom {
-    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
-        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
-    }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+//    mixin {
+//        defaultRefmapName = "${mod_id}-fabric.refmap.json"
+//    }
     runs {
-        client {
+        // task datagen
+        datagen {
             client()
-            setConfigName("Fabric Client")
-            ideConfigGenerated(true)
-            runDir("run")
+            name = "Fabric Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(':common').file('src/main/generated')}"
+            vmArg "-Dfabric-api.datagen.modid=${mod_id}"
+            runDir "build/datagen"
         }
-        server {
-            server()
-            setConfigName("Fabric Server")
-            ideConfigGenerated(true)
-            runDir("run")
+    }
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
+
+//sourceSets.main.resources { srcDir(project(':common').file('src/main/generated/resources')) }
+
+dependencies {
+    testImplementation project(':common')
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modApi "dev.architectury:architectury-fabric:${architectury_version}"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
+
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    // dependents
+    // YACL
+    modImplementation "dev.isxander:yet-another-config-lib:${yacl_version}+${minecraft_version}-fabric"
+    // Configured
+    runtimeOnly "com.electronwill.night-config:core:3.6.4"
+    runtimeOnly "com.electronwill.night-config:toml:3.6.4"
+    modImplementation "curse.maven:configured-457570:5180902"
+    // Mod Menu
+    modImplementation "com.terraformersmc:modmenu:${modmenu_version}"
+    // JEI
+    modLocalRuntime "mezz.jei:jei-${minecraft_version}-fabric:15.3.0.4"
+}
+
+processResources {
+    var expandProps = [
+            'version'                           : version,
+            'group'                             : project.group, //Else we target the task's group.
+            'minecraft_version'                 : minecraft_version,
+            'minecraft_version_range'           : minecraft_version_range,
+            'fabric_version'                    : fabric_version,
+            'fabric_loader_version'             : fabric_loader_version,
+            'mod_name'                          : mod_name,
+            'mod_author'                        : mod_author,
+            'mod_id'                            : mod_id,
+            'license'                           : license,
+            'description'                       : project.description,
+            "forge_version"                     : forge_version,
+            "forge_loader_version_range"        : forge_loader_version_range,
+            'credits'                           : credits,
+            'java_version'                      : java_version,
+            'architectury_version_range'        : architectury_version_range,
+            'yacl_version'                      : yacl_version
+    ]
+
+    filesMatching(["fabric.mod.json", "bettersound.fabric.mixins.json"]) {
+        expand expandProps
+    }
+
+    inputs.properties expandProps
+
+    from(project(':common').file('src/main/resources')) {
+        include 'pack.mcmeta', 'logo.png'
+    }
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier.set("dev-shadow")
+}
+
+remapJar {
+    injectAccessWidener = true
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+sourcesJar {
+    def commonSources = project(':common').sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = rootProject.mod_name + "-" + project.name
+            from components.java
         }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}
+
+tasks.named('runDatagen') {
+    doFirst {
+        delete project(':common').file('src/main/generated')
     }
 }

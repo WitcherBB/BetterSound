@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements BlockExtender {
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/StateDefinition$Builder;create(Ljava/util/function/Function;Lnet/minecraft/world/level/block/state/StateDefinition$Factory;)Lnet/minecraft/world/level/block/state/StateDefinition;"))
+    @Redirect(method = "<init>(Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/StateDefinition$Builder;create(Ljava/util/function/Function;Lnet/minecraft/world/level/block/state/StateDefinition$Factory;)Lnet/minecraft/world/level/block/state/StateDefinition;"))
     public <O, S extends StateHolder<O, S>> StateDefinition<O, S> bettersound$init(StateDefinition.Builder<O, S> builder, Function<O, S> stateValueFunction, StateDefinition.Factory<O, S> stateFunction) {
         return builder.create(stateValueFunction, (StateDefinition.Factory<O, S>) this.getStateFactory());
     }

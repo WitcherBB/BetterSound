@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import dev.architectury.utils.GameInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
@@ -31,7 +32,7 @@ public class LevelDataFile<T> {
 	}
 
 	public static <T> void create(String levelName, LevelDataFile<T> levelDataFile) {
-		MinecraftServer server = com.witcherbb.bettersound.common.platform.Platform.hooks().currentServer();
+		MinecraftServer server = GameInstance.getServer();
 		// 用 MinecraftServer#getWorldPath 取存档目录：它内部按平台给出正确路径
 		//   单人（内置服务端）：<gameDir>/saves/<levelName>/data
 		//   专用服务端：        <gameDir>/<levelName>/data

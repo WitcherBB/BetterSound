@@ -20,15 +20,9 @@ public interface AutoPlayer {
     /** MIDI 曲目入口 */
     MidiPlayer getMidiPlayer();
 
-    void playNBSOn();
+    void playOn();
 
-    void stopNBS();
+    void stop();
 
-    void pauseNBS();
-
-    void playMidiOn();
-
-    void stopMidi();
-
-    void pauseMidi();
+    void pause();
 }

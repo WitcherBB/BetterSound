@@ -1,18 +1,20 @@
 package com.witcherbb.bettersound.blocks.entity;
 
 import com.mojang.serialization.Codec;
+import com.witcherbb.bettersound.blocks.entity.utils.ExtendedPositionMenuProvider;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.common.data.impl.JukeboxEntityDataProvider;
 import com.witcherbb.bettersound.menu.inventory.JukeboxControllerMenu;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -22,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class JukeboxControllerBlockEntity extends BlockEntity implements MenuProvider, TickableBlockEntity {
+public class JukeboxControllerBlockEntity extends BlockEntity implements ExtendedPositionMenuProvider, TickableBlockEntity {
 	public static final Codec<List<BlockPos>> POS_CODEC = BlockPos.CODEC.listOf();
 	private String name = "";
 	private static final JukeboxEntityDataProvider provider = new JukeboxEntityDataProvider();
@@ -128,6 +129,9 @@ public class JukeboxControllerBlockEntity extends BlockEntity implements MenuPro
 	public static void removePos(String name, String dimension, BlockPos blockPos, Level level) {
 		// 直接在this.jukeboxPoses里面remove
 		var jdDT = provider.get(name, dimension);
+		if (jdDT == null) {
+			return;
+		}
 		jdDT.removeBlockPos(blockPos);
 		var ctrlList = jdDT.getControllerPosList();
 		for (BlockPos ctPos : ctrlList) {

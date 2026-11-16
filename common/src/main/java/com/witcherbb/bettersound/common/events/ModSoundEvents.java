@@ -1,8 +1,9 @@
 package com.witcherbb.bettersound.common.events;
 
+import com.witcherbb.bettersound.BetterSoundCommon;
 import com.witcherbb.bettersound.Constants;
-import com.witcherbb.bettersound.common.registry.ModRegistrar;
-import com.witcherbb.bettersound.common.registry.RegistryRef;
+import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -12,41 +13,48 @@ import java.util.List;
 
 /** 音效登记表（含 88 键的钢琴音源）。 */
 public final class ModSoundEvents {
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+            DeferredRegister.create(Constants.MOD_ID, Registries.SOUND_EVENT);
 
-    public static RegistryRef<SoundEvent> MOD_MUSIC_SCHOOL_SONG;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_HAPPY_FLY_TO_FORWARD;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_EXCITED1;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_EXCITED2;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_AWARDING;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_ENDING;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_SMALL_TOWN;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_SYA;
-    public static RegistryRef<SoundEvent> MOD_MUSIC_LDCXQ;
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_SCHOOL_SONG =
+//            registerSoundEvent("music.school_song");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_HAPPY_FLY_TO_FORWARD =
+//            registerSoundEvent("music.happy_to_fly_forward");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_EXCITED1 =
+//            registerSoundEvent("music.excited1");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_EXCITED2 =
+//            registerSoundEvent("music.excited2");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_AWARDING =
+//            registerSoundEvent("music.awarding");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_ENDING =
+//            registerSoundEvent("music.ending");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_SMALL_TOWN =
+//            registerSoundEvent("music.small_town");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_SYA =
+//            registerSoundEvent("music.sya");
+//    public static final RegistrySupplier<SoundEvent> MOD_MUSIC_LDCXQ =
+//            registerSoundEvent("music.ldcxq");
 
     /** 钢琴音源，索引即音调（tone）。 */
-    public static final List<RegistryRef<SoundEvent>> pianoSounds = new ArrayList<>();
-
+    public static final List<RegistrySupplier<SoundEvent>> pianoSounds = new ArrayList<>();
     private static final List<String> TONES = buildTones();
 
-    public static void register(ModRegistrar registrar) {
-        MOD_MUSIC_SCHOOL_SONG = registerSoundEvent(registrar, "music.school_song");
-        MOD_MUSIC_HAPPY_FLY_TO_FORWARD = registerSoundEvent(registrar, "music.happy_to_fly_forward");
-        MOD_MUSIC_EXCITED1 = registerSoundEvent(registrar, "music.excited1");
-        MOD_MUSIC_EXCITED2 = registerSoundEvent(registrar, "music.excited2");
-        MOD_MUSIC_AWARDING = registerSoundEvent(registrar, "music.awarding");
-        MOD_MUSIC_ENDING = registerSoundEvent(registrar, "music.ending");
-        MOD_MUSIC_SMALL_TOWN = registerSoundEvent(registrar, "music.small_town");
-        MOD_MUSIC_SYA = registerSoundEvent(registrar, "music.sya");
-        MOD_MUSIC_LDCXQ = registerSoundEvent(registrar, "music.ldcxq");
-
+    static {
         for (String tone : TONES) {
-            pianoSounds.add(registerSoundEvent(registrar, "note.mda_piano.note_%s".formatted(tone)));
+            pianoSounds.add(registerSoundEvent("note.mda_piano.note_%s".formatted(tone)));
         }
     }
 
-    private static RegistryRef<SoundEvent> registerSoundEvent(ModRegistrar registrar, String name) {
-        return registrar.register(Registries.SOUND_EVENT, name,
-                () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, name)));
+    public static void register() {
+        BetterSoundCommon.RECORD_ITEM_REGISTRY.forEach(supporter -> {
+            supporter.registerSoundEvents(SOUND_EVENTS);
+        });
+        SOUND_EVENTS.register();
+    }
+
+    private static RegistrySupplier<SoundEvent> registerSoundEvent(String name) {
+        return SOUND_EVENTS.register(name, () ->
+                SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, name)));
     }
 
     private static List<String> buildTones() {

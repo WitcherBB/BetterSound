@@ -7,6 +7,8 @@ import com.witcherbb.bettersound.common.utils.Util;
 import com.witcherbb.bettersound.menu.inventory.BetterJukeboxMenu;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.SBetterJukeboxNamePacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+@Environment(EnvType.CLIENT)
 public class BetterJukeboxScreen extends AbstractContainerScreen<BetterJukeboxMenu> {
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/jukebox.png");
 	private final BetterJukeboxBlockEntity blockEntity;

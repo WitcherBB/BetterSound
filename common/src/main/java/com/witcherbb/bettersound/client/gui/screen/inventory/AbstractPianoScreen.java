@@ -14,6 +14,8 @@ import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyPressedPacket;
 import com.witcherbb.bettersound.network.protocol.server.piano.SPianoKeyReleasedPacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -35,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@Environment(EnvType.CLIENT)
 public abstract class AbstractPianoScreen extends Screen {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/piano_keyboard.png");
     private static final int textureWidth = 300;
@@ -112,21 +115,6 @@ public abstract class AbstractPianoScreen extends Screen {
         pGuiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, 0, 300, 145, textureWidth, textureHeight);
         pGuiGraphics.blit(TEXTURE, this.leftPos + 14, this.topPos + 31, 1, 0, 145, 272, 4, textureWidth, textureHeight);
     }
-
-    // @Override
-    // protected void renderBg(@NotNull GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-    //     RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    //     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    //     RenderSystem.setShaderTexture(0, TEXTURE);
-
-    //     pGuiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, 0, 300, 145, textureWidth, textureHeight);
-    //     pGuiGraphics.blit(TEXTURE, this.leftPos + 14, this.topPos + 31, 1, 0, 145, 272, 4, textureWidth, textureHeight);
-    // }
-
-    // @Override
-    // protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-    //     pGuiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xe9e9e9, false);
-    // }
 
     private void initButton() {
         keys.clear();
@@ -252,8 +240,6 @@ public abstract class AbstractPianoScreen extends Screen {
 
     @Override
     public void onClose() {
-        // this.blockEntity.updateFirstWhiteKey(this);
-        // BlockPos pos = this.blockEntity.getBlockPos();
         BlockEntity blockEntity = this.minecraft.level.getBlockEntity(this.position);
         if (blockEntity instanceof PianoBlockEntity pianoBlockEntity) {
             BlockState state = pianoBlockEntity.getBlockState();

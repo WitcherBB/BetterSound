@@ -1,5 +1,6 @@
 package com.witcherbb.bettersound.blocks.entity;
 
+import com.witcherbb.bettersound.blocks.entity.utils.ExtendedPositionMenuProvider;
 import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.menu.inventory.ExampleMenu;
 import net.minecraft.core.BlockPos;
@@ -8,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ExampleBlockEntity extends BlockEntity implements MenuProvider, TickableBlockEntity {
+public class ExampleBlockEntity extends BlockEntity implements ExtendedPositionMenuProvider, TickableBlockEntity {
 
 	private String name = "";
 

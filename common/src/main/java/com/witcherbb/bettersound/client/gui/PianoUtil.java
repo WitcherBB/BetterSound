@@ -1,11 +1,14 @@
 package com.witcherbb.bettersound.client.gui;
 
 import com.google.common.collect.ImmutableList;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class PianoUtil {
     private static final List<Integer> BLACKS;
     private static final String[] keyNames = new String[]{

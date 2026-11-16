@@ -2,7 +2,6 @@ package com.witcherbb.bettersound.music;
 
 import com.mojang.logging.LogUtils;
 import com.witcherbb.bettersound.blocks.PianoBlock;
-import com.witcherbb.bettersound.common.config.Configs;
 import com.witcherbb.bettersound.exception.PlayerIsPlayingMusicException;
 import com.witcherbb.bettersound.music.data.Note;
 import com.witcherbb.bettersound.music.data.PianoSongTrack;
@@ -10,6 +9,7 @@ import com.witcherbb.bettersound.network.ModNetwork;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPausePacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSPlayOnPacket;
 import com.witcherbb.bettersound.network.protocol.client.nbs.CNBSStopPacket;
+import com.witcherbb.bettersound.platform.CommonConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -85,7 +85,7 @@ public class AutoMusicPlayer {
             List<Note> events = track.getNotes(tick);
             if (events == null) continue;
             // 小节线兜底：只有曲子里没有自带释放事件的（NBS）才走这条路
-            if (track.releaseOnBarLine() && tick % Math.round(track.subsectionLength() * Configs.releaseSubsections()) == 0) {
+            if (track.releaseOnBarLine() && tick % Math.round(track.subsectionLength() * CommonConfig.releaseSubsections()) == 0) {
                 this.stopNote();
             }
             this.dispatch(events);

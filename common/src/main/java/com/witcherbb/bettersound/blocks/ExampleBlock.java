@@ -5,6 +5,7 @@ import com.witcherbb.bettersound.blocks.entity.utils.TickableBlockEntity;
 import com.witcherbb.bettersound.blocks.extensions.CombinedBlock;
 import com.witcherbb.bettersound.blocks.state.properties.BlockPart;
 import com.witcherbb.bettersound.blocks.state.properties.ExamplePart;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -54,7 +55,7 @@ public class ExampleBlock extends BaseEntityBlock implements CombinedBlock<Examp
 		BlockEntity entity = pLevel.getBlockEntity(pPos);
 		if (!pLevel.isClientSide()){
 			if (entity instanceof ExampleBlockEntity exampleBlockEntity) {
-				com.witcherbb.bettersound.common.platform.Platform.hooks().openMenu((ServerPlayer) pPlayer, exampleBlockEntity, pPos);
+				MenuRegistry.openExtendedMenu((ServerPlayer) pPlayer, exampleBlockEntity);
 			} else {
 				throw new IllegalStateException("Our Container provider is missing");
 			}

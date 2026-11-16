@@ -1,16 +1,13 @@
 package com.witcherbb.bettersound.blocks;
 
-import com.mojang.serialization.MapCodec;
 import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
-import com.witcherbb.bettersound.common.platform.Platform;
-import com.witcherbb.bettersound.mixins.extenders.BlockExtender;
+import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.collect.ImmutableMap;
 import com.witcherbb.bettersound.blocks.entity.BetterJukeboxBlockEntity;
 import com.witcherbb.bettersound.blocks.entity.JukeboxControllerBlockEntity;
 
@@ -38,21 +35,16 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BetterJukeboxBlock extends BaseEntityBlock implements BlockExtender {
+public class BetterJukeboxBlock extends BaseEntityBlock {
     public static final BooleanProperty HAS_RECORD = BooleanProperty.create("has_record");
 
 	private static final VoxelShape betterSound$OUTSIDE = Shapes.block();
 	private static final VoxelShape betterSound$INSIDE = Block.box(1.0D, 14.0D, 1.0D, 15.0D, 16.0D, 15.0D);
 
-    protected BetterJukeboxBlock(Properties properties) {
-        super(properties);
+    protected BetterJukeboxBlock() {
+        super(BlockBehaviour.Properties.copy(Blocks.JUKEBOX));
         this.registerDefaultState(this.stateDefinition.any().setValue(HAS_RECORD, false));
     }
-
-	@Override
-	public StateDefinition.Factory<Block, BlockState> getStateFactory() {
-		return BetterJukeboxBlockState::new;
-	}
 
 	@Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -98,7 +90,7 @@ public class BetterJukeboxBlock extends BaseEntityBlock implements BlockExtender
 		if (!pLevel.isClientSide()) {
 			if (entity instanceof BetterJukeboxBlockEntity jukeboxBlockEntity) {
 				if (!jukeboxBlockEntity.isRecordPlaying()) {
-					Platform.hooks().openMenu((ServerPlayer) pPlayer, jukeboxBlockEntity);
+					MenuRegistry.openExtendedMenu((ServerPlayer) pPlayer, jukeboxBlockEntity);
 				}
 			} else {
 				throw new IllegalStateException("Our Container provider is missing");
@@ -108,27 +100,21 @@ public class BetterJukeboxBlock extends BaseEntityBlock implements BlockExtender
 	}
 
 	@Override
-	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-		return createTickerHelper(blockEntityType, ModBlockEntityTypes.BETTER_JUKEBOX_BLOCK_ENTITY_TYPE.get(), BetterJukeboxBlockEntity::tick);
+	public void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
+		if (!blockState.is(blockState2.getBlock())) {
+			BlockEntity blockEntity = level.getBlockEntity(blockPos);
+			if (blockEntity instanceof BetterJukeboxBlockEntity jukeboxBlockEntity) {
+				jukeboxBlockEntity.onRemove();
+				level.updateNeighbourForOutputSignal(blockPos, blockState.getBlock());
+				CompoundTag nbt = level.getBlockEntity(blockPos).getUpdateTag();
+				JukeboxControllerBlockEntity.removePos(nbt.getString("Name"), level.dimension().location().getPath(), blockPos, level);
+			}
+		}
+		super.onRemove(blockState, level, blockPos, blockState2, bl);
 	}
 
-	static class BetterJukeboxBlockState extends BlockState {
-		public BetterJukeboxBlockState(Block block, ImmutableMap<Property<?>, Comparable<?>> values, MapCodec<BlockState> propertiesCodec) {
-			super(block, values, propertiesCodec);
-		}
-
-		@Override
-		public void onRemove(Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-			if (!this.is(newState.getBlock())) {
-				BlockEntity blockEntity = level.getBlockEntity(pos);
-				if (blockEntity instanceof BetterJukeboxBlockEntity jukeboxBlockEntity) {
-					jukeboxBlockEntity.onRemove();
-					level.updateNeighbourForOutputSignal(pos, this.getBlock());
-					CompoundTag nbt = level.getBlockEntity(pos).getUpdateTag();
-					JukeboxControllerBlockEntity.removePos(nbt.getString("Name"), level.dimension().location().getPath(), pos, level);
-				}
-			}
-			super.onRemove(level, pos, newState, movedByPiston);
-		}
+	@Override
+	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+		return createTickerHelper(blockEntityType, ModBlockEntityTypes.BETTER_JUKEBOX_BLOCK_ENTITY_TYPE.get(), BetterJukeboxBlockEntity::tick);
 	}
 }

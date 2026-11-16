@@ -1,0 +1,48 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://github.com/WitcherBB",
+        "sources": "https://github.com/WitcherBB/BetterSound"
+    },
+    "license": "${license}",
+    "icon": "logo.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.witcherbb.bettersound.fabric.BetterSoundFabric"
+        ],
+        "client": [
+            "com.witcherbb.bettersound.fabric.BetterSoundFabricClient"
+        ],
+        "server": [
+            "com.witcherbb.bettersound.fabric.BetterSoundFabricServer"
+        ],
+        "fabric-datagen": [
+            "com.witcherbb.bettersound.fabric.data.DataGenerator"
+        ],
+        "modmenu": [
+            "com.witcherbb.bettersound.fabric.config.GUI"
+        ]
+    },
+    "mixins": [
+        "bettersound.mixins.json",
+        "bettersound.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric": "*",
+        "architectury": ">=9",
+        "minecraft": "${minecraft_version}",
+        "java": ">=17"
+    },
+    "recommends": {
+        "yet_another_config_lib_v3": ">=${yacl_version}"
+    }
+}

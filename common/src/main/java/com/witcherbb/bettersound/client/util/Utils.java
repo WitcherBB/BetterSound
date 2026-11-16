@@ -1,6 +1,7 @@
 package com.witcherbb.bettersound.client.util;
 
-import com.witcherbb.bettersound.blocks.PianoBlock;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
+@Environment(EnvType.CLIENT)
 public class Utils {
 
     public static <T extends Block> boolean aimedBlock(Player player, BlockPos aimedPos, Class<T> clazz) {
