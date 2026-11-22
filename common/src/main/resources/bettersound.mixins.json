@@ -6,15 +6,11 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "com.witcherbb.bettersound.mixins.mixins.MixinPlugin",
   "mixins": [
-    "EntityMixin",
+    "LivingEntityMixin",
     "NoteBlockMixin",
-    "PlayerSittingMixin",
-    "ServerPlayerMixin",
     "StructureTemplatePoolAccessor"
   ],
   "client": [
-    "LivingEntityRendererMixin",
-    "LocalPlayerMixin",
     "SoundEngineMixin"
   ],
   "injectors": {

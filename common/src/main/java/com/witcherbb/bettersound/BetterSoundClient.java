@@ -4,6 +4,7 @@ import com.witcherbb.bettersound.blocks.entity.ModBlockEntityTypes;
 import com.witcherbb.bettersound.client.ModOptions;
 import com.witcherbb.bettersound.client.particles.particle.BlackNoteParticle;
 import com.witcherbb.bettersound.client.renderer.blockentity.ToneRenderer;
+import com.witcherbb.bettersound.client.renderer.entity.ModEntityRenderers;
 import com.witcherbb.bettersound.client.sound.ModSoundManager;
 import com.witcherbb.bettersound.commands.Commands;
 import com.witcherbb.bettersound.items.ModItems;
@@ -26,6 +27,7 @@ public class BetterSoundClient {
         registerEventsHandler();
         // 创造模式物品栏注册
         ModCreativeTabs.register();
+        ModEntityRenderers.register();
         buildCreativeModeTabContents();
 
         ModSoundManager.INSTANCE.getNbsLoader().load();

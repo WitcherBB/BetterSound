@@ -30,8 +30,6 @@ public final class ModBlockEntityTypes {
             register("piano_block_entity", PianoBlockEntity::new, ModBlocks.PIANO_BLOCK);
     public static final RegistrySupplier<BlockEntityType<ToneBlockEntity>> TONE_BLOCK_ENTITY_TYPE =
             register("tone_block_entity", ToneBlockEntity::new, ModBlocks.TONE_BLOCK);
-    public static final RegistrySupplier<BlockEntityType<PianoStoolBlockEntity>> PIANO_STOOL_BLOCK_ENTITY_TYPE =
-            register("piano_stool_block_entity", PianoStoolBlockEntity::new, ModBlocks.PIANO_STOOL_BLOCK);
     public static final RegistrySupplier<BlockEntityType<BetterJukeboxBlockEntity>> BETTER_JUKEBOX_BLOCK_ENTITY_TYPE =
             register("better_jukebox_block_entity", BetterJukeboxBlockEntity::new , ModBlocks.BETTER_JUKEBOX_BLOCK);
 

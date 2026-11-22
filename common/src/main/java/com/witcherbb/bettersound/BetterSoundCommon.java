@@ -8,6 +8,7 @@ import com.witcherbb.bettersound.common.events.ModSoundEvents;
 import com.witcherbb.bettersound.common.init.DataManager;
 import com.witcherbb.bettersound.custom.RecordItemSupporter;
 import com.witcherbb.bettersound.custom.registries.RecordItemRegistry;
+import com.witcherbb.bettersound.entities.ModEntities;
 import com.witcherbb.bettersound.items.ModItems;
 import com.witcherbb.bettersound.menu.ModMenuTypes;
 import com.witcherbb.bettersound.network.ModNetwork;
@@ -50,6 +51,7 @@ public class BetterSoundCommon {
         ModSoundEvents.register();
         ModMenuTypes.register();
         ModParticleTypes.register();
+        ModEntities.register();
         ModBlocks.register();
         ModItems.register();
         ModBlockEntityTypes.register();
