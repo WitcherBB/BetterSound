@@ -42,6 +42,9 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modApi "dev.architectury:architectury-fabric:${architectury_version}"
 
+    modImplementation "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+    include "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 
